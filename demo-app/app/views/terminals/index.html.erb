@@ -1,0 +1,89 @@
+<pre id="output" style="height:300px; overflow:auto"></pre>
+<div class="row-fluid">
+	<form id="myForm" class="form-inline" method="POST" action="/terminals/execute">
+	  <input type="text" class="input-large" name="command" placeholder="Enter Command">
+	  <button type="submit" class="btn">Go</button>
+	  <button id="kill" class="btn">Kill</button>
+	</form>
+</div>
+
+<script> 
+	// wait for the DOM to be loaded 
+	$(document).ready(function() { 
+		// bind 'myForm' and provide a simple callback function 
+		$('#myForm').ajaxForm({ 
+			success: function(data) { fetchData(data) },
+			error: function() { alert("an error has occured") }
+		});
+
+		$("#kill").click(function(){
+			$.ajax ({
+				url: "/terminals/kill",
+				success: function(data){ fetchData(data) },
+				error: function() { alert("an error has occured") }
+			})
+		})
+		$.ajax({
+			type: "POST",
+			url: "/terminals/execute",
+			data: "",
+			success: function(data) { storePS1(data) }
+			, error: function() { alert("an error has occured") }
+		})
+		
+	});
+
+	var PS1
+	var objDiv = document.getElementById("output");
+
+	function storePS1(data) {
+		if (data != "") {
+			PS1 = data.replace("$","\\$").replace("@","\\@").replace(/(\n|\r)+$/, '')
+			console.log("PS1 found " + PS1 )
+			$("#output").append(data)
+			re1 = new RegExp("^.*" + PS1 + ".+" + PS1 + ".*$","m")
+			console.log("Regular exp - " + re1)
+		}
+		else {
+			setTimeout(function() {poll(storePS1)}, 3000)
+		}
+	}
+	
+	var Data = ""
+	var re1
+
+	function fetchData(data) {
+		if ( data != "") {
+			$("input[name='command']").val('')
+			console.log("Data received - " + data)
+			$("#output").append(data)
+			objDiv.scrollTop = objDiv.scrollHeight
+			Data += data
+		}
+		if ( !Data.match(re1) ) {
+			setTimeout(function() {poll(fetchData)}, 3000)
+		}
+		else {
+			Data = ""
+		}
+	}
+
+
+	function poll(func) {
+		$.ajax( {
+			url: "/terminals/get",
+			success : function(data, textStatus, jqXHR){
+				if ( data == "" ) {
+					setTimeout(function() {poll(func)}, 3000)
+				}
+				else {
+					func(data)
+				}
+			}
+			, error: function() { alert("an error has occured") }
+
+		})
+	}
+
+
+</script> 
