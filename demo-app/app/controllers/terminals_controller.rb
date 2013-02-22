@@ -9,13 +9,13 @@ class TerminalsController < ApplicationController
 
   def get
 	  http = Curl.get("http://localhost:3001/#{current_user}/get")
-	  render :text => http.body_str
+	  render :json => http.body_str
   end
 
   def execute
 	  #http = Curl.post("http://localhost:3001/#{current_user}", {:command => params[:command]})
 	  http = Curl.post("http://localhost:3001/#{current_user}/execute/#{params[:command]}")
-	  render :text => http.body_str
+	  render :json => http.body_str
   end
 
   def kill

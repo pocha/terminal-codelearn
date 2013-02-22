@@ -23,48 +23,29 @@
 				error: function() { alert("an error has occured") }
 			})
 		})
+
 		$.ajax({
-			type: "POST",
 			url: "/terminals/execute",
+			type: "POST",
 			data: "",
-			success: function(data) { storePS1(data) }
-			, error: function() { alert("an error has occured") }
+			success: function(data) { fetchData(data) },
+			error: function() { alert("an error has occured") }
 		})
 		
 	});
 
-	var PS1
 	var objDiv = document.getElementById("output");
 
-	function storePS1(data) {
-		if (data != "") {
-			PS1 = data.replace("$","\\$").replace("@","\\@").replace(/(\n|\r)+$/, '')
-			console.log("PS1 found " + PS1 )
-			$("#output").append(data)
-			re1 = new RegExp("^.*" + PS1 + ".+" + PS1 + ".*$","m")
-			console.log("Regular exp - " + re1)
-		}
-		else {
-			setTimeout(function() {poll(storePS1)}, 3000)
-		}
-	}
-	
-	var Data = ""
-	var re1
 
 	function fetchData(data) {
 		if ( data != "") {
 			$("input[name='command']").val('')
-			console.log("Data received - " + data)
-			$("#output").append(data)
+			console.log("Data received - " + data.content)
+			$("#output").append(data.content)
 			objDiv.scrollTop = objDiv.scrollHeight
-			Data += data
 		}
-		if ( !Data.match(re1) ) {
+		if ( data.status == "waiting" ) {
 			setTimeout(function() {poll(fetchData)}, 3000)
-		}
-		else {
-			Data = ""
 		}
 	}
 

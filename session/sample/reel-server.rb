@@ -1,6 +1,7 @@
 require 'reel'
 require '../lib/session'
 require 'stringio'
+require 'json'
 
 class Terminal_User
 	
@@ -9,10 +10,18 @@ class Terminal_User
 		@output = ""
 		@read_data = StringIO::new(@output)
 		@check_data = StringIO::new(@output)
-		@bash.outproc = lambda { |out| @output << out }
+		@bash.outproc = lambda {|out| @output << out }
 		@bash.errproc = lambda {|err| @output << err }
 		@bash._initialize
 		@bash.execute "su -l #{user} -c 'bash -i'"
+		sleep 1	
+		@bash.execute(" ")
+		loop do
+			@ps1 = @check_data.gets
+			break if !@ps1.nil? #hold till output got some data
+		end
+		puts "PS1 - #{@ps1}"
+		@ps1.gsub!("$","\\$")
 	end
 
 
@@ -20,6 +29,8 @@ class Terminal_User
 		puts "Executing command"
 		puts @bash.inspect
 		@bash.execute(command)
+
+		#the code below makes sure that the output is captured in a sequential manner
 		loop do
 			break if @check_data.read #hold till output got some data
 		end
@@ -30,7 +41,9 @@ class Terminal_User
 	end
 
 	def respond(request)
-		request.respond :ok, @read_data.read
+		data = @read_data.read
+		status = /(#{@ps1}|>\n)$/.match(data) ? "complete" : "waiting"
+		request.respond :ok, JSON.generate({:content => data, :status => status})
 	end
 	
 end
