@@ -1,4 +1,11 @@
-**Installation**
+#Installation 
+
+Backup your .bashrc & copy the .bashrc from here to your linux user home directory
+
+	cp ~/.bashrc ~/.bashrc-bkup
+	cp .bashrc ~/.bashrc
+
+.bashrc is used to calculate $PS1 . Colored $PS1 might create problems. 
 
 	cd demo-app
 	bundle install
@@ -22,4 +29,4 @@ Open another terminal & run rails server
 
 Now open *http://localhost:3000/* on your browser & start fiddling.
 
-P.S. - The kill butto is not implemented yet.
+P.S. - The kill button is not implemented yet.
