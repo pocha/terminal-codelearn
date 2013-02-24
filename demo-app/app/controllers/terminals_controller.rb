@@ -13,8 +13,9 @@ class TerminalsController < ApplicationController
   end
 
   def execute
-	  #http = Curl.post("http://localhost:3001/#{current_user}", {:command => params[:command]})
-	  http = Curl.post("http://localhost:3001/#{current_user}/execute/#{params[:command]}")
+	  url = "http://localhost:3001/#{current_user}/execute/#{params[:command].nil? ? "" : CGI::escape(params[:command])}" 
+	  puts url
+	  http = Curl.get(url)
 	  render :json => http.body_str
   end
 

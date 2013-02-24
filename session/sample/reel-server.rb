@@ -2,6 +2,7 @@ require 'reel'
 require '../lib/session'
 require 'stringio'
 require 'json'
+require 'cgi'
 
 class Terminal_User
 	
@@ -15,6 +16,7 @@ class Terminal_User
 		@bash._initialize
 		@bash.execute "su -l #{user} -c 'bash -i'"
 		sleep 1	
+=begin
 		@bash.execute(" ")
 		loop do
 			@ps1 = @check_data.gets
@@ -22,6 +24,7 @@ class Terminal_User
 		end
 		puts "PS1 - #{@ps1}"
 		@ps1.gsub!("$","\\$")
+=end
 	end
 
 
@@ -34,16 +37,17 @@ class Terminal_User
 		loop do
 			break if @check_data.read #hold till output got some data
 		end
-		if !command.nil? and !command.empty? and !/\s+/.match(command)
-			@bash.execute(" ") #empty command so that post complete we get the PS1 back 
+		#if !command.nil? and !command.empty? and !/\s+/.match(command)
+			@bash.execute("\n") #empty command so that post complete we get the PS1 back 
 			sleep 1 #cant do loop here as the main command might be blocking the output
-		end
+		#end
 	end
 
 	def respond(request)
 		data = @read_data.read
-		status = /(#{@ps1}|>\n)$/.match(data) ? "complete" : "waiting"
-		request.respond :ok, JSON.generate({:content => data, :status => status})
+		#we sent two enters at the end of every command. If command is over you get two $PS1 or two $PS2. If the bash is still waiting, then there would be two empty lines. This will break if pressing enter creates similar lines in the output other than $PS1 or $PS2. But in that case as well, the client keeps polling & things will restore to normal when next command gets executed
+		status = /\n\n$/.match(data) ? "waiting" : "complete"
+		request.respond :ok, JSON.generate({:content => data.split("\n")[0..-2].join("\n") + "\n", :status => status})
 	end
 	
 end
@@ -66,7 +70,7 @@ class MyServer < Reel::Server
   end
 
   def handle_request(request)
-	nothing,user,type,command = URI.unescape(request.url).split("/")
+	nothing,user,type,command = request.url.split("/")
 	if @users["#{user}"].nil?
 		@users["#{user}"] = Terminal_User.new(user)
 	end
@@ -74,6 +78,7 @@ class MyServer < Reel::Server
 
 	case type
 	when "execute"
+		command = CGI::unescape(command) if command
 		puts "command #{command}"
 		user.execute(command)
 	end
