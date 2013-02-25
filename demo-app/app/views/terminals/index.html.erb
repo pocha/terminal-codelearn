@@ -1,4 +1,6 @@
-<pre id="output" style="height:300px; overflow:auto"></pre>
+<pre id="output" style="height:300px; overflow:auto; position:relative">
+	<img style="position:fixed; left: 45%; top: 45%; z-index:1; height:40px; display:none" src="/assets/loading51.gif" id="loading-img"/>
+</pre>
 <div class="row-fluid">
 	<form id="myForm" class="form-inline" method="POST" action="/terminals/execute">
 	  <input type="text" class="input-large" name="command" placeholder="Enter Command">
@@ -9,13 +11,22 @@
 
 <script> 
 	// wait for the DOM to be loaded 
-	$(document).ready(function() { 
+	$(document).ready(function() {
+
+		$.ajaxSetup({
+			beforeSend: function() {
+				$("#loading-img").show()
+			}
+			,complete: function() {
+				$("#loading-img").hide()
+			}
+		});
+
 		// bind 'myForm' and provide a simple callback function 
 		$('#myForm').ajaxForm({ 
-			success: function(data) { fetchData(data) },
-			error: function() { alert("an error has occured") },
-			complete : function() { $("input[name='command']").val('') }
-
+			success: function(data) {  fetchData(data) },
+			error: function() { alert("an error has occured") }
+			,complete: function() { $("input[name='command']").val(''); }
 		});
 
 		$("#kill").click(function(){
@@ -32,6 +43,7 @@
 			data: "",
 			success: function(data) { fetchData(data) },
 			error: function() { alert("an error has occured") }
+			,complete: function() {} //overriding behavior to hide the image
 		})
 		
 	});
@@ -48,6 +60,9 @@
 		if ( data.status == "waiting" ) {
 			setTimeout(function() {poll(fetchData)}, 3000)
 		}
+		else {
+			$("#loading-img").hide()
+		}
 	}
 
 
@@ -63,7 +78,8 @@
 				}
 			}
 			, error: function() { alert("an error has occured") }
-
+			, beforeSubmit: function(){}
+			, complete: function(){}
 		})
 	}
 
