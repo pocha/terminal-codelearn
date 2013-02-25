@@ -29,25 +29,31 @@ class Terminal_User
 
 
 	def execute(command)
-		puts "Executing command"
-		puts @bash.inspect
-		@bash.execute(command)
+		if !command.nil? and !command.empty? and !/^\s+$/.match(command) #The if ensures that empty command do not get executed as we are anyway sending two enters below
+			@check_data.read #empty check data
+			puts "Executing command"
+			puts @bash.inspect
+			@bash.execute(command)
 
-		#the code below makes sure that the output is captured in a sequential manner
-		loop do
-			break if @check_data.read #hold till output got some data
+			#the code below makes sure that the output is captured in a sequential manner
+			loop do
+				break if @check_data.read #hold till output got some data
+			end
 		end
-		#if !command.nil? and !command.empty? and !/\s+/.match(command)
-			@bash.execute("\n") #empty command so that post complete we get the PS1 back 
-			sleep 1 #cant do loop here as the main command might be blocking the output
-		#end
+		@bash.execute("\n") #empty command so that post complete we get the PS1 back 
+		sleep 1 #cant do loop here as the main command might be blocking the output
 	end
 
 	def respond(request)
-		data = @read_data.read
 		#we sent two enters at the end of every command. If command is over you get two $PS1 or two $PS2. If the bash is still waiting, then there would be two empty lines. This will break if pressing enter creates similar lines in the output other than $PS1 or $PS2. But in that case as well, the client keeps polling & things will restore to normal when next command gets executed
-		status = /\n\n$/.match(data) ? "waiting" : "complete"
-		request.respond :ok, JSON.generate({:content => data.split("\n")[0..-2].join("\n") + "\n", :status => status})
+		status = (/(.+?)\n\1\n$/.match(@output) or /.*?>\n.*?>\n/.match(@output)) ? "complete" : "waiting"
+		data = @read_data.read
+		if status == "waiting" 
+			request.respond :ok, JSON.generate({:content => data, :status => status})
+		else
+			#remove extra line from the output because of extra enter - @bash.execute("\n")
+			request.respond :ok, JSON.generate({:content => data.gsub(/.*?\n$/,""), :status => status}) 
+		end
 	end
 	
 end

@@ -13,7 +13,9 @@
 		// bind 'myForm' and provide a simple callback function 
 		$('#myForm').ajaxForm({ 
 			success: function(data) { fetchData(data) },
-			error: function() { alert("an error has occured") }
+			error: function() { alert("an error has occured") },
+			complete : function() { $("input[name='command']").val('') }
+
 		});
 
 		$("#kill").click(function(){
@@ -38,8 +40,7 @@
 
 
 	function fetchData(data) {
-		if ( data != "") {
-			$("input[name='command']").val('')
+		if ( data.content != "") { //change it to remove the last line of the previous data & append current data
 			console.log("Data received - " + data.content)
 			$("#output").append(data.content)
 			objDiv.scrollTop = objDiv.scrollHeight
