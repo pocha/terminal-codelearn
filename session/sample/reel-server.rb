@@ -26,33 +26,46 @@ class Terminal_User
 		@ps1.gsub!("$","\\$")
 =end
 	end
-
+	
+	def loop_for_lines(lines) #for normal command, 2 lines are one input & 1 output. For @bash.execute("\n"), two lines suffice as well
+		count = 0
+		loop do
+			puts "inside loop"
+			if !@check_data.gets.nil?
+				count = count + 1
+			end
+			break if count == lines
+		end
+	end
 
 	def execute(command)
+		puts @bash.inspect
 		if !command.nil? and !command.empty? and !/^\s+$/.match(command) #The if ensures that empty command do not get executed as we are anyway sending two enters below
-			@check_data.read #empty check data
 			puts "Executing command"
-			puts @bash.inspect
+			#@check_data.read #empty check data
 			@bash.execute(command)
 
-			#the code below makes sure that the output is captured in a sequential manner
-			loop do
-				break if @check_data.read #hold till output got some data
-			end
+			#wait for the input command to appear
+			#loop_for_lines(1) - guess its best to wait for a second or so else the output gets garbled
+			sleep 1
 		end
+		#@check_data.read #empty check data
 		@bash.execute("\n") #empty command so that post complete we get the PS1 back 
-		sleep 1 #cant do loop here as the main command might be blocking the output
+		#loop_for_lines(2)
+		sleep 1 #sleep another second. Passing empty input wont show on the output. So cant loop/wait for lines
 	end
 
 	def respond(request)
-		#we sent two enters at the end of every command. If command is over you get two $PS1 or two $PS2. If the bash is still waiting, then there would be two empty lines. This will break if pressing enter creates similar lines in the output other than $PS1 or $PS2. But in that case as well, the client keeps polling & things will restore to normal when next command gets executed
-		status = (/(.+?)\n\1\n$/.match(@output) or /.*?>\n.*?>\n/.match(@output)) ? "complete" : "waiting"
+		#we sent two enters at the end of every command. If command is over you get two $PS1 or two $PS2. If the bash is still waiting, then there would be two empty lines. This will break if pressing enter creates similar lines in the output other than $PS1 or $PS2. But in that case as well, the client keeps polling & things will restore to normal when next command gets execute
+		puts "output - #{@output}"
+		status = (/(.+?)\n\1\n\z/.match(@output) or /.*?>.*?\n.*?>.*?\n\z/.match(@output)) ? "complete" : "waiting"
 		data = @read_data.read
+		puts "data - #{data}"
 		if status == "waiting" 
 			request.respond :ok, JSON.generate({:content => data, :status => status})
 		else
 			#remove extra line from the output because of extra enter - @bash.execute("\n")
-			request.respond :ok, JSON.generate({:content => data.gsub(/.*?\n$/,""), :status => status}) 
+			request.respond :ok, JSON.generate({:content => data.gsub(/.*?\n\z/,""), :status => status}) 
 		end
 	end
 	
@@ -81,9 +94,9 @@ class MyServer < Reel::Server
 		@users["#{user}"] = Terminal_User.new(user)
 	end
 	user = @users["#{user}"]
-
-	case type
-	when "execute"
+	
+	puts "url - #{request.url}"
+	if type == "execute"
 		command = CGI::unescape(command) if command
 		puts "command #{command}"
 		user.execute(command)

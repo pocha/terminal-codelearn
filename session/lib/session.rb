@@ -367,7 +367,7 @@ module Session
                 line = iodat[:io].gets
 				buf = line
 
-                if buf
+                #if buf
 				  puts "inside session stdout - #{buf}"
                   #iodat[:mutex].synchronize do
                     #iodat[:cmd] << buf
@@ -375,7 +375,7 @@ module Session
                     iodat[:proc].call buf  if iodat[:proc]
                     #iodat[:yield].call buf  if block_given?
                   #end
-                end
+                #end
               end
 
               true

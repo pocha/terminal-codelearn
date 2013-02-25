@@ -25,7 +25,9 @@ Inside *app/controller/terminals_controller.rb*, change "pocha" to the linux use
 Open another terminal & run rails server
 	
 	cd demo-app
-	rails server
+	thin start
+
+> Used thin instead of Webrick as Webrick did not support parallel requests
 
 Now open *http://localhost:3000/* on your browser & start fiddling.
 
