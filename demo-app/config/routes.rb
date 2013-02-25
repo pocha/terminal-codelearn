@@ -7,6 +7,7 @@ TerminalCodelearn::Application.routes.draw do
   match "terminals/execute" => "terminals#execute", :via => "post"
 
   get "terminals/kill"
+  get "terminals/reset"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

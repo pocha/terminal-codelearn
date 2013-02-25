@@ -4,8 +4,9 @@
 <div class="row-fluid">
 	<form id="myForm" class="form-inline" method="POST" action="/terminals/execute">
 	  <input type="text" class="input-large" name="command" placeholder="Enter Command">
-	  <button type="submit" class="btn">Go</button>
-	  <button id="kill" class="btn">Kill</button>
+	  <button type="submit" class="btn btn-primary">Go</button>
+	  <button id="kill" class="btn btn-warning">Kill running process</button>
+	  <button id="reset" class="btn btn-danger">Reset</button>
 	</form>
 </div>
 
@@ -34,22 +35,36 @@
 				url: "/terminals/kill",
 				success: function(data){ fetchData(data) },
 				error: function() { alert("an error has occured") }
+				,complete: function() {} //overriding behavior to NOT hide the image
 			})
 		})
 
-		$.ajax({
-			url: "/terminals/execute",
-			type: "POST",
-			data: "",
-			success: function(data) { fetchData(data) },
-			error: function() { alert("an error has occured") }
-			,complete: function() {} //overriding behavior to hide the image
+		$("#reset").click(function(){
+			$.ajax ({
+				url: "/terminals/reset",
+				success: function(data){ initialize() },
+				error: function() { alert("an error has occured") }
+				,complete: function() {} //overriding behavior to NOT hide the image
+			})
 		})
 		
+		initialize();
 	});
 
 	var objDiv = document.getElementById("output");
+	
+	function initialize() {
+		$("#output").html('<img style="position:fixed; left: 45%; top: 45%; z-index:1; height:40px; display:none" src="/assets/loading51.gif" id="loading-img"/>')
 
+		$.ajax({
+				url: "/terminals/execute",
+				type: "POST",
+				data: "",
+				success: function(data) { fetchData(data) },
+				error: function() { alert("an error has occured") }
+				,complete: function() {} //overriding behavior to NOT hide the image
+			})
+	}
 
 	function fetchData(data) {
 		if ( data.content != "") { //change it to remove the last line of the previous data & append current data

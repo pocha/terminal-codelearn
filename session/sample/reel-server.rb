@@ -68,6 +68,20 @@ class Terminal_User
 			request.respond :ok, JSON.generate({:content => data.gsub(/.*?\n\z/,""), :status => status}) 
 		end
 	end
+
+	def get_children_process(pid)
+		`ps --ppid #{pid} | grep -v PID | awk '{print $1}'`.split("\n")
+	end
+
+	def kill_all_children
+		if @parent_pid.nil?
+			@parent_pid = get_children_process(get_children_process(@bash.pid)[0])[0] 
+		end	
+		get_children_process(@parent_pid).each do |p|
+			system("kill -2 #{p}")
+		end
+		sleep 1 #let the PS1 appear which was sent prior to the command execution
+	end
 	
 end
 
@@ -96,11 +110,24 @@ class MyServer < Reel::Server
 	user = @users["#{user}"]
 	
 	puts "url - #{request.url}"
+	
 	if type == "execute"
 		command = CGI::unescape(command) if command
 		puts "command #{command}"
 		user.execute(command)
 	end
+
+	if type == "kill"
+		user.kill_all_children
+	end
+
+	if type == "reset"
+		user.kill_all_children
+		@users["#{user}"] = nil
+		request.respond :ok, JSON.generate({:content => "", :status => "completed"}) 
+		return
+	end
+
 	user.respond(request)
   end
 

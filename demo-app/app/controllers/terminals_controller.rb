@@ -21,6 +21,12 @@ class TerminalsController < ApplicationController
 
   def kill
 	  http = Curl.get("http://localhost:3001/#{current_user}/kill")
-	  render :text => http.body_str
+	  render :json => http.body_str
   end
+
+  def reset
+	  http = Curl.get("http://localhost:3001/#{current_user}/reset")
+	  render :json => http.body_str
+  end
+
 end

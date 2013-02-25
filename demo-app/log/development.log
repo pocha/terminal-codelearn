@@ -42888,3 +42888,735 @@ Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 20:42:42 +0530
 Processing by TerminalsController#execute as */*
   Parameters: {"command"=>"cd "}
 Completed 200 OK in 2009ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/" for 127.0.0.1 at 2013-02-25 20:45:23 +0530
+Processing by TerminalsController#index as HTML
+  Rendered terminals/index.html.erb within layouts/application (0.6ms)
+Completed 200 OK in 22ms (Views: 22.0ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/application.css?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /application.css - 304 Not Modified (2ms)
+
+
+Started GET "/assets/twitter-bootstrap-static/bootstrap.css?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter-bootstrap-static/bootstrap.css - 304 Not Modified (1ms)
+
+
+Started GET "/assets/twitter-bootstrap-static/fontawesome.css?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter-bootstrap-static/fontawesome.css - 304 Not Modified (0ms)
+
+
+Started GET "/assets/bootstrap_and_overrides.css?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /bootstrap_and_overrides.css - 304 Not Modified (1ms)
+
+
+Started GET "/assets/terminals.css?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /terminals.css - 304 Not Modified (0ms)
+
+
+Started GET "/assets/jquery.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /jquery.js - 304 Not Modified (3ms)
+
+
+Started GET "/assets/jquery_ujs.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /jquery_ujs.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-transition.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-transition.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-alert.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-alert.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-modal.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-modal.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-dropdown.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-dropdown.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-scrollspy.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-scrollspy.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-tab.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-tab.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-tooltip.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-tooltip.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-popover.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-popover.js - 304 Not Modified (4ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-button.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-button.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-collapse.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-collapse.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-carousel.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-carousel.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-typeahead.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-typeahead.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-affix.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap/bootstrap-affix.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /twitter/bootstrap.js - 304 Not Modified (2ms)
+
+
+Started GET "/assets/bootstrap.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /bootstrap.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/jquery.form.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /jquery.form.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/terminals.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /terminals.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/application.js?body=1" for 127.0.0.1 at 2013-02-25 20:45:24 +0530
+Served asset /application.js - 304 Not Modified (6ms)
+
+
+Started GET "/assets/loading51.gif" for 127.0.0.1 at 2013-02-25 20:45:25 +0530
+Served asset /loading51.gif - 304 Not Modified (0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 20:45:25 +0530
+Processing by TerminalsController#execute as */*
+Completed 200 OK in 1009ms (Views: 0.2ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Processing by TerminalsController#index as HTML
+  Rendered terminals/index.html.erb within layouts/application (0.6ms)
+Completed 200 OK in 71ms (Views: 70.7ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/application.css?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /application.css - 304 Not Modified (4ms)
+
+
+Started GET "/assets/twitter-bootstrap-static/bootstrap.css?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter-bootstrap-static/bootstrap.css - 304 Not Modified (1ms)
+
+
+Started GET "/assets/twitter-bootstrap-static/fontawesome.css?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter-bootstrap-static/fontawesome.css - 304 Not Modified (0ms)
+
+
+Started GET "/assets/bootstrap_and_overrides.css?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /bootstrap_and_overrides.css - 304 Not Modified (1ms)
+
+
+Started GET "/assets/terminals.css?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /terminals.css - 304 Not Modified (0ms)
+
+
+Started GET "/assets/jquery.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /jquery.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/jquery_ujs.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /jquery_ujs.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-transition.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-transition.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-alert.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-alert.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-modal.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-modal.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-dropdown.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-dropdown.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-scrollspy.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-scrollspy.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-tab.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-tab.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-tooltip.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-tooltip.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-popover.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-popover.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-button.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-button.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-collapse.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-collapse.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-carousel.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-carousel.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-typeahead.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-typeahead.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-affix.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap/bootstrap-affix.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /twitter/bootstrap.js - 304 Not Modified (2ms)
+
+
+Started GET "/assets/bootstrap.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /bootstrap.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/jquery.form.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /jquery.form.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/terminals.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /terminals.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/application.js?body=1" for 127.0.0.1 at 2013-02-25 20:46:11 +0530
+Served asset /application.js - 304 Not Modified (4ms)
+
+
+Started GET "/assets/loading51.gif" for 127.0.0.1 at 2013-02-25 20:46:12 +0530
+Served asset /loading51.gif - 304 Not Modified (0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 20:46:12 +0530
+Processing by TerminalsController#execute as */*
+Completed 200 OK in 1008ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 20:47:44 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1007ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/" for 127.0.0.1 at 2013-02-25 21:13:55 +0530
+Processing by TerminalsController#index as HTML
+  Rendered terminals/index.html.erb within layouts/application (0.7ms)
+Completed 200 OK in 27ms (Views: 26.5ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/application.css?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /application.css - 304 Not Modified (2ms)
+
+
+Started GET "/assets/twitter-bootstrap-static/bootstrap.css?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter-bootstrap-static/bootstrap.css - 304 Not Modified (1ms)
+
+
+Started GET "/assets/twitter-bootstrap-static/fontawesome.css?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter-bootstrap-static/fontawesome.css - 304 Not Modified (0ms)
+
+
+Started GET "/assets/bootstrap_and_overrides.css?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /bootstrap_and_overrides.css - 304 Not Modified (1ms)
+
+
+Started GET "/assets/terminals.css?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /terminals.css - 304 Not Modified (0ms)
+
+
+Started GET "/assets/jquery.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /jquery.js - 304 Not Modified (1ms)
+
+
+Started GET "/assets/jquery_ujs.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /jquery_ujs.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-transition.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-transition.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-alert.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-alert.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-modal.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-modal.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-dropdown.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-dropdown.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-scrollspy.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-scrollspy.js - 304 Not Modified (1ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-tab.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-tab.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-tooltip.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-tooltip.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-popover.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-popover.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-button.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-button.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-collapse.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-collapse.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-carousel.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-carousel.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-typeahead.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-typeahead.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-affix.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap/bootstrap-affix.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /twitter/bootstrap.js - 304 Not Modified (4ms)
+
+
+Started GET "/assets/bootstrap.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /bootstrap.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/jquery.form.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /jquery.form.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/terminals.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /terminals.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/application.js?body=1" for 127.0.0.1 at 2013-02-25 21:13:56 +0530
+Served asset /application.js - 304 Not Modified (3ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:13:57 +0530
+Processing by TerminalsController#execute as */*
+Completed 200 OK in 2041ms (Views: 0.2ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/loading51.gif" for 127.0.0.1 at 2013-02-25 21:13:59 +0530
+Served asset /loading51.gif - 304 Not Modified (0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:14:02 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 4ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:14:09 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>"cd ~/rails/qa; rails server -p 3002"}
+Completed 200 OK in 2007ms (Views: 0.2ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:14:14 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 3ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:14:17 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 4ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:14:20 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 4ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:14:23 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 4ms (Views: 0.2ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:14:26 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 4ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:14:28 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1004ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/kill" for 127.0.0.1 at 2013-02-25 21:14:30 +0530
+Processing by TerminalsController#kill as */*
+  Rendered text template (0.0ms)
+Completed 200 OK in 1544ms (Views: 18.8ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:14:31 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 7ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:14:33 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 5ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:14:44 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>"pwd"}
+Completed 200 OK in 2006ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:15:29 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>"rails s -p 3002"}
+Completed 200 OK in 2009ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:15:34 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 69ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:15:38 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 12ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:15:41 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 7ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:15:44 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 11ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:15:47 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 7ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:15:50 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 8ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:15:50 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1008ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/kill" for 127.0.0.1 at 2013-02-25 21:15:51 +0530
+Processing by TerminalsController#kill as */*
+  Rendered text template (0.0ms)
+Completed 200 OK in 1099ms (Views: 0.5ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:15:53 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 9ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:15:54 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 4ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:16:45 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1017ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:16:48 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1008ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/kill" for 127.0.0.1 at 2013-02-25 21:16:49 +0530
+Processing by TerminalsController#kill as */*
+  Rendered text template (0.0ms)
+Completed 200 OK in 1120ms (Views: 0.5ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:16:51 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1007ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:16:53 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1007ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/kill" for 127.0.0.1 at 2013-02-25 21:16:54 +0530
+Processing by TerminalsController#kill as */*
+  Rendered text template (0.0ms)
+Completed 200 OK in 1087ms (Views: 0.5ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:16:56 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1008ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Processing by TerminalsController#index as HTML
+  Rendered terminals/index.html.erb within layouts/application (0.5ms)
+Completed 200 OK in 43ms (Views: 42.5ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/application.css?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /application.css - 304 Not Modified (2ms)
+
+
+Started GET "/assets/twitter-bootstrap-static/bootstrap.css?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter-bootstrap-static/bootstrap.css - 304 Not Modified (1ms)
+
+
+Started GET "/assets/twitter-bootstrap-static/fontawesome.css?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter-bootstrap-static/fontawesome.css - 304 Not Modified (0ms)
+
+
+Started GET "/assets/bootstrap_and_overrides.css?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /bootstrap_and_overrides.css - 304 Not Modified (2ms)
+
+
+Started GET "/assets/terminals.css?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /terminals.css - 304 Not Modified (0ms)
+
+
+Started GET "/assets/jquery.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /jquery.js - 304 Not Modified (1ms)
+
+
+Started GET "/assets/jquery_ujs.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /jquery_ujs.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-transition.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-transition.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-alert.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-alert.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-modal.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-modal.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-dropdown.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-dropdown.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-scrollspy.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-scrollspy.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-tab.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-tab.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-tooltip.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-tooltip.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-popover.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-popover.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-button.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-button.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-collapse.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-collapse.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-carousel.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-carousel.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-typeahead.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-typeahead.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-affix.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap/bootstrap-affix.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/twitter/bootstrap.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:15 +0530
+Served asset /twitter/bootstrap.js - 304 Not Modified (2ms)
+
+
+Started GET "/assets/bootstrap.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:16 +0530
+Served asset /bootstrap.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/jquery.form.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:16 +0530
+Served asset /jquery.form.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/terminals.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:16 +0530
+Served asset /terminals.js - 304 Not Modified (0ms)
+
+
+Started GET "/assets/application.js?body=1" for 127.0.0.1 at 2013-02-25 21:36:16 +0530
+Served asset /application.js - 304 Not Modified (3ms)
+
+
+Started GET "/assets/loading51.gif" for 127.0.0.1 at 2013-02-25 21:36:17 +0530
+Served asset /loading51.gif - 304 Not Modified (0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:36:17 +0530
+Processing by TerminalsController#execute as */*
+Completed 200 OK in 2037ms (Views: 0.2ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:36:20 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1003ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:36:22 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1003ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/kill" for 127.0.0.1 at 2013-02-25 21:36:23 +0530
+Processing by TerminalsController#kill as */*
+Completed 200 OK in 1166ms (Views: 0.2ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:36:31 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1009ms (Views: 0.2ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/reset" for 127.0.0.1 at 2013-02-25 21:36:32 +0530
+Processing by TerminalsController#reset as */*
+Completed 200 OK in 1072ms (Views: 0.2ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:36:33 +0530
+Processing by TerminalsController#execute as */*
+Completed 200 OK in 1003ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:36:46 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>"cd rails/qa"}
+Completed 200 OK in 2004ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:36:53 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>"rails server -p 3002"}
+Completed 200 OK in 2007ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:36:58 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 3ms (Views: 0.2ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:37:01 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 4ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:37:04 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 4ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:37:07 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 4ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:37:07 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1009ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/kill" for 127.0.0.1 at 2013-02-25 21:37:08 +0530
+Processing by TerminalsController#kill as */*
+Completed 200 OK in 1173ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:37:10 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 5ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/get" for 127.0.0.1 at 2013-02-25 21:37:11 +0530
+Processing by TerminalsController#get as */*
+Completed 200 OK in 7ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:37:30 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"command"=>""}
+Completed 200 OK in 1005ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/reset" for 127.0.0.1 at 2013-02-25 21:37:31 +0530
+Processing by TerminalsController#reset as */*
+Completed 200 OK in 1064ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started POST "/terminals/execute" for 127.0.0.1 at 2013-02-25 21:37:32 +0530
+Processing by TerminalsController#execute as */*
+Completed 200 OK in 1005ms (Views: 0.1ms | ActiveRecord: 0.0ms)
