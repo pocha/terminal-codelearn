@@ -2,13 +2,17 @@
 	<img style="position:fixed; left: 45%; top: 45%; z-index:1; height:40px; display:none" src="/assets/loading51.gif" id="loading-img"/>
 </pre>
 <div class="row-fluid">
-	<form id="myForm" class="form-inline" method="POST" action="/terminals/execute">
-	  <input type="text" class="input-large" name="command" placeholder="Enter Command">
-	  <button type="submit" class="btn btn-primary">Go</button>
+	<div class="span3">
+		<form id="myForm" class="form-inline" method="POST" action="/terminals/execute">
+		  <input type="text" class="input-large" name="command" placeholder="Enter Command">
+		  <button type="submit" class="btn btn-primary">Go</button>
+		</form>
+	</div>
+	<div class="span9">
 	  <button id="refresh" class="btn btn-success">Get Data</button>
 	  <button id="kill" class="btn btn-warning">Kill process</button>
 	  <button id="reset" class="btn btn-danger">Reset</button>
-	</form>
+  	</div>
 </div>
 
 <script> 
@@ -79,6 +83,7 @@
 
 
 	function poll(func) {
+		console.log("inside poll")
 		$.ajax( {
 			url: "/terminals/get",
 			success : function(data, textStatus, jqXHR){
