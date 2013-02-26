@@ -1,6 +1,6 @@
 This is a multi user bash Terminal web app done in Ruby using Reel server. This will only run on a linux platform. 
 
-The server code is inside session. demo-app is the example front-end done in Rails that provides the Terminal webpage & also acts as proxy for the commands between the web page & the Terminal server. Typically you need the setup to delegate user information to the backend. 
+The server code is inside session. demo-app is the example front-end done in Rails that provides the Terminal webpage & also acts as proxy for the commands between the web page & the Terminal server. Typically you need the setup to keep all the user level information at the backend. 
 
 The purpose of this app is not to emulate a true Terminal. It is designed to let website owners give a web based Pseudo Terminal to their users to be able to run linux commands.
 
