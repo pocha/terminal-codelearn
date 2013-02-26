@@ -40,5 +40,3 @@ Open another terminal & run rails server
 > Used thin instead of Webrick as Webrick did not support parallel requests
 
 Now open *http://localhost:3000/* on your browser & start fiddling.
-
-P.S. - The kill button is not implemented yet.
