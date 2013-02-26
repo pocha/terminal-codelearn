@@ -7,14 +7,13 @@ require 'cgi'
 class Terminal_User
 	
 	def initialize(user)
-		@bash = Session::Bash.new
+		@bash = Session::Bash::new({:prog => "su -l #{user} -c 'bash -i'"})
 		@output = ""
 		@read_data = StringIO::new(@output)
 		@check_data = StringIO::new(@output)
 		@bash.outproc = lambda {|out| @output << out }
 		@bash.errproc = lambda {|err| @output << err }
 		@bash._initialize
-		@bash.execute "su -l #{user} -c 'bash -i'"
 		sleep 1	
 =begin
 		@bash.execute(" ")

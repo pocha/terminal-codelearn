@@ -183,7 +183,7 @@ module Session
 
       @threads = []
 
-      clear
+      #clear
 
       if block_given?
         ret = nil
