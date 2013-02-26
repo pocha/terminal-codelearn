@@ -45,9 +45,11 @@
 		})
 
 		$("#reset").click(function(){
-			$.ajax ({
-				url: "/terminals/reset",
-				success: function(data){ initialize() }
+			$.ajax({
+				url: "/terminals/execute",
+				type: "POST",
+				data: "command=exit",
+				success: function(data) { fetchData(data) }
 			})
 		})
 		
@@ -75,6 +77,9 @@
 		}
 		if ( data.status == "waiting" ) {
 			setTimeout(function() {poll(fetchData)}, 3000)
+		}
+		else if (data.status == "error") {
+			initialize()
 		}
 		else {
 			$("#loading-img").hide()

@@ -4,7 +4,7 @@ require 'stringio'
 require 'json'
 require 'cgi'
 
-class Terminal_User
+class TerminalUser
 	
 	def initialize(user)
 		@bash = Session::Bash::new({:prog => "su -l #{user} -c 'bash -i'"})
@@ -102,32 +102,49 @@ class MyServer < Reel::Server
   end
 
   def handle_request(request)
-	nothing,user,type,command = request.url.split("/")
-	if @users["#{user}"].nil?
-		@users["#{user}"] = Terminal_User.new(user)
-	end
-	user = @users["#{user}"]
-	
-	puts "url - #{request.url}"
-	
-	if type == "execute"
-		command = CGI::unescape(command) if command
-		puts "command #{command}"
-		user.execute(command)
-	end
+	begin	
+		puts "url - #{request.url}"
+		nothing,user,type,command = request.url.split("/")
+		
+		if @users["#{user}"].nil?
+			puts "user not found. Creating"
+			@users["#{user}"] = TerminalUser.new(user)
+		end
+		terminal_user = @users["#{user}"]
+		puts terminal_user.inspect
+		
+		
+		if type == "execute"
+			command = CGI::unescape(command) if command
+			puts "command #{command}"
+			terminal_user.execute(command)
+		end
 
-	if type == "kill"
-		user.kill_all_children
-	end
+		if type == "kill"
+			terminal_user.kill_all_children
+		end
 
-	if type == "reset"
-		user.kill_all_children
+		if type == "reset"
+			terminal_user.kill_all_children
+			handle_error(user,request)			
+		end
+
+		terminal_user.respond(request)
+	rescue
+		#there might be a problem with broken pipe as the user might have typed 'exit'. Just send error & expect for a new request
+		handle_error(user,request)
+	end
+  end
+
+  def handle_error(user,request)
+	  	puts "User before reinitialization"
+		puts @users["#{user}"].inspect 
 		@users["#{user}"] = nil
-		request.respond :ok, JSON.generate({:content => "", :status => "completed"}) 
+		@users["#{user}"] = TerminalUser.new(user)
+	  	puts "User after reinitialization"
+		puts @users["#{user}"].inspect 
+		request.respond :ok, JSON.generate({:status => "error", :content => ""})
 		return
-	end
-
-	user.respond(request)
   end
 
   def handle_websocket(sock)
