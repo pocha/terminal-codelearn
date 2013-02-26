@@ -5,7 +5,8 @@
 	<form id="myForm" class="form-inline" method="POST" action="/terminals/execute">
 	  <input type="text" class="input-large" name="command" placeholder="Enter Command">
 	  <button type="submit" class="btn btn-primary">Go</button>
-	  <button id="kill" class="btn btn-warning">Kill running process</button>
+	  <button id="refresh" class="btn btn-success">Get Data</button>
+	  <button id="kill" class="btn btn-warning">Kill process</button>
 	  <button id="reset" class="btn btn-danger">Reset</button>
 	</form>
 </div>
@@ -29,6 +30,8 @@
 			success: function(data) {  fetchData(data) }
 			,complete: function() { $("input[name='command']").val(''); }
 		});
+		
+		$("#refresh").click(function(){ poll(fetchData) });
 
 		$("#kill").click(function(){
 			$.ajax ({
@@ -86,7 +89,6 @@
 					func(data)
 				}
 			}
-			, beforeSubmit: function(){}
 		})
 	}
 
