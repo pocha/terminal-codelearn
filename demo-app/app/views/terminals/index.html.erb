@@ -18,33 +18,29 @@
 			beforeSend: function() {
 				$("#loading-img").show()
 			}
-			,complete: function() {
+			, error: function() {
+				alert("an error has occured")
 				$("#loading-img").hide()
 			}
 		});
 
 		// bind 'myForm' and provide a simple callback function 
 		$('#myForm').ajaxForm({ 
-			success: function(data) {  fetchData(data) },
-			error: function() { alert("an error has occured") }
+			success: function(data) {  fetchData(data) }
 			,complete: function() { $("input[name='command']").val(''); }
 		});
 
 		$("#kill").click(function(){
 			$.ajax ({
 				url: "/terminals/kill",
-				success: function(data){ fetchData(data) },
-				error: function() { alert("an error has occured") }
-				,complete: function() {} //overriding behavior to NOT hide the image
+				success: function(data){ fetchData(data) }
 			})
 		})
 
 		$("#reset").click(function(){
 			$.ajax ({
 				url: "/terminals/reset",
-				success: function(data){ initialize() },
-				error: function() { alert("an error has occured") }
-				,complete: function() {} //overriding behavior to NOT hide the image
+				success: function(data){ initialize() }
 			})
 		})
 		
@@ -60,9 +56,7 @@
 				url: "/terminals/execute",
 				type: "POST",
 				data: "",
-				success: function(data) { fetchData(data) },
-				error: function() { alert("an error has occured") }
-				,complete: function() {} //overriding behavior to NOT hide the image
+				success: function(data) { fetchData(data) }
 			})
 	}
 
@@ -92,9 +86,7 @@
 					func(data)
 				}
 			}
-			, error: function() { alert("an error has occured") }
 			, beforeSubmit: function(){}
-			, complete: function(){}
 		})
 	}
 
