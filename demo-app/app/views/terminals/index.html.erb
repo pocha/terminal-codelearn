@@ -2,13 +2,13 @@
 	<img style="position:fixed; left: 45%; top: 45%; z-index:1; height:40px; display:none" src="/assets/loading51.gif" id="loading-img"/>
 </pre>
 <div class="row-fluid">
-	<div class="span3">
+	<div class="span6">
 		<form id="myForm" class="form-inline" method="POST" action="/terminals/execute">
-		  <input type="text" class="input-large" name="command" placeholder="Enter Command">
+		  <input type="text" class="input-large" style="width:70%" name="command" placeholder="Enter Command">
 		  <button type="submit" class="btn btn-primary">Go</button>
 		</form>
 	</div>
-	<div class="span9">
+	<div class="span6">
 	  <button id="refresh" class="btn btn-success">Get Data</button>
 	  <button id="kill" class="btn btn-warning">Kill process</button>
 	  <button id="reset" class="btn btn-danger">Reset</button>
@@ -30,9 +30,15 @@
 		});
 
 		// bind 'myForm' and provide a simple callback function 
-		$('#myForm').ajaxForm({ 
-			success: function(data) {  fetchData(data) }
-			,complete: function() { $("input[name='command']").val(''); }
+		$('#myForm').ajaxForm({
+			beforeSend: function() {
+				$("input[name='command']").val(''); 
+				$("#loading-img").show()
+			}
+			, success: function(data) {  fetchData(data) }
+			,complete: function() { 
+				$("input[name='command']").focus(); 
+			}
 		});
 		
 		$("#refresh").click(function(){ poll(fetchData) });
@@ -64,13 +70,14 @@
 				type: "POST",
 				data: "",
 				success: function(data) { fetchData(data) }
+				,complete: function() { $("input[name='command']").focus(); }
 			})
 	}
 
 	function fetchData(data) {
 		if ( data.content != "") { //change it to remove the last line of the previous data & append current data
 			console.log("Data received - " + data.content)
-			$("#output").append(data.content)
+			$("#output").append(ansispan(data.content))
 			objDiv.scrollTop = objDiv.scrollHeight
 		}
 		if ( data.status == "waiting" ) {
