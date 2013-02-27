@@ -72,14 +72,26 @@ class TerminalUser
 		`ps --ppid #{pid} | grep -v PID | awk '{print $1}'`.split("\n")
 	end
 
-	def kill_all_children
+	def kill_all_children(interrupt)
 		if @parent_pid.nil?
 			@parent_pid = get_children_process(get_children_process(@bash.pid)[0])[0] 
 		end	
 		get_children_process(@parent_pid).each do |p|
-			system("kill -2 #{p}")
+			system("kill #{interrupt} #{p}")
+			sleep 1
 		end
 		sleep 1 #let the PS1 appear which was sent prior to the command execution
+	end
+
+	def kill_all
+		kill_all_children(-9)
+		intermediate_parent = get_children_process(@bash.pid)[0]
+		system("kill -9 #{@parent_pid}")
+		sleep 1
+		system("kill -9 #{intermediate_parent}")
+		sleep 1
+		system("kill -9 #{@bash.pid}")
+		sleep 1
 	end
 	
 end
@@ -121,11 +133,13 @@ class MyServer < Reel::Server
 		end
 
 		if type == "kill"
-			terminal_user.kill_all_children
+			terminal_user.kill_all_children(-2)
 		end
 
 		if type == "reset"
-			terminal_user.kill_all_children
+			#kill all children (that could be hung like vim) as well as bash processes
+			terminal_user.kill_all_children(-9)
+			terminal_user.execute("exit")
 			handle_error(user,request)			
 		end
 
@@ -137,12 +151,10 @@ class MyServer < Reel::Server
   end
 
   def handle_error(user,request)
-	  	puts "User before reinitialization"
-		puts @users["#{user}"].inspect 
+		
 		@users["#{user}"] = nil
 		@users["#{user}"] = TerminalUser.new(user)
-	  	puts "User after reinitialization"
-		puts @users["#{user}"].inspect 
+		
 		request.respond :ok, JSON.generate({:status => "error", :content => ""})
 		return
   end

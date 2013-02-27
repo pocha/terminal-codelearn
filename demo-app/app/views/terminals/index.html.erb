@@ -46,9 +46,7 @@
 
 		$("#reset").click(function(){
 			$.ajax({
-				url: "/terminals/execute",
-				type: "POST",
-				data: "command=exit",
+				url: "/terminals/reset",
 				success: function(data) { fetchData(data) }
 			})
 		})
