@@ -39,7 +39,7 @@ class TerminalUser
 
 	def execute(command)
 		puts @bash.inspect
-		if !command.nil? and !command.empty? and !/^\s+$/.match(command) #The if ensures that empty command do not get executed as we are anyway sending two enters below
+		#if !command.nil? and !command.empty? and !/^\s+$/.match(command) #The if ensures that empty command do not get executed as we are anyway sending two enters below
 			puts "Executing command"
 			#@check_data.read #empty check data
 			@bash.execute(command)
@@ -47,22 +47,21 @@ class TerminalUser
 			#wait for the input command to appear
 			#loop_for_lines(1) - guess its best to wait for a second or so else the output gets garbled
 			sleep 1
-		end
+		#end
 		#@check_data.read #empty check data
-		@bash.execute("") #empty command so that post complete we get the PS1 back 
+		#@bash.execute("") #empty command so that post complete we get the PS1 back 
 		#loop_for_lines(2)
-		sleep 1 #sleep another second. Passing empty input wont show on the output. So cant loop/wait for lines
+		#sleep 1 #sleep another second. Passing empty input wont show on the output. So cant loop/wait for lines
 	end
 
 	def respond(request)
-		#we sent two enters at the end of every command. If command is over you get two $PS1 or two $PS2. If the bash is still waiting, then there would be two empty lines. This will break if pressing enter creates similar lines in the output other than $PS1 or $PS2. But in that case as well, the client keeps polling & things will restore to normal when next command gets execute
 		puts "output - #{@output}"
-		status = (/(.+?)\n\1\z/.match(@output) or />\s*\z/.match(@output)) ? "complete" : "waiting"
+		status = (/\$\s*\z/.match(@output) or />\s*\z/.match(@output)) ? "complete" : "waiting"
 		data = @read_data.read
 		puts "data - #{data}"
 
-		if /(.+?)\n\1\z/.match(@output)
-			request.respond :ok, JSON.generate({:content => data.gsub(/\n.*?\z/,""), :status => status}) 
+		if /\$\s*\z/.match(@output)
+			request.respond :ok, JSON.generate({:content => data, :status => 'complete'})
 		elsif />\s*\z/.match(@output)
 			request.respond :ok, JSON.generate({:content => data, :status => 'complete'})
 		else
