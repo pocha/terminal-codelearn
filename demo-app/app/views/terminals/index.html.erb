@@ -85,7 +85,7 @@
 			objDiv.scrollTop = objDiv.scrollHeight
 		}
 		if ( data.status == "waiting" ) {
-			setTimeout(function() {poll(fetchData)}, 3000)
+			setTimeout(function() {poll(fetchData)}, 1000)
 		}
 		else if (data.status == "error") {
 			initialize()
@@ -102,7 +102,7 @@
 			url: "/terminals/get",
 			success : function(data, textStatus, jqXHR){
 				if ( data == "" ) {
-					setTimeout(function() {poll(func)}, 3000)
+					setTimeout(function() {poll(func)}, 1000)
 				}
 				else {
 					func(data)
