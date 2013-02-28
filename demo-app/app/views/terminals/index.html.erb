@@ -34,7 +34,7 @@
 			beforeSubmit: function() {
 				$("input[name='command']").val(''); 
 				$("#loading-img").show()
-				setTimeout(function(){ poll(fetchData) }, 1000)
+				_setTimeout(function(){ poll(fetchData) }, 1000)
 			}
 			, success: function(data) { /* fetchData(data) */ }
 			,complete: function() { 
@@ -78,6 +78,12 @@
 				,complete: function() { $("input[name='command']").focus(); }
 			})
 	}
+	
+	var Scheduled
+	function _setTimeout(func,time) {
+		clearTimeout(Scheduled)
+		Scheduled = setTimeout(func,time)
+	}
 
 	function fetchData(data) {
 		if ( data.content != "") { //change it to remove the last line of the previous data & append current data
@@ -86,12 +92,13 @@
 			objDiv.scrollTop = objDiv.scrollHeight
 		}
 		if ( data.status == "waiting" ) {
-			setTimeout(function() {poll(fetchData)}, 1000)
+			_setTimeout(function() {poll(fetchData)}, 1000)
 		}
 		else if (data.status == "error") {
 			initialize()
 		}
 		else {
+			clearTimeout(Scheduled)
 			$("#loading-img").hide()
 		}
 	}
@@ -103,7 +110,7 @@
 			url: "/terminals/get",
 			success : function(data, textStatus, jqXHR){
 				if ( data == "" ) {
-					setTimeout(function() {poll(func)}, 1000)
+					_setTimeout(function() {poll(func)}, 1000)
 				}
 				else {
 					func(data)
