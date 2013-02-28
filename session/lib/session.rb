@@ -364,7 +364,7 @@ module Session
               loop do
 				#puts "inside loop #{iodat[:name]} - #{@threads.length}"
                 main.raise(PipeError, command) unless ready? 
-                line = iodat[:io].gets
+                line = iodat[:io].readpartial(4096)
 				buf = line
 
                 #if buf
