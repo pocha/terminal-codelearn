@@ -52,7 +52,11 @@
 
 		$("#reset").click(function(){
 			$.ajax({
-				url: "/terminals/reset",
+				beforeSend: function() {
+					$("#output").html('<img style="position:fixed; left: 45%; top: 45%; z-index:1; height:40px; display:none" src="/assets/loading51.gif" id="loading-img"/>')
+					$("#loading-img").show()
+				}
+				, url: "/terminals/reset",
 				success: function(data) { fetchData(data) }
 			})
 		})
