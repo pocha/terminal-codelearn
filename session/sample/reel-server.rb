@@ -60,9 +60,13 @@ class TerminalUser
 		data = @read_data.read
 		puts "data - #{data}"
 
-		if /\$\s*\z/.match(@output)
+		if /\$\s*\z/.match(data)
+			@output.slice!(0,@read_data.pos)
+			@read_data.rewind
 			request.respond :ok, JSON.generate({:content => data, :status => 'complete'})
-		elsif />\s*\z/.match(@output)
+		elsif />\s*\z/.match(data)
+			@output.slice!(0,@read_data.pos)
+			@read_data.rewind
 			request.respond :ok, JSON.generate({:content => data, :status => 'complete'})
 		else
 			request.respond :ok, JSON.generate({:content => data, :status => 'waiting'})
@@ -133,7 +137,8 @@ class MyServer < Reel::Server
 			Thread::new(terminal_user, command) do |terminal_user, command|
 				terminal_user.execute(command)
 			end
-			request.respond :ok, JSON.generate({:content => "", :status => 'waiting'})
+			#request.respond :ok, JSON.generate({:content => "", :status => 'waiting'})
+			#return
 		end
 
 		if type == "kill"
