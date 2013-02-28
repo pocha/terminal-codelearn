@@ -90,6 +90,8 @@ class TerminalUser
 
 	def kill_all
 		kill_all_children(-9)
+		@bash.close
+=begin
 		intermediate_parent = get_children_process(@bash.pid)[0]
 		system("kill -9 #{@parent_pid}")
 		sleep 1
@@ -97,6 +99,7 @@ class TerminalUser
 		sleep 1
 		system("kill -9 #{@bash.pid}")
 		sleep 1
+=end
 	end
 	
 end
@@ -147,19 +150,20 @@ class MyServer < Reel::Server
 
 		if type == "reset"
 			#kill all children (that could be hung like vim) as well as bash processes
-			terminal_user.kill_all_children(-9)
-			terminal_user.execute("exit")
-			handle_error(user,request)			
+			#terminal_user.kill_all_children(-9)
+			#terminal_user.execute("exit")
+			handle_error(terminal_user, user,request)			
 		end
 
 		terminal_user.respond(request)
 	rescue
 		#there might be a problem with broken pipe as the user might have typed 'exit'. Just send error & expect for a new request
-		handle_error(user,request)
+		handle_error(terminal_user, user,request)
 	end
   end
 
-  def handle_error(user,request)
+  def handle_error(terminal_user, user,request)
+		terminal_user.kill_all
 		
 		@users["#{user}"] = nil
 		@users["#{user}"] = TerminalUser.new(user)
