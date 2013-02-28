@@ -130,7 +130,10 @@ class MyServer < Reel::Server
 		if type == "execute"
 			command = CGI::unescape(command) if command
 			puts "command #{command}"
-			terminal_user.execute(command)
+			Thread::new(terminal_user, command) do |terminal_user, command|
+				terminal_user.execute(command)
+			end
+			request.respond :ok, JSON.generate({:content => "", :status => 'waiting'})
 		end
 
 		if type == "kill"

@@ -31,11 +31,12 @@
 
 		// bind 'myForm' and provide a simple callback function 
 		$('#myForm').ajaxForm({
-			beforeSend: function() {
+			beforeSubmit: function() {
 				$("input[name='command']").val(''); 
 				$("#loading-img").show()
+				setTimeout(function(){ poll(fetchData) }, 1000)
 			}
-			, success: function(data) {  fetchData(data) }
+			, success: function(data) { /* fetchData(data) */ }
 			,complete: function() { 
 				$("input[name='command']").focus(); 
 			}
