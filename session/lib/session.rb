@@ -3,6 +3,7 @@ require 'tmpdir'
 require 'thread'
 require 'yaml'
 require 'tempfile'
+require 'pty'
 
 module Session 
   VERSION = '3.1.0'
@@ -178,7 +179,8 @@ module Session
         elsif @use_open3
           Open3::popen3 @prog
         else
-           __popen3 @prog
+           #__popen3 @prog
+		   pty_open @prog
         end
 
       @threads = []
@@ -215,6 +217,12 @@ module Session
       return key if hash.has_key? key
       return false 
     end
+
+	def pty_open(*cmd)
+		r, w, pid = PTY.spawn(*cmd)
+		[w,r,r,pid]
+	end
+
     def __popen3(*cmd)
       pw = IO::pipe   # pipe[0] for read, pipe[1] for write
       pr = IO::pipe
@@ -238,7 +246,7 @@ module Session
           exec(*cmd)
         }
 
-      Process::detach pid   # avoid zombies
+      #Process::detach pid   # avoid zombies
 
       pw[0].close
       pr[1].close
@@ -317,7 +325,7 @@ module Session
 
 		# store cmd if tracking history
 		  history << cmd if track_history
-      	
+      		  puts "inside execute #{cmd.cmd}"	
 		  stdin.printf "%s\n", cmd.cmd 
 	end
 		
@@ -356,9 +364,9 @@ module Session
         exceptions = []
 			
 		# fire off reader threads
-        [err, out].each do |iodat|
+        #[err, out].each do |iodat|
           @threads <<
-            Thread::new(iodat, main) do |iodat, main|
+            Thread::new(out, main) do |iodat, main|
 			#puts "inside #{iodat[:name]} - #{@threads.length}"
 
               loop do
@@ -380,7 +388,7 @@ module Session
 
               true
           end
-        end
+        #end
       ensure
       # reap all threads - accumulating and rethrowing any exceptions
 =begin
