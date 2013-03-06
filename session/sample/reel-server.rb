@@ -91,6 +91,7 @@ class TerminalUser
 	def kill_all
 		kill_all_children(-9)
 		@bash.close
+		sleep 1
 =begin
 		intermediate_parent = get_children_process(@bash.pid)[0]
 		system("kill -9 #{@parent_pid}")
