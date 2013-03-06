@@ -14,14 +14,14 @@ Eye.application "test" do
 
     chain :grace => 5.seconds, :action => :restart # restarting with 5s interval, one by one.
   	
-	process("reel-server") do
+    process("reel-server") do
       pid_file "1.pid" # will be expanded with working_dir
       start_command "ruby ./reel-server.rb"
       daemonize true
       stdall "reel-server.log"
 
       checks :cpu, :below => 30, :every => 1.minute
-	  checks :memory, :below => 50.megabytes, :every => 1.minute
+      checks :memory, :below => 50.megabytes, :every => 1.minute
     end
   
 end
