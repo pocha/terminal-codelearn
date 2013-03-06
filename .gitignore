@@ -11,5 +11,5 @@
 /demo-app/db/*.sqlite3
 
 # Ignore all logfiles and tempfiles.
-/log/*.log
+/demo-app/log/*.log
 /demo-app/tmp
