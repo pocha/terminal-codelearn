@@ -12,4 +12,4 @@
 
 # Ignore all logfiles and tempfiles.
 /demo-app/log/*.log
-/demo-app/tmp
+/demo-app/tmp/*
