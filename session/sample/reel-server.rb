@@ -4,6 +4,19 @@ require 'stringio'
 require 'json'
 require 'cgi'
 
+ANSI_COLOR_CODE = {
+	0 => 'black',
+	1 => 'red',
+	2 => 'green',
+	3 => 'yellow',
+	4 => 'blue',
+	5 => 'purple',
+	6 => 'cyan',
+	7 => 'white'
+}
+
+
+
 class TerminalUser
 	
 	def initialize(user)
@@ -11,67 +24,66 @@ class TerminalUser
 		@output = ""
 		@read_data = StringIO::new(@output)
 		@check_data = StringIO::new(@output)
-		@bash.outproc = lambda {|out| @output << out }
-		@bash.errproc = lambda {|err| @output << err }
+		@bash.outproc = lambda {|out| 
+			@output << out
+			@status = ( /(\$|>)\s*\z/.match(out) ) ? "complete" : "waiting"
+		}
+		#commenting out as no STDERR in ruby pty
+		#@bash.errproc = lambda {|err| @output << err }
 		@bash._initialize
+		@status = "waiting"
 		sleep 1	
-=begin
-		@bash.execute(" ")
-		loop do
-			@ps1 = @check_data.gets
-			break if !@ps1.nil? #hold till output got some data
-		end
-		puts "PS1 - #{@ps1}"
-		@ps1.gsub!("$","\\$")
-=end
 	end
 	
-	def loop_for_lines(lines) #for normal command, 2 lines are one input & 1 output. For @bash.execute("\n"), two lines suffice as well
-		count = 0
-		loop do
-			puts "inside loop"
-			if !@check_data.gets.nil?
-				count = count + 1
-			end
-			break if count == lines
-		end
-	end
 
 	def execute(command)
 		puts @bash.inspect
-		#if !command.nil? and !command.empty? and !/^\s+$/.match(command) #The if ensures that empty command do not get executed as we are anyway sending two enters below
-			puts "Executing command"
-			#@check_data.read #empty check data
-			@bash.execute(command)
+		puts "Executing command"
+		@bash.execute(command)
 
-			#wait for the input command to appear
-			#loop_for_lines(1) - guess its best to wait for a second or so else the output gets garbled
-			sleep 1
-		#end
-		#@check_data.read #empty check data
-		#@bash.execute("") #empty command so that post complete we get the PS1 back 
-		#loop_for_lines(2)
-		#sleep 1 #sleep another second. Passing empty input wont show on the output. So cant loop/wait for lines
+		sleep 1
 	end
 
 	def respond(request)
 		puts "output - #{@output}"
-		status = (/\$\s*\z/.match(@output) or />\s*\z/.match(@output)) ? "complete" : "waiting"
 		data = @read_data.read
 		puts "data - #{data}"
-
-		if /\$\s*\z/.match(data)
-			@output.slice!(0,@read_data.pos)
-			@read_data.rewind
-			request.respond :ok, JSON.generate({:content => data, :status => 'complete'})
-		elsif />\s*\z/.match(data)
-			@output.slice!(0,@read_data.pos)
-			@read_data.rewind
-			request.respond :ok, JSON.generate({:content => data, :status => 'complete'})
-		else
-			request.respond :ok, JSON.generate({:content => data, :status => 'waiting'})
-		end
+		@output.slice!(0,@read_data.pos)
+		@read_data.rewind
+		request.respond :ok, JSON.generate({:content => sanitize_ansi_data(data), :status => @status})
 	end
+
+	def sanitize_ansi_data(data) 
+		data.gsub!(/\033\[1m/,"<b>")
+		data.gsub!(/\033\[0m/,"</b></span>")
+		
+		data.gsub!(/\033\[[\d\;]{2,}m.*?<\/b><\/span>/){ |data|
+			span = "<span style='"
+			content = ""
+			/\033\[([\d\;]{2,})m(.*?)<\/b><\/span>/.match(data) {|m|
+				content = m[2]
+				m[1].split(";").each do |code|
+					#puts code
+					if match = /(\d)(\d)/.match(code) 
+						case match[1]
+						when "3"
+							span += "color: #{ANSI_COLOR_CODE[match[2].to_i]}; "
+						when "4"
+							span += "background-color: #{ANSI_COLOR_CODE[match[2].to_i]}; "
+						else
+							#do nothing
+						end
+					else
+						span += "font-weight:bold; "
+					end
+				end
+			}
+			span += "'>"
+			"#{span}#{content}</b></span>"
+		}
+		data
+	end
+
 
 	def get_children_process(pid)
 		`ps --ppid #{pid} | grep -v PID | awk '{print $1}'`.split("\n")
@@ -141,8 +153,6 @@ class MyServer < Reel::Server
 			Thread::new(terminal_user, command) do |terminal_user, command|
 				terminal_user.execute(command)
 			end
-			#request.respond :ok, JSON.generate({:content => "", :status => 'waiting'})
-			#return
 		end
 
 		if type == "kill"
@@ -150,9 +160,6 @@ class MyServer < Reel::Server
 		end
 
 		if type == "reset"
-			#kill all children (that could be hung like vim) as well as bash processes
-			#terminal_user.kill_all_children(-9)
-			#terminal_user.execute("exit")
 			handle_error(terminal_user, user,request)			
 		end
 
@@ -167,6 +174,7 @@ class MyServer < Reel::Server
 		terminal_user.kill_all
 		
 		@users["#{user}"] = nil
+		#hopefully garbage collector kicks in here & picks up the object that is made nil
 		@users["#{user}"] = TerminalUser.new(user)
 		
 		request.respond :ok, JSON.generate({:status => "error", :content => ""})
