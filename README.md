@@ -18,13 +18,23 @@ Backup your .bashrc & copy the .bashrc from here to your linux user home directo
 	cd demo-app
 	bundle install
 	cd ..
+	
 	sudo su 	#the app needs to run as super user to be able to switch the user as 'su'
 	gem install reel
 	gem install json
-	cd session/sample
-	ruby reel-server.rb
+	gem install eye
 
-This will run the Terminal server at port 3001.
+	cd session/sample
+	eye l test.eye
+	eye test start
+
+This will run the Terminal server at port 3001. To stop the server, run 
+
+	eye test stop
+
+Eye is a process monitoring tool http://github.com/kostya/eye . I included it to monitor memory leaks in the server & restart the server if it dies. The logs are in session/sample/eye.log . The server logs is in session/sample/reel-server.log 
+
+This starts the Terminal server. To be able to see the Terminal in action, the *demo-app* directory is included. 
 
 Inside *app/controller/terminals_controller.rb*, change "pocha" to the linux username of your PC
 
@@ -32,7 +42,7 @@ Inside *app/controller/terminals_controller.rb*, change "pocha" to the linux use
 		"pocha"
 	end
 
-Open another terminal & run rails server
+Open another terminal & run rails server from inside demo-app
 	
 	cd demo-app
 	thin start
