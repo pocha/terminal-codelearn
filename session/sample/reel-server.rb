@@ -50,7 +50,7 @@ class TerminalUser
 		puts "data - #{data}"
 		@output.slice!(0,@read_data.pos)
 		@read_data.rewind
-		request.respond :ok, JSON.generate({:content => sanitize_ansi_data(data), :status => @status})
+		request.respond :ok, {"Content-type" => "text/html; charset=utf-8"},  JSON.generate({:content => sanitize_ansi_data(data), :status => @status})
 	end
 
 	def sanitize_ansi_data(data) 
@@ -89,7 +89,7 @@ class TerminalUser
 		`ps --ppid #{pid} | grep -v PID | awk '{print $1}'`.split("\n")
 	end
 
-	def kill_all_children(interrupt)
+def kill_all_children(interrupt)
 		if @parent_pid.nil?
 			@parent_pid = get_children_process(get_children_process(@bash.pid)[0])[0] 
 		end	
@@ -102,7 +102,7 @@ class TerminalUser
 
 	def kill_all
 		kill_all_children(-9)
-		@bash.close
+		@bash.close if @bash.ready?
 		sleep 1
 =begin
 		intermediate_parent = get_children_process(@bash.pid)[0]
