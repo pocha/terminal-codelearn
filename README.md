@@ -26,11 +26,17 @@ Backup your .bashrc & copy the .bashrc from here to your linux user home directo
 
 	cd session/sample
 	eye l test.eye
-	eye test start
+	eye start test
 
-This will run the Terminal server at port 3001. To stop the server, run 
+This will run the Terminal server at port 3001. To see if the server has started, just do
 
-	eye test stop
+	ps -ef | grep ruby
+
+There should be an entry like `ruby reel-server.rb`. It means the reel server is running. 
+
+To stop the server, run 
+
+	eye stop test
 
 Eye is a process monitoring tool http://github.com/kostya/eye . I included it to monitor memory leaks in the server & restart the server if it dies. The logs are in session/sample/eye.log . The server logs is in session/sample/reel-server.log 
 
