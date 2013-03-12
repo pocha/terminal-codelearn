@@ -35,13 +35,26 @@ class TerminalUser
 		sleep 1	
 	end
 	
+	def block_for_two_lines_in_output
+		count = 0
+		@check_data.read
+		loop_count = 0
+		loop do
+			break if @status == "complete" or loop_count > 5
+			sleep 1
+			loop_count = loop_count + 1
+			puts "inside loop"
+		end
+		puts "timeout or got end of data"
+	end
 
 	def execute(command)
 		puts @bash.inspect
+		@check_data.read
 		puts "Executing command"
 		@bash.execute(command)
-
-		sleep 1
+		#sleep 5
+		block_for_two_lines_in_output
 	end
 
 	def respond(request)
@@ -102,7 +115,11 @@ def kill_all_children(interrupt)
 
 	def kill_all
 		kill_all_children(-9)
-		@bash.close if @bash.ready?
+		begin
+			@bash.close
+		rescue Exception => e
+			puts e
+		end
 		sleep 1
 =begin
 		intermediate_parent = get_children_process(@bash.pid)[0]
@@ -119,8 +136,8 @@ end
 
 class MyServer < Reel::Server
   def initialize(host = "127.0.0.1", port = 3001)
-    super(host, port, &method(:on_connection))
-  	@users = Hash.new
+	 super(host, port, &method(:on_connection))
+	 $users = Hash.new
   end
   
   def on_connection(connection)
@@ -139,20 +156,20 @@ class MyServer < Reel::Server
 		puts "url - #{request.url}"
 		nothing,user,type,command = request.url.split("/")
 		
-		if @users["#{user}"].nil?
+		if $users["#{user}"].nil?
 			puts "user not found. Creating"
-			@users["#{user}"] = TerminalUser.new(user)
+			$users["#{user}"] = TerminalUser.new(user)
 		end
-		terminal_user = @users["#{user}"]
+		terminal_user = $users["#{user}"]
 		puts terminal_user.inspect
 		
 		
 		if type == "execute"
 			command = CGI::unescape(command) if command
 			puts "command #{command}"
-			Thread::new(terminal_user, command) do |terminal_user, command|
+			#Thread::new(terminal_user, command) do |terminal_user, command|
 				terminal_user.execute(command)
-			end
+			#end
 		end
 
 		if type == "kill"
@@ -163,9 +180,13 @@ class MyServer < Reel::Server
 			handle_error(terminal_user, user,request)			
 		end
 
+
+
 		terminal_user.respond(request)
+
 	rescue
 		#there might be a problem with broken pipe as the user might have typed 'exit'. Just send error & expect for a new request
+		puts "I am here"
 		handle_error(terminal_user, user,request)
 	end
   end
@@ -173,11 +194,27 @@ class MyServer < Reel::Server
   def handle_error(terminal_user, user,request)
 		terminal_user.kill_all
 		
-		@users["#{user}"] = nil
+		$users["#{user}"] = nil
 		#hopefully garbage collector kicks in here & picks up the object that is made nil
-		@users["#{user}"] = TerminalUser.new(user)
+		$users["#{user}"] = TerminalUser.new(user)
 		
-		request.respond :ok, JSON.generate({:status => "error", :content => ""})
+		request.respond :ok, {"Content-type" => "text/html; charset=utf-8"}, JSON.generate({:status => "error", :content => ""})
+		return
+  end
+
+  def self.exit_system #cleanup all the users
+	   $users.each do |user, terminal_user|
+			terminal_user.kill_all
+			$users["#{user}"] = nil
+		end
+
+		#there could be the case when for a user multiple process might have spawned. Kill all the process with 'bash -i'
+		`ps -ef | grep "bash -i" | awk '{print $2}'`.split("\n").each do |pid|
+			puts "killing pid #{pid}"
+			`kill -9 #{pid}`
+			sleep 1
+		end
+		puts "All is well"
 		return
   end
 
@@ -186,5 +223,8 @@ class MyServer < Reel::Server
     sock.close
   end
 end
-
-MyServer.run
+begin
+	MyServer.run
+rescue SystemExit, Interrupt
+	MyServer.exit_system
+end
