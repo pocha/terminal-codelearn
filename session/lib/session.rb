@@ -373,10 +373,10 @@ module Session
 				#puts "inside loop #{iodat[:name]} - #{@threads.length}"
                 main.raise(PipeError, command) unless ready? 
                 line = iodat[:io].readpartial(4096)
-				buf = line
+		buf = line
 
                 #if buf
-				  puts "inside session stdout - #{buf}"
+		  puts "inside session stdout - #{buf}"
                   #iodat[:mutex].synchronize do
                     #iodat[:cmd] << buf
                     #iodat[:redirect] << buf if iodat[:redirect]
@@ -384,6 +384,7 @@ module Session
                     #iodat[:yield].call buf  if block_given?
                   #end
                 #end
+		sleep 1
               end
 
               true
