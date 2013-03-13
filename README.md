@@ -56,3 +56,19 @@ Open another terminal & run rails server from inside demo-app
 > Used thin instead of Webrick as Webrick did not support parallel requests
 
 Now open *http://localhost:3000/* on your browser & start fiddling.
+
+#Test Setup
+
+Stress test the server with multiple users sending requests in parallel through siege
+> Install siege from the source.
+
+	cd stress-tests
+	# install siege from the source siege-2.55.tar.gz
+	sudo su
+	ruby multi-user-stress-test.rb #you need to be root as the script creates multiple users on your linux machine & deletes at the end of the tests
+
+Rspec test for multi Terminal per user 
+
+	cd demo-app
+	rspec spec/requests/multi_terminals_spec.rb
+
