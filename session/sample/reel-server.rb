@@ -58,6 +58,7 @@ class TerminalUser
 	end
 
 	def respond(request)
+		block_for_output_to_come
 		puts "output - #{@output}"
 		data = @read_data.read
 		puts "data - #{data}"
@@ -102,7 +103,7 @@ class TerminalUser
 		`ps --ppid #{pid} | grep -v PID | awk '{print $1}'`.split("\n")
 	end
 
-def kill_all_children(interrupt)
+	def kill_all_children(interrupt)
 		if @parent_pid.nil?
 			@parent_pid = get_children_process(get_children_process(@bash.pid)[0])[0] 
 		end	
