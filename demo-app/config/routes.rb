@@ -2,12 +2,12 @@ TerminalCodelearn::Application.routes.draw do
 	
   root :to => "terminals#index" 
 
-  get "terminals/get"
+  match "terminals/:terminal_id/get" => "terminals#get"
 
-  match "terminals/execute" => "terminals#execute", :via => "post"
+  match "terminals/:terminal_id/execute" => "terminals#execute", :via => "post"
 
-  get "terminals/kill"
-  get "terminals/reset"
+  match "terminals/:terminal_id/kill" => "terminals#kill"
+  match "terminals/:terminal_id/reset" => "terminals#reset"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

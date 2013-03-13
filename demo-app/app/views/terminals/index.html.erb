@@ -1,19 +1,49 @@
-<pre id="output" style="height:300px; overflow:auto; position:relative">
+<ul class="nav nav-tabs">
+	<li class="active"><a href="#terminal-1" data-toggle="tab">Terminal 1</a></li>
+	<li><a href="#terminal-2" data-toggle="tab">Terminal 2</a></li>
+</ul>
+
+<div class="tab-content" style="position:relative">
+
 	<img style="position:fixed; left: 45%; top: 45%; z-index:1; height:40px; display:none" src="/assets/loading51.gif" id="loading-img"/>
-</pre>
-<div class="row-fluid">
-	<div class="span6">
-		<form id="myForm" class="form-inline" method="POST" action="/terminals/execute">
-		  <input type="text" class="input-large" style="width:70%" name="command" placeholder="Enter Command" autocomplete="off">
-		  <button type="submit" class="btn btn-primary">Go</button>
-		</form>
+
+	<div id="terminal-1" class="tab-pane active">
+		<pre id="output" style="height:300px; overflow:auto;"></pre>
+
+		<div class="row-fluid">
+			<div class="span6">
+				<form id="myForm" class="form-inline" method="POST" action="/terminals/0/execute">
+					<input type="text" class="input-large" style="width:70%" name="command" placeholder="Enter Command" autocomplete="off">
+					<button type="submit" class="btn btn-primary">Go</button>
+				</form>
+			</div>
+			<div class="span6">
+				<button id="refresh" class="btn btn-success">Get Data</button>
+				<button id="kill" class="btn btn-warning">Kill process</button>
+				<button id="reset" class="btn btn-danger">Reset</button>
+			</div>
+		</div>
 	</div>
-	<div class="span6">
-	  <button id="refresh" class="btn btn-success">Get Data</button>
-	  <button id="kill" class="btn btn-warning">Kill process</button>
-	  <button id="reset" class="btn btn-danger">Reset</button>
-  	</div>
-</div>
+	
+	<div id="terminal-2" class="tab-pane">
+		<pre id="output" style="height:300px; overflow:auto;"></pre>
+
+		<div class="row-fluid">
+			<div class="span6">
+				<form id="myForm" class="form-inline" method="POST" action="/terminals/1/execute">
+					<input type="text" class="input-large" style="width:70%" name="command" placeholder="Enter Command" autocomplete="off">
+					<button type="submit" class="btn btn-primary">Go</button>
+				</form>
+			</div>
+			<div class="span6">
+				<button id="refresh" class="btn btn-success">Get Data</button>
+				<button id="kill" class="btn btn-warning">Kill process</button>
+				<button id="reset" class="btn btn-danger">Reset</button>
+			</div>
+		</div>
+	</div>
+
+</div><!-- tab-content -->
 
 <script> 
 	// wait for the DOM to be loaded 
@@ -28,57 +58,78 @@
 				$("#loading-img").hide()
 			}
 		});
+		
+		t1 = new CodelearnTerminal('terminal-1',0)
+		t1.setup()
 
-		// bind 'myForm' and provide a simple callback function 
-		$('#myForm').ajaxForm({
+		t2 = new CodelearnTerminal('terminal-2',1)
+		t2.setup()
+
+	});
+
+function CodelearnTerminal(_id,_number) {
+	
+	var id = _id
+
+	var objDiv = document.getElementById(id).getElementsByTagName('pre')[0];
+	var removeFirstOutputLine = false
+
+	function getElement(element) {
+		return $("#"+id+" "+element)
+	}
+
+	this.setup = function() {
+		
+		getElement('#myForm').ajaxForm({
 			beforeSubmit: function() {
-				$("input[name='command']").val(''); 
 				$("#loading-img").show()
-				_setTimeout(function(){ poll(fetchData) }, 1000)
+				getElement("#output").append(getElement("input[name='command']").val())
+				getElement("input[name='command']").val('');
+				removeFirstOutputLine = true
+				//_setTimeout(function(){ poll(fetchData) }, 1000)
 			}
-			, success: function(data) { /* fetchData(data) */ }
+			, success: function(data) {  fetchData(data)  }
 			,complete: function() { 
-				$("input[name='command']").focus(); 
+				getElement("input[name='command']").focus(); 
 			}
 		});
-		
-		$("#refresh").click(function(){ poll(fetchData) });
 
-		$("#kill").click(function(){
+		getElement("#refresh").click(function(){ poll(fetchData) });
+
+		getElement("#kill").click(function(){
 			$.ajax ({
-				url: "/terminals/kill",
+				url: "/terminals/"+_number+"/kill",
 				success: function(data){ fetchData(data) }
 			})
 		})
 
-		$("#reset").click(function(){
+		getElement("#reset").click(function(){
 			$.ajax({
 				beforeSend: function() {
-					$("#output").html('<img style="position:fixed; left: 45%; top: 45%; z-index:1; height:40px; display:none" src="/assets/loading51.gif" id="loading-img"/>')
+					getElement("#output").html('')
 					$("#loading-img").show()
 				}
-				, url: "/terminals/reset",
+				, url: "/terminals/"+_number+"/reset",
 				success: function(data) { fetchData(data) }
 			})
 		})
-		
-		initialize();
-	});
 
-	var objDiv = document.getElementById("output");
-	
+		initialize();
+
+	}
+
 	function initialize() {
-		$("#output").html('<img style="position:fixed; left: 45%; top: 45%; z-index:1; height:40px; display:none" src="/assets/loading51.gif" id="loading-img"/>')
+		getElement("#output").html('')
 
 		$.ajax({
-				url: "/terminals/execute",
-				type: "POST",
-				data: "",
-				success: function(data) { fetchData(data) }
-				,complete: function() { $("input[name='command']").focus(); }
-			})
+			url: "/terminals/"+_number+"/execute",
+			type: "POST",
+			data: "",
+			success: function(data) { fetchData(data) }
+			,complete: function() { getElement("input[name='command']").focus(); }
+		})
 	}
-	
+
 	var Scheduled
 	function _setTimeout(func,time) {
 		clearTimeout(Scheduled)
@@ -86,9 +137,13 @@
 	}
 
 	function fetchData(data) {
-		if ( data.content != "") { //change it to remove the last line of the previous data & append current data
+		if ( data.content != "") { 
 			console.log("Data received - " + data.content)
-			$("#output").append(data.content)
+			if (removeFirstOutputLine) {
+				data.content = data.content.replace(/^.*?\r\n/,"\r\n")
+				removeFirstOutputLine = false
+			}
+			getElement("#output").append(data.content)
 			objDiv.scrollTop = objDiv.scrollHeight
 		}
 		if ( data.status == "waiting" ) {
@@ -97,7 +152,7 @@
 		else if (data.status == "error") {
 			initialize()
 		}
-		else {
+		else { //complete
 			clearTimeout(Scheduled)
 			$("#loading-img").hide()
 		}
@@ -107,7 +162,7 @@
 	function poll(func) {
 		console.log("inside poll")
 		$.ajax( {
-			url: "/terminals/get",
+			url: "/terminals/"+_number+"/get",
 			success : function(data, textStatus, jqXHR){
 				if ( data == "" ) {
 					_setTimeout(function() {poll(func)}, 1000)
@@ -118,6 +173,6 @@
 			}
 		})
 	}
-
+}
 
 </script> 
