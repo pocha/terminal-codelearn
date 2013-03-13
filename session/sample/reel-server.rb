@@ -35,7 +35,7 @@ class TerminalUser
 		sleep 1	
 	end
 	
-	def block_for_two_lines_in_output
+	def block_for_output_to_come
 		count = 0
 		@check_data.read
 		loop_count = 0
@@ -49,12 +49,12 @@ class TerminalUser
 	end
 
 	def execute(command)
+		@status = "waiting" #changing state so that execution hangs till output appear
 		puts @bash.inspect
-		@check_data.read
-		puts "Executing command"
+		puts "Executing command - #{command}"
 		@bash.execute(command)
-		#sleep 5
-		block_for_two_lines_in_output
+		#sleep 1
+		block_for_output_to_come
 	end
 
 	def respond(request)
@@ -154,13 +154,18 @@ class MyServer < Reel::Server
   def handle_request(request)
 	begin	
 		puts "url - #{request.url}"
-		nothing,user,type,command = request.url.split("/")
-		
-		if $users["#{user}"].nil?
-			puts "user not found. Creating"
-			$users["#{user}"] = TerminalUser.new(user)
+		nothing,user,terminal_no,type,command = request.url.split("/")
+		terminal_no = terminal_no.to_i
+
+		if $users["#{user}"].nil? 
+			puts "#{user} not found. Creating"
+			$users["#{user}"] = []
+			$users["#{user}"][terminal_no] = TerminalUser.new(user)
+		elsif $users["#{user}"][terminal_no].nil?
+			$users["#{user}"][terminal_no] = TerminalUser.new(user)
 		end
-		terminal_user = $users["#{user}"]
+		
+		terminal_user = $users["#{user}"][terminal_no]
 		puts terminal_user.inspect
 		
 		
@@ -177,35 +182,38 @@ class MyServer < Reel::Server
 		end
 
 		if type == "reset"
-			handle_error(terminal_user, user,request)			
+			handle_error(terminal_user, user, terminal_no, request)			
 		end
 
 
 
 		terminal_user.respond(request)
 
-	rescue
+	rescue Exception => e
 		#there might be a problem with broken pipe as the user might have typed 'exit'. Just send error & expect for a new request
-		puts "I am here"
-		handle_error(terminal_user, user,request)
+		puts "---- Inside Exception ----\n#{e}"
+		handle_error(terminal_user, user, terminal_no, request)
 	end
   end
 
-  def handle_error(terminal_user, user,request)
+  def handle_error(terminal_user, user, terminal_no, request)
 		terminal_user.kill_all
 		
-		$users["#{user}"] = nil
+		$users["#{user}"][terminal_no] = nil
 		#hopefully garbage collector kicks in here & picks up the object that is made nil
-		$users["#{user}"] = TerminalUser.new(user)
+		$users["#{user}"][terminal_no] = TerminalUser.new(user)
 		
 		request.respond :ok, {"Content-type" => "text/html; charset=utf-8"}, JSON.generate({:status => "error", :content => ""})
 		return
   end
 
   def self.exit_system #cleanup all the users
-	   $users.each do |user, terminal_user|
-			terminal_user.kill_all
-			$users["#{user}"] = nil
+	   $users.each do |user, terminals|
+		   terminals.each_with_index.map do |terminal_user,i|
+				terminal_user.kill_all
+				terminals[i] = nil
+		   end
+		   $users["#{user}"] = nil
 		end
 
 		#there could be the case when for a user multiple process might have spawned. Kill all the process with 'bash -i'
