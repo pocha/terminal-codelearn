@@ -51,3 +51,5 @@ while user_count <= TOTAL_USERS do
 	system("userdel -rf user_#{user_count}")
 	user_count = user_count + 1
 end
+
+puts "done. There might be some siege process running. Kill them via 'ps -ef | grep siege'"
