@@ -13,3 +13,4 @@
 # Ignore all logfiles and tempfiles.
 /demo-app/log/*.log
 /demo-app/tmp/*
+/mongo-stuff/data
