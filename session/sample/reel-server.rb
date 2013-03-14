@@ -3,6 +3,7 @@ require '../lib/session'
 require 'stringio'
 require 'json'
 require 'cgi'
+require 'moped'
 
 ANSI_COLOR_CODE = {
 	0 => 'black',
@@ -15,6 +16,8 @@ ANSI_COLOR_CODE = {
 	7 => 'white'
 }
 
+$mongodb_session = Moped::Session.new([ "127.0.0.1:27017" ])
+$mongodb_session.use "terminal_commands"
 
 
 class TerminalUser
@@ -64,7 +67,7 @@ class TerminalUser
 		puts "data - #{data}"
 		@output.slice!(0,@read_data.pos)
 		@read_data.rewind
-		request.respond :ok, {"Content-type" => "text/html; charset=utf-8"},  JSON.generate({:content => sanitize_ansi_data(data), :status => @status})
+		[sanitize_ansi_data(data), @status]
 	end
 
 	def sanitize_ansi_data(data) 
@@ -158,17 +161,20 @@ class MyServer < Reel::Server
 		nothing,user,terminal_no,type,command = request.url.split("/")
 		terminal_no = terminal_no.to_i
 
-		if $users["#{user}"].nil? 
+		if $users[user].nil? 
 			puts "#{user} not found. Creating"
-			$users["#{user}"] = []
-			$users["#{user}"][terminal_no] = TerminalUser.new(user)
-		elsif $users["#{user}"][terminal_no].nil?
-			$users["#{user}"][terminal_no] = TerminalUser.new(user)
+			$users[user] = []
+			$users[user][terminal_no] = TerminalUser.new(user)
+		elsif $users[user][terminal_no].nil?
+			$users[user][terminal_no] = TerminalUser.new(user)
 		end
 		
-		terminal_user = $users["#{user}"][terminal_no]
+		terminal_user = $users[user][terminal_no]
 		puts terminal_user.inspect
+		now = Time.now
 		
+		#insert into mongo now before any errors that might come
+		$mongodb_session[:commands].insert(user: user, terminal_no: terminal_no, command: (command.nil? ? "/#{type}" : CGI::unescape(command)), type: 'input', time: "#{now}")
 		
 		if type == "execute"
 			command = CGI::unescape(command) if command
@@ -187,8 +193,12 @@ class MyServer < Reel::Server
 		end
 
 
-
-		terminal_user.respond(request)
+		data, status = terminal_user.respond(request)
+		request.respond :ok, {"Content-type" => "text/html; charset=utf-8"},  JSON.generate({:content => data, :status => status})
+  
+		if !data.empty? #logging only non-empty output to keep the clutter less 
+			$mongodb_session[:commands].insert(user: user, terminal_no: terminal_no, command: data.gsub(%r{</?[^>]+?>}, ''), type: 'output', time: "#{now}") 
+		end
 
 	rescue Exception => e
 		#there might be a problem with broken pipe as the user might have typed 'exit'. Just send error & expect for a new request
@@ -200,9 +210,9 @@ class MyServer < Reel::Server
   def handle_error(terminal_user, user, terminal_no, request)
 		terminal_user.kill_all
 		
-		$users["#{user}"][terminal_no] = nil
+		$users[user][terminal_no] = nil
 		#hopefully garbage collector kicks in here & picks up the object that is made nil
-		$users["#{user}"][terminal_no] = TerminalUser.new(user)
+		$users[user][terminal_no] = TerminalUser.new(user)
 		
 		request.respond :ok, {"Content-type" => "text/html; charset=utf-8"}, JSON.generate({:status => "error", :content => ""})
 		return
@@ -214,14 +224,13 @@ class MyServer < Reel::Server
 				terminal_user.kill_all
 				terminals[i] = nil
 		   end
-		   $users["#{user}"] = nil
+		   $users[user] = nil
 		end
 
 		#there could be the case when for a user multiple process might have spawned. Kill all the process with 'bash -i'
 		`ps -ef | grep "bash -i" | awk '{print $2}'`.split("\n").each do |pid|
 			puts "killing pid #{pid}"
 			`kill -9 #{pid}`
-			sleep 1
 		end
 		puts "All is well"
 		return

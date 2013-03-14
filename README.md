@@ -8,17 +8,18 @@ The purpose of this app is not to emulate a true Terminal. It is designed to let
 
 #Installation 
 
-Backup your .bashrc & copy the .bashrc from here to your linux user home directory
+All the commands are logged in mongodb database. Read *mongo-stuff/README.md* to setup mongodb & moped Ruby driver, if you have not already set it up.  
 
-	cp ~/.bashrc ~/.bashrc-bkup
-	cp .bashrc ~/.bashrc
+> If you do not want to log the data, you can remove lines with `$mongodb_session = ...` inside *session/sample/reel-server.rb* & it will be fine. Also remove `require 'moped'` as you most probably will not have the Ruby gem installed either. 
 
-.bashrc is used to calculate $PS1 . Colored $PS1 might create problems. 
+Install the gems for demo-app which is the example app that uses Terminal server
 
 	cd demo-app
 	bundle install
 	cd ..
-	
+
+Install the gems for Terminal server
+
 	sudo su 	#the app needs to run as super user to be able to switch the user as 'su'
 	gem install reel
 	gem install json
@@ -32,7 +33,7 @@ This will run the Terminal server at port 3001. To see if the server has started
 
 	ps -ef | grep ruby
 
-There should be an entry like `ruby reel-server.rb`. It means the reel server is running. 
+There should be an entry like `ruby reel-server.rb`. It means the Terminal server is running. *session/sample/reel-server.rb* is the file where all the magic happens.
 
 To stop the server, run 
 
@@ -57,10 +58,16 @@ Open another terminal & run rails server from inside demo-app
 
 Now open *http://localhost:3000/* on your browser & start fiddling.
 
+P.S. - if you see garbled prompt, backup your .bashrc & copy the .bashrc from here to your linux user home directory
+
+	cp ~/.bashrc ~/.bashrc-bkup
+	cp .bashrc ~/.bashrc
+
+.bashrc is used to calculate $PS1 . Colored $PS1 might lead to garbled prompt.
+
 #Test Setup
 
 Stress test the server with multiple users sending requests in parallel through siege
-> Install siege from the source.
 
 	cd stress-tests
 	# install siege from the source siege-2.55.tar.gz
