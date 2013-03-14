@@ -48,6 +48,10 @@
 <script> 
 	// wait for the DOM to be loaded 
 	$(document).ready(function() {
+		
+		$.ajaxPrefilter( function( options ) {
+			options.url += "?authenticity_token=<%= form_authenticity_token %>";
+		});
 
 		$.ajaxSetup({
 			beforeSend: function() {
