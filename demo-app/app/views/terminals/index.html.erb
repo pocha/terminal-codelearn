@@ -1,6 +1,6 @@
 <ul class="nav nav-tabs">
-	<li class="active"><a href="#terminal-1" data-toggle="tab">Terminal 1</a></li>
-	<li><a href="#terminal-2" data-toggle="tab">Terminal 2</a></li>
+	<li class="active"><a href="#terminal-1" data-toggle="pill">Terminal 1</a></li>
+	<li><a href="#terminal-2" data-toggle="pill">Terminal 2</a></li>
 </ul>
 
 <div class="tab-content" style="position:relative">
@@ -18,9 +18,9 @@
 				</form>
 			</div>
 			<div class="span6">
-				<button id="refresh" class="btn btn-success">Get Data</button>
-				<button id="kill" class="btn btn-warning">Kill process</button>
-				<button id="reset" class="btn btn-danger">Reset</button>
+				<!--<button id="refresh" class="btn btn-success">Get Data</button> -->
+				<button id="kill" class="btn">Kill process</button>
+				<button id="reset" class="btn">Reset</button>
 			</div>
 		</div>
 	</div>
@@ -36,9 +36,9 @@
 				</form>
 			</div>
 			<div class="span6">
-				<button id="refresh" class="btn btn-success">Get Data</button>
-				<button id="kill" class="btn btn-warning">Kill process</button>
-				<button id="reset" class="btn btn-danger">Reset</button>
+				<!--<button id="refresh" class="btn btn-success">Get Data</button>-->
+				<button id="kill" class="btn">Kill process</button>
+				<button id="reset" class="btn">Reset</button>
 			</div>
 		</div>
 	</div>
@@ -48,7 +48,7 @@
 <script> 
 	// wait for the DOM to be loaded 
 	$(document).ready(function() {
-		
+
 		$.ajaxPrefilter( function( options ) {
 			options.url += "?authenticity_token=<%= form_authenticity_token %>";
 		});
