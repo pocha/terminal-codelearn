@@ -19,11 +19,16 @@ ANSI_COLOR_CODE = {
 $mongodb_session = Moped::Session.new([ "127.0.0.1:27017" ])
 $mongodb_session.use "terminal_commands"
 
+#making function global as it is needed by both TerminalUser & MyServer
+def get_children_process(pid)
+	`ps --ppid #{pid} | grep -v PID | awk '{print $1}'`.split("\n")
+	#Could not find a Ruby way to do this
+end
 
 class TerminalUser
 	
 	def initialize(user)
-		@bash = Session::Bash::new({:prog => "su -l #{user} -c 'bash -i'"})
+		@bash = Session::Bash::new({:prog => "su #{user}"})
 		@output = ""
 		@read_data = StringIO::new(@output)
 		@check_data = StringIO::new(@output)
@@ -33,22 +38,31 @@ class TerminalUser
 		}
 		#commenting out as no STDERR in ruby pty
 		#@bash.errproc = lambda {|err| @output << err }
-		@bash._initialize
+		#@bash.execute "sudo -i -u #{user}"
 		@status = "waiting"
-		sleep 1	
+		@bash._initialize
+=begin
+		#discard sudo data output - hence the below things
+		while !/terminal-codelearn/.match(@output) 
+			puts "waiting"
+			sleep 1
+		end
+		
+		@read_data.read
+		@output.slice!(0,@read_data.pos)
+		@read_data.rewind
+=end
 	end
 	
 	def block_for_output_to_come
 		count = 0
 		@check_data.read
 		loop_count = 0
-		loop do
-			break if @status == "complete" or loop_count > 5
+		until @status == "complete" or loop_count > 4
 			sleep 1
 			loop_count = loop_count + 1
 			puts "inside loop"
 		end
-		puts "timeout or got end of data"
 	end
 
 	def execute(command)
@@ -57,7 +71,7 @@ class TerminalUser
 		puts "Executing command - #{command}"
 		@bash.execute(command)
 		#sleep 1
-		block_for_output_to_come
+		#block_for_output_to_come
 	end
 
 	def respond(request)
@@ -102,13 +116,10 @@ class TerminalUser
 	end
 
 
-	def get_children_process(pid)
-		`ps --ppid #{pid} | grep -v PID | awk '{print $1}'`.split("\n")
-	end
 
 	def kill_all_children(interrupt)
 		if @parent_pid.nil?
-			@parent_pid = get_children_process(get_children_process(@bash.pid)[0])[0] 
+			@parent_pid = get_children_process(@bash.pid)[0] 
 		end	
 		get_children_process(@parent_pid).each do |p|
 			system("kill #{interrupt} #{p}")
@@ -219,21 +230,33 @@ class MyServer < Reel::Server
   end
 
   def self.exit_system #cleanup all the users
-	   $users.each do |user, terminals|
-		   terminals.each_with_index.map do |terminal_user,i|
-				terminal_user.kill_all
-				terminals[i] = nil
-		   end
-		   $users[user] = nil
-		end
+	puts "Cleaning up all users. This may take sometime. Please wait ...."
 
-		#there could be the case when for a user multiple process might have spawned. Kill all the process with 'bash -i'
-		`ps -ef | grep "bash -i" | awk '{print $2}'`.split("\n").each do |pid|
-			puts "killing pid #{pid}"
-			`kill -9 #{pid}`
-		end
-		puts "All is well"
-		return
+	$users.each do |user, terminals|
+	   terminals.each_with_index.map do |terminal_user,i|
+			terminal_user.kill_all
+			terminals[i] = nil
+	   end
+	   $users[user] = nil
+	end
+
+	#kill any remaining child process that are active
+	puts "Process pid #{Process.pid}"
+	get_children_process(Process.pid).each do |p| #recursively kill  
+		MyServer.kill_children_and_self(p)
+	end
+		
+	puts "All is well"
+	return
+  
+  end
+
+  def self.kill_children_and_self(pid)
+	  get_children_process(pid).each do |p|
+		  kill_children_and_self(p)
+	  end
+	  puts "Killing pid #{pid}"
+	  system("kill -9 #{pid}")
   end
 
   def handle_websocket(sock)
