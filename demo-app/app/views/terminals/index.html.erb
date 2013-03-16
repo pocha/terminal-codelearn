@@ -12,7 +12,7 @@
 
 		<div class="row-fluid">
 			<div class="span6">
-				<form id="myForm" class="form-inline" method="POST" action="/terminals/0/execute">
+				<form id="myForm" class="form-inline" action="/terminals/0/execute">
 					<input type="text" class="input-large" style="width:70%" name="command" placeholder="Enter Command" autocomplete="off">
 					<button type="submit" class="btn btn-primary">Go</button>
 				</form>
@@ -30,7 +30,7 @@
 
 		<div class="row-fluid">
 			<div class="span6">
-				<form id="myForm" class="form-inline" method="POST" action="/terminals/1/execute">
+				<form id="myForm" class="form-inline" action="/terminals/1/execute">
 					<input type="text" class="input-large" style="width:70%" name="command" placeholder="Enter Command" autocomplete="off">
 					<button type="submit" class="btn btn-primary">Go</button>
 				</form>
@@ -48,10 +48,6 @@
 <script> 
 	// wait for the DOM to be loaded 
 	$(document).ready(function() {
-
-		$.ajaxPrefilter( function( options ) {
-			options.url += "?authenticity_token=<%= form_authenticity_token %>";
-		});
 
 		$.ajaxSetup({
 			beforeSend: function() {
@@ -126,9 +122,7 @@ function CodelearnTerminal(_id,_number) {
 		getElement("#output").html('')
 
 		$.ajax({
-			url: "/terminals/"+_number+"/execute",
-			type: "POST",
-			data: "",
+			url: "/terminals/"+_number+"/execute/",
 			success: function(data) { fetchData(data) }
 			,complete: function() { getElement("input[name='command']").focus(); }
 		})

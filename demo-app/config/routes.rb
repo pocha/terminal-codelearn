@@ -4,7 +4,7 @@ TerminalCodelearn::Application.routes.draw do
 
   match "terminals/:terminal_id/get" => "terminals#get"
 
-  match "terminals/:terminal_id/execute" => "terminals#execute", :via => "post"
+  match "terminals/:terminal_id/execute" => "terminals#execute"
 
   match "terminals/:terminal_id/kill" => "terminals#kill"
   match "terminals/:terminal_id/reset" => "terminals#reset"
