@@ -5,9 +5,10 @@
 
 <div class="tab-content" style="position:relative">
 
-	<img style="position:fixed; left: 45%; top: 45%; z-index:1; height:40px; display:none" src="/assets/loading51.gif" id="loading-img"/>
 
 	<div id="terminal-1" class="tab-pane active">
+		<img style="position:fixed; left: 45%; top: 45%; z-index:1; height:40px; display:none" src="/assets/loading51.gif" id="loading-img"/>
+		
 		<pre id="output" style="height:300px; overflow:auto;"></pre>
 
 		<div class="row-fluid">
@@ -26,6 +27,8 @@
 	</div>
 	
 	<div id="terminal-2" class="tab-pane">
+		<img style="position:fixed; left: 45%; top: 45%; z-index:1; height:40px; display:none" src="/assets/loading51.gif" id="loading-img"/>
+		
 		<pre id="output" style="height:300px; overflow:auto;"></pre>
 
 		<div class="row-fluid">
@@ -49,15 +52,7 @@
 	// wait for the DOM to be loaded 
 	$(document).ready(function() {
 
-		$.ajaxSetup({
-			beforeSend: function() {
-				$("#loading-img").show()
-			}
-			, error: function() {
-				alert("an error has occured")
-				$("#loading-img").hide()
-			}
-		});
+		
 		
 		t1 = new CodelearnTerminal('terminal-1',0)
 		t1.setup()
@@ -82,7 +77,7 @@ function CodelearnTerminal(_id,_number) {
 		
 		getElement('#myForm').ajaxForm({
 			beforeSubmit: function() {
-				$("#loading-img").show()
+				getElement("#loading-img").show()
 				getElement("#output").append(getElement("input[name='command']").val())
 				getElement("input[name='command']").val('');
 				removeFirstOutputLine = true
@@ -92,14 +87,25 @@ function CodelearnTerminal(_id,_number) {
 			,complete: function() { 
 				getElement("input[name='command']").focus(); 
 			}
+			, error: function() {
+				alert("an error has occured")
+				getElement("#loading-img").hide()
+			}
 		});
 
 		getElement("#refresh").click(function(){ poll(fetchData) });
 
 		getElement("#kill").click(function(){
 			$.ajax ({
+				beforeSend: function() {
+					getElement("#loading-img").show()
+				},
 				url: "/terminals/"+_number+"/kill",
 				success: function(data){ fetchData(data) }
+				, error: function() {
+					alert("an error has occured")
+					getElement("#loading-img").hide()
+				}
 			})
 		})
 
@@ -107,10 +113,14 @@ function CodelearnTerminal(_id,_number) {
 			$.ajax({
 				beforeSend: function() {
 					getElement("#output").html('')
-					$("#loading-img").show()
+					getElement("#loading-img").show()
 				}
 				, url: "/terminals/"+_number+"/reset",
 				success: function(data) { fetchData(data) }
+				, error: function() {
+					alert("an error has occured")
+					getElement("#loading-img").hide()
+				}
 			})
 		})
 
@@ -122,9 +132,16 @@ function CodelearnTerminal(_id,_number) {
 		getElement("#output").html('')
 
 		$.ajax({
+			beforeSend: function() {
+				getElement("#loading-img").show()
+			},
 			url: "/terminals/"+_number+"/execute/",
 			success: function(data) { fetchData(data) }
 			,complete: function() { getElement("input[name='command']").focus(); }
+			, error: function() {
+					alert("an error has occured")
+					getElement("#loading-img").hide()
+			}
 		})
 	}
 
@@ -136,7 +153,7 @@ function CodelearnTerminal(_id,_number) {
 
 	function fetchData(data) {
 		if ( data.content != "") { 
-			console.log("Data received - " + data.content)
+			//console.log("Data received - " + data.content)
 			if (removeFirstOutputLine) {
 				data.content = data.content.replace(/^.*?\r\n/,"\r\n")
 				removeFirstOutputLine = false
@@ -152,7 +169,7 @@ function CodelearnTerminal(_id,_number) {
 		}
 		else { //complete
 			clearTimeout(Scheduled)
-			$("#loading-img").hide()
+			getElement("#loading-img").hide()
 		}
 	}
 
@@ -160,6 +177,9 @@ function CodelearnTerminal(_id,_number) {
 	function poll(func) {
 		console.log("inside poll")
 		$.ajax( {
+			beforeSend: function() {
+				getElement("#loading-img").show()
+			},
 			url: "/terminals/"+_number+"/get",
 			success : function(data, textStatus, jqXHR){
 				if ( data == "" ) {
@@ -168,6 +188,10 @@ function CodelearnTerminal(_id,_number) {
 				else {
 					func(data)
 				}
+			}
+			, error: function() {
+					alert("an error has occured")
+					getElement("#loading-img").hide()
 			}
 		})
 	}
