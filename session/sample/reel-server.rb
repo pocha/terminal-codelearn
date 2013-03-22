@@ -4,6 +4,7 @@ require 'stringio'
 require 'json'
 require 'cgi'
 require 'moped'
+require 'active_support/core_ext/hash/slice'
 
 ANSI_COLOR_CODE = {
 	0 => 'black',
@@ -36,22 +37,8 @@ class TerminalUser
 			@output << out
 			@status = ( /(\$|>)\s*\z/.match(out) ) ? "complete" : "waiting"
 		}
-		#commenting out as no STDERR in ruby pty
-		#@bash.errproc = lambda {|err| @output << err }
-		#@bash.execute "sudo -i -u #{user}"
 		@status = "waiting"
 		@bash._initialize
-=begin
-		#discard sudo data output - hence the below things
-		while !/terminal-codelearn/.match(@output) 
-			puts "waiting"
-			sleep 1
-		end
-		
-		@read_data.read
-		@output.slice!(0,@read_data.pos)
-		@read_data.rewind
-=end
 	end
 	
 	def block_for_output_to_come
@@ -61,14 +48,14 @@ class TerminalUser
 		until @status == "complete" or loop_count > 4
 			sleep 1
 			loop_count = loop_count + 1
-			puts "inside loop"
+			#puts "inside loop"
 		end
 	end
 
 	def execute(command)
 		@status = "waiting" #changing state so that execution hangs till output appear
-		puts @bash.inspect
-		puts "Executing command - #{command}"
+		#puts @bash.inspect
+		#puts "Executing command - #{command}"
 		@bash.execute(command)
 		#sleep 1
 		#block_for_output_to_come
@@ -76,9 +63,9 @@ class TerminalUser
 
 	def respond(request)
 		block_for_output_to_come
-		puts "output - #{@output}"
+		#puts "output - #{@output}"
 		data = @read_data.read
-		puts "data - #{data}"
+		#puts "data - #{data}"
 		@output.slice!(0,@read_data.pos)
 		@read_data.rewind
 		[sanitize_ansi_data(data), @status]
@@ -135,16 +122,6 @@ class TerminalUser
 		rescue Exception => e
 			puts e
 		end
-		sleep 1
-=begin
-		intermediate_parent = get_children_process(@bash.pid)[0]
-		system("kill -9 #{@parent_pid}")
-		sleep 1
-		system("kill -9 #{intermediate_parent}")
-		sleep 1
-		system("kill -9 #{@bash.pid}")
-		sleep 1
-=end
 	end
 	
 end
@@ -168,28 +145,40 @@ class MyServer < Reel::Server
 
   def handle_request(request)
 	begin	
-		puts "url - #{request.url}"
+		#puts "url - #{request.url}"
 		nothing,user,terminal_no,type,command = request.url.split("/")
+		
+		puts "users # - #{$users.size}"
+
+		now = Time.now
+		if user == "clean"  #clean inactive users & exit 
+		  user_killed = clean_inactive_users
+		  request.respond :ok, {"Content-type" => "text/html; charset=utf-8"},  "Killed users - #{user_killed.join(" \n")}"
+		  return
+		end
+		
 		terminal_no = terminal_no.to_i
 
 		if $users[user].nil? 
-			puts "#{user} not found. Creating"
-			$users[user] = []
-			$users[user][terminal_no] = TerminalUser.new(user)
-		elsif $users[user][terminal_no].nil?
-			$users[user][terminal_no] = TerminalUser.new(user)
+			#puts "#{user} not found. Creating"
+			$users[user] = {:terminals => [], :time => now}
+			$users[user][:terminals][terminal_no] = TerminalUser.new(user)
+		elsif $users[user][:terminals][terminal_no].nil?
+			$users[user][:time] = now
+			$users[user][:terminals][terminal_no] = TerminalUser.new(user)
 		end
 		
-		terminal_user = $users[user][terminal_no]
-		puts terminal_user.inspect
-		now = Time.now
+		terminal_user = $users[user][:terminals][terminal_no]
+		#puts terminal_user.inspect
 		
 		#insert into mongo now before any errors that might come
 		$mongodb_session[:commands].insert(user: user, terminal_no: terminal_no, command: (command.nil? ? "/#{type}" : CGI::unescape(command)), type: 'input', time: "#{now}")
 		
 		if type == "execute"
+			$users[user][:time] = now #update time for the user
+			
 			command = CGI::unescape(command) if command
-			puts "command #{command}"
+			#puts "command #{command}"
 			#Thread::new(terminal_user, command) do |terminal_user, command|
 				terminal_user.execute(command)
 			#end
@@ -213,7 +202,7 @@ class MyServer < Reel::Server
 
 	rescue Exception => e
 		#there might be a problem with broken pipe as the user might have typed 'exit'. Just send error & expect for a new request
-		puts "---- Inside Exception ----\n#{e}"
+		puts "---- Inside Exception ----\n#{e.backtrace}"
 		handle_error(terminal_user, user, terminal_no, request)
 	end
   end
@@ -221,9 +210,9 @@ class MyServer < Reel::Server
   def handle_error(terminal_user, user, terminal_no, request)
 		terminal_user.kill_all
 		
-		$users[user][terminal_no] = nil
+		$users[user][:terminals][terminal_no] = nil
 		#hopefully garbage collector kicks in here & picks up the object that is made nil
-		$users[user][terminal_no] = TerminalUser.new(user)
+		#$users[user][:terminals][terminal_no] = TerminalUser.new(user)
 		
 		request.respond :ok, {"Content-type" => "text/html; charset=utf-8"}, JSON.generate({:status => "error", :content => ""})
 		return
@@ -232,11 +221,13 @@ class MyServer < Reel::Server
   def self.exit_system #cleanup all the users
 	puts "Cleaning up all users. This may take sometime. Please wait ...."
 
-	$users.each do |user, terminals|
-	   terminals.each_with_index.map do |terminal_user,i|
+	$users.each do |user, hash|
+	   hash[:terminals].each_with_index.map do |terminal_user,i|
 			terminal_user.kill_all
-			terminals[i] = nil
+			hash[:terminals][i] = nil
 	   end
+	   $users[user][:terminals] = nil
+	   $users[user][:time] = nil
 	   $users[user] = nil
 	end
 
@@ -251,6 +242,7 @@ class MyServer < Reel::Server
   
   end
 
+
   def self.kill_children_and_self(pid)
 	  get_children_process(pid).each do |p|
 		  kill_children_and_self(p)
@@ -259,9 +251,30 @@ class MyServer < Reel::Server
 	  system("kill -9 #{pid}")
   end
 
+  def clean_inactive_users
+	  user_killed = []
+	  $users.each do |user, hash|
+		  if (Time.now - hash[:time]) > 10 #if time elapsed is more than 10 min, remove user
+			  #puts "killing user #{user}"
+			  user_killed << user
+			  hash[:terminals].each_with_index do |terminal_user, index| 
+				  terminal_user.kill_all
+				  hash[:terminals][index] = nil
+			  end
+			  $users[user][:terminals] = nil
+			  $users[user][:time] = nil
+			  $users.delete(user)
+		  end
+	  end
+	  #puts $users.inspect 
+	  user_killed
+  end
+
+
+
   def handle_websocket(sock)
-    sock << "Hello everyone out there in WebSocket land!"
-    sock.close
+	  sock << "Hello everyone out there in WebSocket land!"
+	  sock.close
   end
 end
 begin
