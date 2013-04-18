@@ -1,7 +1,7 @@
 class TerminalsController < ApplicationController
 	
   def current_user
-	  "pocha"
+	  `echo $USER`.strip
   end
 
   def index
