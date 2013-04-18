@@ -43,12 +43,6 @@ Eye is a process monitoring tool http://github.com/kostya/eye . I included it to
 
 This starts the Terminal server. To be able to see the Terminal in action, the *demo-app* directory is included. 
 
-Inside *app/controller/terminals_controller.rb*, change "pocha" to the linux username of your PC
-
-	def current_user
-		"pocha"
-	end
-
 Open another terminal & run rails server from inside demo-app
 	
 	cd demo-app
