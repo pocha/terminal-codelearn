@@ -4,6 +4,7 @@ require 'stringio'
 require 'json'
 require 'cgi'
 require 'moped'
+require 'ruby-prof'
 
 ANSI_COLOR_CODE = {
 	0 => 'black',
@@ -32,9 +33,20 @@ def get_children_process(pid)
 	#Could not find a Ruby way to do this
 end
 
+# method for print ruby-profiler logs
+def print_profile_logs(results, file_name, method_name)
+	printer = RubyProf::FlatPrinter.new(results)
+	File.open "#{file_name}.log", 'a+' do |file|
+		file.puts "Profiler result from #{method_name}-----------------------------------------\n"
+		RubyProf::FlatPrinter.new(results).print(file)
+		file.puts "----------------------------------------------------------------------------\n"
+	end
+end
+
 class TerminalUser
 	
 	def initialize(user)
+		RubyProf.start
 		@bash = Session::Bash::new({:prog => "su #{user}"})
 		@output = ""
 		@read_data = StringIO::new(@output)
@@ -47,7 +59,10 @@ class TerminalUser
 		#@bash.errproc = lambda {|err| @output << err }
 		#@bash.execute "sudo -i -u #{user}"
 		@status = "waiting"
-		@bash._initialize
+		@bash._initialize	
+		profile_result = RubyProf.stop # end profiling 
+		print_profile_logs(profile_result,"reel_server_profiler", "TerminalUser -> initialize")
+		
 =begin
 		#discard sudo data output - hence the below things
 		while !/terminal-codelearn/.match(@output) 
@@ -62,6 +77,7 @@ class TerminalUser
 	end
 	
 	def block_for_output_to_come
+		RubyProf.start
 		count = 0
 		@check_data.read
 		loop_count = 0
@@ -70,13 +86,18 @@ class TerminalUser
 			loop_count = loop_count + 1
 			puts "inside loop"
 		end
+		profile_result = RubyProf.stop # end profiling
+		print_profile_logs(profile_result,"reel_server_profiler", "TerminalUser -> block_for_output_to_come")
 	end
 
 	def execute(command)
+		RubyProf.start
 		@status = "waiting" #changing state so that execution hangs till output appear
 		puts @bash.inspect
 		puts "Executing command - #{command}"
 		@bash.execute(command)
+		profile_result = RubyProf.stop # end profiling
+		print_profile_logs(profile_result,"reel_server_profiler", "TerminalUser -> execute")
 		#sleep 1
 		#block_for_output_to_come
 	end
@@ -122,8 +143,6 @@ class TerminalUser
 		data
 	end
 
-
-
 	def kill_all_children(interrupt)
 		if @parent_pid.nil?
 			@parent_pid = get_children_process(@bash.pid)[0] 
@@ -143,6 +162,7 @@ class TerminalUser
 			puts e
 		end
 		sleep 1
+		
 =begin
 		intermediate_parent = get_children_process(@bash.pid)[0]
 		system("kill -9 #{@parent_pid}")
@@ -158,12 +178,15 @@ end
 
 class MyServer < Reel::Server
    def initialize(host = DEFAULT_HOST, port = REEL_SERVER_PORT)
+   	 RubyProf.start	
 	 super(host, port, &method(:on_connection))
 	 $users = Hash.new
+	 profile_result = RubyProf.stop # end profiling
+	 print_profile_logs(profile_result,"reel_server_profiler", "MyServer -> initialize")
   end
   
   def on_connection(connection)
-    while request = connection.request
+  	while request = connection.request
       case request
       when Reel::Request
         handle_request(request)
@@ -174,11 +197,10 @@ class MyServer < Reel::Server
   end
 
   def handle_request(request)
-	begin	
-		puts "url - #{request.url}"
+  	begin	
+  		puts "url - #{request.url}"
 		nothing,user,terminal_no,type,command = request.url.split("/")
 		terminal_no = terminal_no.to_i
-
 		if $users[user].nil? 
 			puts "#{user} not found. Creating"
 			$users[user] = []
@@ -186,13 +208,15 @@ class MyServer < Reel::Server
 		elsif $users[user][terminal_no].nil?
 			$users[user][terminal_no] = TerminalUser.new(user)
 		end
-		
 		terminal_user = $users[user][terminal_no]
 		puts terminal_user.inspect
 		now = Time.now
 		
 		#insert into mongo now before any errors that might come
+		RubyProf.start
 		$mongodb_session[:commands].insert(user: user, terminal_no: terminal_no, command: (command.nil? ? "/#{type}" : CGI::unescape(command)), type: 'input', time: "#{now}")
+		profile_result = RubyProf.stop # end profiling
+	 	print_profile_logs(profile_result,"reel_server_profiler", "MyServer -> insert_mongodb")
 		
 		if type == "execute"
 			command = CGI::unescape(command) if command
@@ -217,16 +241,17 @@ class MyServer < Reel::Server
 		if !data.empty? #logging only non-empty output to keep the clutter less 
 			$mongodb_session[:commands].insert(user: user, terminal_no: terminal_no, command: data.gsub(%r{</?[^>]+?>}, ''), type: 'output', time: "#{now}") 
 		end
-
+		
 	rescue Exception => e
 		#there might be a problem with broken pipe as the user might have typed 'exit'. Just send error & expect for a new request
 		puts "---- Inside Exception ----\n#{e}"
 		handle_error(terminal_user, user, terminal_no, request)
 	end
+	
   end
 
   def handle_error(terminal_user, user, terminal_no, request)
-		terminal_user.kill_all
+  		terminal_user.kill_all
 		
 		$users[user][terminal_no] = nil
 		#hopefully garbage collector kicks in here & picks up the object that is made nil
@@ -238,7 +263,6 @@ class MyServer < Reel::Server
 
   def self.exit_system #cleanup all the users
 	puts "Cleaning up all users. This may take sometime. Please wait ...."
-
 	$users.each do |user, terminals|
 	   terminals.each_with_index.map do |terminal_user,i|
 			terminal_user.kill_all
@@ -255,24 +279,31 @@ class MyServer < Reel::Server
 		
 	puts "All is well"
 	return
-  
   end
 
   def self.kill_children_and_self(pid)
+  	  # RubyProf.start	
 	  get_children_process(pid).each do |p|
 		  kill_children_and_self(p)
 	  end
 	  puts "Killing pid #{pid}"
 	  system("kill -9 #{pid}")
+	  # profile_result = RubyProf.stop # end profiling
+	  # print_profile_logs(profile_result,"reel_server_profiler", "MyServer -> kill_children_and_self")
   end
 
   def handle_websocket(sock)
+  	# RubyProf.start
     sock << "Hello everyone out there in WebSocket land!"
     sock.close
+    # profile_result = RubyProf.stop # end profiling
+	# print_profile_logs(profile_result,"reel_server_profiler", "MyServer -> handle_websocket")
   end
 end
+
 begin
-	MyServer.run
+	 MyServer.run
 rescue SystemExit, Interrupt
 	MyServer.exit_system
+	
 end
