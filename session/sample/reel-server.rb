@@ -16,7 +16,14 @@ ANSI_COLOR_CODE = {
 	7 => 'white'
 }
 
-$mongodb_session = Moped::Session.new([ "127.0.0.1:27017" ])
+#### Configurable data points#####
+
+DEFAULT_HOST = '127.0.0.1'
+MONGODB_PORT = '27017'
+REEL_SERVER_PORT = 3001
+
+
+$mongodb_session = Moped::Session.new([ DEFAULT_HOST+":"+MONGODB_PORT ])
 $mongodb_session.use "terminal_commands"
 
 #making function global as it is needed by both TerminalUser & MyServer
@@ -150,7 +157,7 @@ class TerminalUser
 end
 
 class MyServer < Reel::Server
-  def initialize(host = "127.0.0.1", port = 3001)
+   def initialize(host = DEFAULT_HOST, port = REEL_SERVER_PORT)
 	 super(host, port, &method(:on_connection))
 	 $users = Hash.new
   end
