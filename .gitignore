@@ -14,3 +14,8 @@
 /demo-app/log/*.log
 /demo-app/tmp/*
 /mongo-stuff/data
+
+#Ignore all files under /session/performance/ directory
+/session/performance/*.txt
+
+
