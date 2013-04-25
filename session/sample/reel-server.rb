@@ -166,14 +166,14 @@ class MyServer < Reel::Server
   end
   
   def on_connection(connection)
+  	start_time = Time.now
   	while request = connection.request
       case request
       when Reel::Request
       	
-      	CodeProfiler::profile_logger("handle_request") do
+      	CodeProfiler::profile_logger("handle_request", start_time) do
        	 	handle_request(request)
     	end
-   		
    		
       when Reel::WebSocket
         handle_websocket(request)
