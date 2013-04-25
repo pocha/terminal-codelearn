@@ -4,7 +4,9 @@ require 'stringio'
 require 'json'
 require 'cgi'
 require 'moped'
-require 'ruby-prof'
+require '../lib/code_profiler'
+# require "ruby-prof"
+
 
 ANSI_COLOR_CODE = {
 	0 => 'black',
@@ -33,20 +35,9 @@ def get_children_process(pid)
 	#Could not find a Ruby way to do this
 end
 
-# method for print ruby-profiler logs
-def print_profile_logs(results, file_name, method_name)
-	printer = RubyProf::FlatPrinter.new(results)
-	File.open "#{file_name}.log", 'a+' do |file|
-		file.puts "Profiler result from #{method_name}-----------------------------------------\n"
-		RubyProf::FlatPrinter.new(results).print(file)
-		file.puts "----------------------------------------------------------------------------\n"
-	end
-end
-
 class TerminalUser
 	
 	def initialize(user)
-		RubyProf.start
 		@bash = Session::Bash::new({:prog => "su #{user}"})
 		@output = ""
 		@read_data = StringIO::new(@output)
@@ -60,8 +51,6 @@ class TerminalUser
 		#@bash.execute "sudo -i -u #{user}"
 		@status = "waiting"
 		@bash._initialize	
-		profile_result = RubyProf.stop # end profiling 
-		print_profile_logs(profile_result,"reel_server_profiler", "TerminalUser -> initialize")
 		
 =begin
 		#discard sudo data output - hence the below things
@@ -77,7 +66,6 @@ class TerminalUser
 	end
 	
 	def block_for_output_to_come
-		RubyProf.start
 		count = 0
 		@check_data.read
 		loop_count = 0
@@ -86,18 +74,13 @@ class TerminalUser
 			loop_count = loop_count + 1
 			puts "inside loop"
 		end
-		profile_result = RubyProf.stop # end profiling
-		print_profile_logs(profile_result,"reel_server_profiler", "TerminalUser -> block_for_output_to_come")
 	end
 
 	def execute(command)
-		RubyProf.start
 		@status = "waiting" #changing state so that execution hangs till output appear
 		puts @bash.inspect
 		puts "Executing command - #{command}"
 		@bash.execute(command)
-		profile_result = RubyProf.stop # end profiling
-		print_profile_logs(profile_result,"reel_server_profiler", "TerminalUser -> execute")
 		#sleep 1
 		#block_for_output_to_come
 	end
@@ -178,18 +161,20 @@ end
 
 class MyServer < Reel::Server
    def initialize(host = DEFAULT_HOST, port = REEL_SERVER_PORT)
-   	 RubyProf.start	
-	 super(host, port, &method(:on_connection))
+   	 super(host, port, &method(:on_connection))
 	 $users = Hash.new
-	 profile_result = RubyProf.stop # end profiling
-	 print_profile_logs(profile_result,"reel_server_profiler", "MyServer -> initialize")
   end
   
   def on_connection(connection)
   	while request = connection.request
       case request
       when Reel::Request
-        handle_request(request)
+      	
+      	CodeProfiler::profile_logger("handle_request") do
+       	 	handle_request(request)
+    	end
+   		
+   		
       when Reel::WebSocket
         handle_websocket(request)
       end
@@ -213,10 +198,7 @@ class MyServer < Reel::Server
 		now = Time.now
 		
 		#insert into mongo now before any errors that might come
-		RubyProf.start
 		$mongodb_session[:commands].insert(user: user, terminal_no: terminal_no, command: (command.nil? ? "/#{type}" : CGI::unescape(command)), type: 'input', time: "#{now}")
-		profile_result = RubyProf.stop # end profiling
-	 	print_profile_logs(profile_result,"reel_server_profiler", "MyServer -> insert_mongodb")
 		
 		if type == "execute"
 			command = CGI::unescape(command) if command
