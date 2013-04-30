@@ -171,7 +171,7 @@ class MyServer < Reel::Server
       case request
       when Reel::Request
       	
-      	CodeProfiler::profile_logger("handle_request", start_time) do
+      	CodeProfiler::profile_logger("handle_request", start_time, request.url) do
        	 	handle_request(request)
     	end
    		
