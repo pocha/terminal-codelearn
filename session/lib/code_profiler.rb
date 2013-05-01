@@ -1,7 +1,14 @@
 require 'ruby-prof'
 
 module CodeProfiler
+	
+	PROFILE_LOGGER_ENABLED = true # config variable for enabling/disabling log
 
+	def self.profile_logger_enabled?
+		PROFILE_LOGGER_ENABLED ||= true
+	end
+
+	
 	# profile logger. As of now, it will log the records inside performance/hande-request-graph.txt file
 	def self.profile_logger(file_name, start_time,request_url)
 		RubyProf.start

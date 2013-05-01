@@ -170,10 +170,13 @@ class MyServer < Reel::Server
   	while request = connection.request
       case request
       when Reel::Request
-      	
-      	CodeProfiler::profile_logger("handle_request", start_time, request.url) do
-       	 	handle_request(request)
-    	end
+      	if CodeProfiler::profile_logger_enabled?
+	      	CodeProfiler::profile_logger("handle_request", start_time, request.url) do
+	       	 	handle_request(request)
+	    	end
+	    else
+	    	handle_request(request)
+	    end
    		
       when Reel::WebSocket
         handle_websocket(request)
