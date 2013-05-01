@@ -2,10 +2,11 @@ require 'ruby-prof'
 
 module CodeProfiler
 	
-	PROFILE_LOGGER_ENABLED = true # config variable for enabling/disabling log
+	# config variable for enabling/disabling log. To disable profile logger, set PROFILE_LOGGER_STATUS = false
+	PROFILE_LOGGER_STATUS = true 
 
 	def self.profile_logger_enabled?
-		PROFILE_LOGGER_ENABLED ||= true
+		PROFILE_LOGGER_STATUS ||= true
 	end
 
 	
