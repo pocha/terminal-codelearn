@@ -24,6 +24,7 @@ Install the gems for Terminal server
 	gem install reel
 	gem install json
 	gem install eye
+	gem install ruby-prof 	# this gem is used for code profiling.
 
 	cd session/sample
 	eye l test.eye
