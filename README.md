@@ -24,6 +24,7 @@ Install the gems for Terminal server
 	gem install reel
 	gem install json
 	gem install eye
+	gem install ruby-prof 	# this gem is used for code profiling.
 
 	cd session/sample
 	eye l test.eye
@@ -42,12 +43,6 @@ To stop the server, run
 Eye is a process monitoring tool http://github.com/kostya/eye . I included it to monitor memory leaks in the server & restart the server if it dies. The logs are in session/sample/eye.log . The server logs is in session/sample/reel-server.log 
 
 This starts the Terminal server. To be able to see the Terminal in action, the *demo-app* directory is included. 
-
-Inside *app/controller/terminals_controller.rb*, change "pocha" to the linux username of your PC
-
-	def current_user
-		"pocha"
-	end
 
 Open another terminal & run rails server from inside demo-app
 	

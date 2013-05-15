@@ -17,7 +17,14 @@ ANSI_COLOR_CODE = {
 	7 => 'white'
 }
 
-$mongodb_session = Moped::Session.new([ "127.0.0.1:27017" ])
+#### Configurable data points#####
+
+DEFAULT_HOST = '127.0.0.1'
+MONGODB_PORT = '27017'
+REEL_SERVER_PORT = 3001
+
+
+$mongodb_session = Moped::Session.new([ DEFAULT_HOST+":"+MONGODB_PORT ])
 $mongodb_session.use "terminal_commands"
 
 #making function global as it is needed by both TerminalUser & MyServer
@@ -102,8 +109,6 @@ class TerminalUser
 		data
 	end
 
-
-
 	def kill_all_children(interrupt)
 		if @parent_pid.nil?
 			@parent_pid = get_children_process(@bash.pid)[0] 
@@ -127,16 +132,24 @@ class TerminalUser
 end
 
 class MyServer < Reel::Server
-  def initialize(host = "127.0.0.1", port = 3001)
-	 super(host, port, &method(:on_connection))
+   def initialize(host = DEFAULT_HOST, port = REEL_SERVER_PORT)
+   	 super(host, port, &method(:on_connection))
 	 $users = Hash.new
   end
   
   def on_connection(connection)
-    while request = connection.request
+  	start_time = Time.now
+  	while request = connection.request
       case request
       when Reel::Request
-        handle_request(request)
+      	if CodeProfiler::profile_logger_enabled?
+	      	CodeProfiler::profile_logger("handle_request", start_time, request.url) do
+	       	 	handle_request(request)
+	    	end
+	    else
+	    	handle_request(request)
+	    end
+   		
       when Reel::WebSocket
         handle_websocket(request)
       end
@@ -158,7 +171,6 @@ class MyServer < Reel::Server
 		end
 		
 		terminal_no = terminal_no.to_i
-
 		if $users[user].nil? 
 			#puts "#{user} not found. Creating"
 			$users[user] = {:terminals => [], :time => now}
@@ -199,16 +211,17 @@ class MyServer < Reel::Server
 		if !data.empty? #logging only non-empty output to keep the clutter less 
 			$mongodb_session[:commands].insert(user: user, terminal_no: terminal_no, command: data.gsub(%r{</?[^>]+?>}, ''), type: 'output', time: "#{now}") 
 		end
-
+		
 	rescue Exception => e
 		#there might be a problem with broken pipe as the user might have typed 'exit'. Just send error & expect for a new request
 		puts "---- Inside Exception ----\n#{e.backtrace}"
 		handle_error(terminal_user, user, terminal_no, request)
 	end
+	
   end
 
   def handle_error(terminal_user, user, terminal_no, request)
-		terminal_user.kill_all
+  		terminal_user.kill_all
 		
 		$users[user][:terminals][terminal_no] = nil
 		#hopefully garbage collector kicks in here & picks up the object that is made nil
@@ -239,16 +252,18 @@ class MyServer < Reel::Server
 		
 	puts "All is well"
 	return
-  
   end
 
 
   def self.kill_children_and_self(pid)
+  	  # RubyProf.start	
 	  get_children_process(pid).each do |p|
 		  kill_children_and_self(p)
 	  end
 	  puts "Killing pid #{pid}"
 	  system("kill -9 #{pid}")
+	  # profile_result = RubyProf.stop # end profiling
+	  # print_profile_logs(profile_result,"reel_server_profiler", "MyServer -> kill_children_and_self")
   end
 
   def clean_inactive_users
@@ -277,8 +292,10 @@ class MyServer < Reel::Server
 	  sock.close
   end
 end
+
 begin
-	MyServer.run
+	 MyServer.run
 rescue SystemExit, Interrupt
 	MyServer.exit_system
+	
 end

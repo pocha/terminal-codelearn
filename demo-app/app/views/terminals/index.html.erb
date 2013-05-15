@@ -87,10 +87,7 @@ function CodelearnTerminal(_id,_number) {
 			,complete: function() { 
 				getElement("input[name='command']").focus(); 
 			}
-			, error: function() {
-				alert("an error has occured")
-				getElement("#loading-img").hide()
-			}
+			, error: show_error
 		});
 
 		getElement("#refresh").click(function(){ poll(fetchData) });
@@ -102,10 +99,7 @@ function CodelearnTerminal(_id,_number) {
 				},
 				url: "/terminals/"+_number+"/kill",
 				success: function(data){ fetchData(data) }
-				, error: function() {
-					alert("an error has occured")
-					getElement("#loading-img").hide()
-				}
+				, error: show_error
 			})
 		})
 
@@ -117,10 +111,7 @@ function CodelearnTerminal(_id,_number) {
 				}
 				, url: "/terminals/"+_number+"/reset",
 				success: function(data) { fetchData(data) }
-				, error: function() {
-					alert("an error has occured")
-					getElement("#loading-img").hide()
-				}
+				, error: show_error
 			})
 		})
 
@@ -138,10 +129,7 @@ function CodelearnTerminal(_id,_number) {
 			url: "/terminals/"+_number+"/execute/",
 			success: function(data) { fetchData(data) }
 			,complete: function() { getElement("input[name='command']").focus(); }
-			, error: function() {
-					alert("an error has occured")
-					getElement("#loading-img").hide()
-			}
+			, error: show_error
 		})
 	}
 
@@ -189,11 +177,13 @@ function CodelearnTerminal(_id,_number) {
 					func(data)
 				}
 			}
-			, error: function() {
-					alert("an error has occured")
-					getElement("#loading-img").hide()
-			}
+			, error: show_error
 		})
+	}
+
+	function show_error() {
+		alert("an error has occured")
+		getElement("#loading-img").hide()
 	}
 }
 
