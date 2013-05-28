@@ -1,0 +1,117 @@
+apache2-mpm-itk has been merged into the apache2 source package. For newer
+changes, see the apache2 changelog.
+
+apache2-mpm-itk (2.2.11-02-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Steinar H. Gunderson <sesse@debian.org>  Tue, 14 Apr 2009 23:47:36 +0200
+
+apache2-mpm-itk (2.2.11-01-1) unstable; urgency=low
+
+  * New upstream release.
+    * Updated debian/copyright file with COPYRIGHT from the tarball.
+    * Updated apache2-src build-dependency to make sure we build against Apache
+      2.2.11. (The patch set itself will work just fine for 2.2.9, although
+      not without some fuzz.)
+  * Updated Standards-Version to 3.8.1 (no changes needed).
+
+ -- Steinar H. Gunderson <sesse@debian.org>  Sun, 22 Mar 2009 15:39:39 +0100
+
+apache2-mpm-itk (2.2.6-02-1) unstable; urgency=medium
+
+  * New upstream release.
+    * Fixes a configure test for libcap.
+  * Update Debian package to fix fine-grained capability dropping support.
+    Together with the upstream fixes, this enables capability dropping,
+    which was previously broken. (Closes: #492614)
+    * Run autoheader before autoconf, so HAVE_LIBCAP gets into the right .h
+      file.
+    * Change build-dependency from libcap-dev to libcap2-dev, as libcap-dev is
+      deprecated.
+
+ -- Steinar H. Gunderson <sesse@debian.org>  Sun, 27 Jul 2008 22:18:26 +0200
+
+apache2-mpm-itk (2.2.6-01-3.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Correctly determine the dependency on apache2.2-common. (Closes: #477772)
+
+ -- Stefan Fritsch <sf@debian.org>  Wed, 18 Jun 2008 23:09:34 +0200
+
+apache2-mpm-itk (2.2.6-01-3) unstable; urgency=low
+
+  * Use config.nice from apache2-src. This allows us to drop the
+    build-dependency on apache2-prefork-dev.
+    * Bump versioned build-dependency on apache2-src to 2.2.9.
+    * Build-depend on libaprutil1-dev, since we no lenger get it in
+      transitively from apache2-prefork-dev.
+
+ -- Steinar H. Gunderson <sesse@debian.org>  Sun, 15 Jun 2008 10:11:49 -0700
+
+apache2-mpm-itk (2.2.6-01-2) unstable; urgency=low
+
+  * Update the long description to better reflect the status of the package
+    (it can hardly be called “highly experimental” anymore).
+  * Lintian fixes:
+    * Build-depend on apache2-src (>= 2.2.6) instead of apache2-src
+      (>= 2.2.6-1).
+    * Update to Standards-Version 3.7.3 (no changes needed).
+
+ -- Steinar H. Gunderson <sesse@debian.org>  Tue, 29 Apr 2008 00:55:41 +0200
+
+apache2-mpm-itk (2.2.6-01-1) unstable; urgency=high
+
+  * New upstream release, with patches updated for Apache 2.2.6. Should fix
+    FTBFS (but that FTBFS was silently ignored, see next item).
+    * Update the apache2-src build dependency to at least 2.2.6-1, as I'm
+      unsure of the effects of building with this patch set against older
+      versions.
+  * Use "set -e" in the patch target so failing hunks are not ignored during
+    building.
+  * Updated the homepage URL in debian/copyright, and added
+    licensing/copyright/tarball information.
+
+ -- Steinar H. Gunderson <sesse@debian.org>  Sat, 05 Jan 2008 12:27:08 +0100
+
+apache2-mpm-itk (2.2.3-04-3) unstable; urgency=medium
+
+  * Provide and conflict with apache2-mpm, in line with new practice from
+    the main Apache package. This replaces the old conflict lines, as well as
+    the Provides: apache2-modules.
+  * apache2-src now contains a top-level directory; adjust debian/rules
+    accordingly so we just unpack the tarball instead of making an apache2.2
+    directory and untarring within that. Fixes FTBFS with newer apache2-src.
+    (Closes: #428919)
+    * Build-depend on apache2-src (>= 2.2.3-5), as this will now FTBFS with
+      older apache2-src versions.
+  * Remove an obsolete comment from the debian/rules source target.
+
+ -- Steinar H. Gunderson <sesse@debian.org>  Fri, 15 Jun 2007 13:19:51 +0200
+
+apache2-mpm-itk (2.2.3-04-2) unstable; urgency=low
+
+  * Don't build-depend on libcap-dev for non-Linux architectures, which
+    prevents building on those; patch from Cyril Brulebois.
+    (Closes: #416460)
+
+ -- Steinar H. Gunderson <sesse@debian.org>  Sat, 19 May 2007 01:48:11 +0200
+
+apache2-mpm-itk (2.2.3-04-1) unstable; urgency=low
+
+  * New upstream release; now with split patches in a tarball (with license
+    and all) instead of one monolithic patch.
+    * Adjust debian/rules accordingly.
+    * Make a "source" target that uses quilt instead of manual patching.
+  * Remove workaround for old apache2-src.
+  * Drop dh_testroot from the clean target, as we do not really need root for
+    it, and it's convenient to be able to just do "debian/rules source" without
+    using fakeroot.
+
+ -- Steinar H. Gunderson <sesse@debian.org>  Wed, 25 Apr 2007 14:13:33 +0200
+
+apache2-mpm-itk (2.2.3-01-1) unstable; urgency=low
+
+  * Initial port to Apache 2.2, and upload to Debian.
+
+ -- Steinar H. Gunderson <sesse@debian.org>  Sun, 29 Oct 2006 23:05:36 +0100

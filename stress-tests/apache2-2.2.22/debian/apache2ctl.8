@@ -1,0 +1,182 @@
+.TH apache2ctl 8 "April 2008"
+.\" The Apache Software License, Version 1.1
+.\"
+.\" Copyright (c) 2000-2002 The Apache Software Foundation.  All rights
+.\" reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\"
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\"
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in
+.\"    the documentation and/or other materials provided with the
+.\"    distribution.
+.\"
+.\" 3. The end-user documentation included with the redistribution,
+.\"    if any, must include the following acknowledgment:
+.\"       "This product includes software developed by the
+.\"        Apache Software Foundation (http://www.apache.org/)."
+.\"    Alternately, this acknowledgment may appear in the software itself,
+.\"    if and wherever such third-party acknowledgments normally appear.
+.\"
+.\" 4. The names "Apache" and "Apache Software Foundation" must
+.\"    not be used to endorse or promote products derived from this
+.\"    software without prior written permission. For written
+.\"    permission, please contact apache@apache.org.
+.\"
+.\" 5. Products derived from this software may not be called "Apache",
+.\"    nor may "Apache" appear in their name, without prior written
+.\"    permission of the Apache Software Foundation.
+.\"
+.\" THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+.\" WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+.\" OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+.\" DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
+.\" ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+.\" SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+.\" LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+.\" USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+.\" ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+.\" OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+.\" OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\" This software consists of voluntary contributions made by many
+.\" individuals on behalf of the Apache Software Foundation.  For more
+.\" information on the Apache Software Foundation, please see
+.\" <http://www.apache.org/>.
+.\"
+.SH NAME
+apache2ctl \- Apache HTTP server control interface
+.SH SYNOPSIS
+When acting in SysV init mode, apache2ctl takes simple, one-word commands,
+defined below.
+.PP
+.B apachectl 
+.I command
+.PP
+.B apache2ctl 
+.I command
+.PP
+When acting in pass-through mode, apache2ctl can take all the arguments available
+for the httpd binary.
+.PP
+.B apachectl 
+.RI [ httpd-argument ]
+.PP
+.B apache2ctl 
+.RI [ httpd-argument ]
+.PP
+.SH DESCRIPTION
+.B apache2ctl
+is a front end to the Apache HyperText Transfer Protocol (HTTP) 
+server.  It is designed to help the administrator control the 
+functioning of the Apache 
+.B apache2
+daemon.  
+.PP
+.B NOTE: 
+The default Debian configuration requires the environment variables
+.BR APACHE_RUN_USER ,
+.BR APACHE_RUN_GROUP ,
+and
+.B APACHE_PID_FILE
+to be set in 
+.BR /etc/apache2/envvars .
+.PP
+The 
+.B apache2ctl
+script returns a 0 exit value on success, and >0 if an error 
+occurs.  For more details, view the comments in the script.
+.PP
+.SH OPTIONS
+The \fIcommand\fP can be any one or more of the following options:
+.TP 14
+.BI start
+Start the Apache daemon.  Gives an error if it is already running.
+.TP
+.BI stop
+Stops the Apache daemon.
+.TP
+.BI restart
+Restarts the Apache daemon by sending it a SIGHUP.  If the daemon
+is not running, it is started.
+This command automatically checks the configuration files via 
+.BI configtest
+before initiating the restart to to catch  the  most obvious  errors.
+However, it is still possible for the daemon to die because of problems
+with the configuration.
+.TP
+.BI fullstatus
+Displays a full status report from 
+.B mod_status. 
+For this to work, you need to have mod_status enabled on your server 
+and a text-based browser such as \fIlynx\fP available on your system.  The
+URL used to access the status report can be set by setting the
+.B APACHE_STATUSURL
+variable in 
+.BR /etc/apache2/envvars .
+.TP
+.BI status
+Displays a brief status report. Similar to the fullstatus option,
+except that the list of requests currently being served is omitted.
+.TP
+.BI graceful
+Gracefully restarts the Apache daemon by sending it a SIGUSR1.  If
+the daemon is not running, it is started.  This differs from a
+normal restart in that currently open connections are not aborted.
+A side effect is that old log files will not be closed immediately.
+This means that if used in a log rotation script, a substantial delay may be
+necessary to ensure that the old log files are closed before processing them.
+This command automatically checks the configuration files via apache2ctl
+configtest before initiating the restart to to catch the most obvious errors.
+However, it is still possible for the daemon to die because of problems with
+the configuration.
+.TP
+.BI graceful-stop
+Gracefully stops the Apache httpd daemon.
+This differs from a normal stop in that currently open connections are not
+aborted.
+A side effect is that old log files will not be closed immediately.
+.TP
+.BI configtest
+Run a configuration file syntax test. It parses the configuration
+files and either reports 
+.B "Syntax Ok"
+or information about the particular syntax error. This test does not catch
+all errors.
+.TP
+.BI help
+Displays a short help message.
+.TP
+The following option was available in earlier versions but has been removed.
+.TP
+.BI startssl
+To start httpd with SSL support, you should edit your configuration file to
+include the relevant directives and then use the normal apache2ctl start.
+.SH ENVIRONMENT
+The behaviour of
+.B apache2ctl
+can be influenced with these environment variables:
+.BR APACHE_HTTPD ,
+.BR APACHE_LYNX ,
+.BR APACHE_STATUSURL ,
+.BR APACHE_ULIMIT_MAX_FILES ,
+.BR APACHE_RUN_DIR ,
+.BR APACHE_LOCK_DIR ,
+.BR APACHE_RUN_USER ,
+.BR APACHE_ARGUMENTS ,
+.BR APACHE_ENVVARS .
+See the comments in the script for details.
+These variables (except 
+.BR APACHE_ENVVARS )
+can be set in
+.BR /etc/apache2/envvars .
+.SH SEE ALSO
+.BR apache2(8) ,
+.BR /usr/share/doc/apache2.2-common/README.Debian.gz
+.

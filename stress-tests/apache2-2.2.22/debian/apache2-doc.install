@@ -1,0 +1,3 @@
+usr/share/apache2/default-site/htdocs/manual usr/share/doc/apache2-doc
+usr/lib/cgi-bin/printenv usr/share/doc/apache2-doc/cgi-examples
+usr/lib/cgi-bin/test-cgi usr/share/doc/apache2-doc/cgi-examples

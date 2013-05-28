@@ -1,0 +1,60 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## Stolen from the fedora package
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Support "--enable-modules=none" to build an httpd binary with 
+## DP: no optional modules enabled.
+
+@DPATCH@
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -290,14 +290,19 @@
+ 
+   AC_ARG_ENABLE(modules,
+   APACHE_HELP_STRING(--enable-modules=MODULE-LIST,Space-separated list of modules to enable | "all" | "most"),[
+-    for i in $enableval; do
+-      if test "$i" = "all" -o "$i" = "most"; then
+-        module_selection=$i
+-      else
+-        i=`echo $i | sed 's/-/_/g'`
+-        eval "enable_$i=yes"
+-      fi
+-    done
++    if test "$enableval" = "none"; then
++       module_default=no
++       module_selection=none
++    else
++      for i in $enableval; do
++        if test "$i" = "all" -o "$i" = "most"; then
++          module_selection=$i
++        else
++          i=`echo $i | sed 's/-/_/g'`
++          eval "enable_$i=yes"
++        fi
++      done
++    fi
+   ])
+   
+   AC_ARG_ENABLE(mods-shared,
+--- a/configure
++++ b/configure
+@@ -7385,6 +7385,10 @@
+   # Check whether --enable-modules was given.
+ if test "${enable_modules+set}" = set; then :
+   enableval=$enable_modules;
++  if test "$enableval" = "none"; then
++     module_default=no
++     module_selection=none
++  else
+     for i in $enableval; do
+       if test "$i" = "all" -o "$i" = "most"; then
+         module_selection=$i
+@@ -7393,7 +7397,7 @@
+         eval "enable_$i=yes"
+       fi
+     done
+-
++  fi
+ fi
+ 
+ 

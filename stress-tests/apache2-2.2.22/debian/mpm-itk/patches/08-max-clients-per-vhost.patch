@@ -1,0 +1,94 @@
+Enforce the per-vhost server limit. Note that this is per-vhost, not
+per-directory (since it works by reading the scoreboard), so we need to add
+per-server configuration data.
+
+Index: httpd-2.2.17/server/mpm/experimental/itk/itk.c
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/itk.c
++++ httpd-2.2.17/server/mpm/experimental/itk/itk.c
+@@ -159,6 +159,11 @@ typedef struct
+     char *username;
+ } itk_per_dir_conf;
+ 
++typedef struct
++{
++    int max_clients_vhost;
++} itk_server_conf;
++
+ module AP_MODULE_DECLARE_DATA mpm_itk_module;
+ 
+ #ifdef GPROF
+@@ -1400,6 +1405,26 @@ static int itk_post_perdir_config(reques
+     gid_t wanted_gid;
+     const char *wanted_username;
+     int err = 0;
++    
++    itk_server_conf *sconf =
++        (itk_server_conf *) ap_get_module_config(r->server->module_config, &mpm_itk_module);
++
++    /* Enforce MaxClientsVhost. */
++    if (sconf->max_clients_vhost > 0) {
++        int i, num_other_servers = 0;
++        for (i = 0; i < ap_daemons_limit; ++i) {
++            worker_score *ws = &ap_scoreboard_image->servers[i][0];
++            if (ws->status >= SERVER_BUSY_READ && strncmp(ws->vhost, r->server->server_hostname, 31) == 0)
++                ++num_other_servers;
++        }
++
++        if (num_other_servers > sconf->max_clients_vhost) {
++            ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, \
++                "MaxClientsVhost reached for %s, refusing client.",
++                r->server->server_hostname);
++            return HTTP_SERVICE_UNAVAILABLE;
++        }
++    }
+ 
+     itk_per_dir_conf *dconf =
+         (itk_per_dir_conf *) ap_get_module_config(r->per_dir_config, &mpm_itk_module);
+@@ -1585,6 +1610,14 @@ static const char *assign_user_id (cmd_p
+     return NULL;
+ }
+ 
++static const char *set_max_clients_vhost (cmd_parms *cmd, void *dummy, const char *arg)   
++{
++    itk_server_conf *sconf =
++        (itk_server_conf *) ap_get_module_config(cmd->server->module_config, &mpm_itk_module);
++    sconf->max_clients_vhost = atoi(arg);
++    return NULL;
++}
++
+ static const command_rec itk_cmds[] = {
+ UNIX_DAEMON_COMMANDS,
+ LISTEN_COMMANDS,
+@@ -1600,6 +1633,8 @@ AP_INIT_TAKE1("ServerLimit", set_server_
+               "Maximum value of MaxClients for this run of Apache"),
+ AP_INIT_TAKE2("AssignUserID", assign_user_id, NULL, RSRC_CONF|ACCESS_CONF,
+               "Tie a virtual host to a specific child process."),
++AP_INIT_TAKE1("MaxClientsVHost", set_max_clients_vhost, NULL, RSRC_CONF,
++              "Maximum number of children alive at the same time for this virtual host."),
+ AP_GRACEFUL_SHUTDOWN_TIMEOUT_COMMAND,
+ { NULL }
+ };
+@@ -1613,12 +1648,21 @@ static void *itk_create_dir_config(apr_p
+     return c;
+ }
+ 
++/* == allocate a private server config structure == */
++static void *itk_create_server_config(apr_pool_t *p, server_rec *s)
++{
++    itk_server_conf *c = (itk_server_conf *)
++        apr_pcalloc(p, sizeof(itk_server_conf));
++    c->max_clients_vhost = -1;
++    return c;
++}
++
+ module AP_MODULE_DECLARE_DATA mpm_itk_module = {
+     MPM20_MODULE_STUFF,
+     ap_mpm_rewrite_args,        /* hook to run before apache parses args */
+     itk_create_dir_config,      /* create per-directory config structure */
+     NULL,                       /* merge per-directory config structures */
+-    NULL,                       /* create per-server config structure */
++    itk_create_server_config,   /* create per-server config structure */
+     NULL,                       /* merge per-server config structures */
+     itk_cmds,                   /* command apr_table_t */
+     itk_hooks,                  /* register hooks */

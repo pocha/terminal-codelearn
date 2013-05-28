@@ -1,0 +1,165 @@
+apache2 (2.2.15-4) unstable; urgency=low
+
+  * Note to people using mod_proxy as forward proxy, i.e. with
+    'ProxyRequests on':
+    This release disables the configuration in mods-available/proxy.conf
+    by default. You should verify that access control for proxy access
+    still works as intended. This is especially important if you have
+    your forward proxy configuration in a different configuration file
+    than proxy.conf.
+
+ -- Stefan Fritsch <sf@debian.org>  Mon, 19 Apr 2010 22:36:57 +0200
+
+apache2 (2.2.15-1) unstable; urgency=low
+
+  * To fix a security vulnerability in the design of the SSL/TLS protocol
+    (CVE-2009-3555), the protocol had to be extended (RFC 5746). By default,
+    session renegotiation is no longer supported with old clients that do not
+    implement this extension. This breaks certain configurations with client
+    certificate authentication. If you still need to support old clients, you
+    may restore the old (insecure) behaviour by uncommenting the
+
+        SSLInsecureRenegotiation on
+
+    line in /etc/apache2/mods-available/ssl.conf
+
+  * This release adds and enables mod_reqtimeout, which limits the time
+    Apache waits for a client to send a complete request. This helps to
+    mitigate against certain denial of service attacks. In case of problems
+    with slow clients, the timeout values can be adjusted in
+    /etc/apache2/mods-available/reqtimeout.conf , or the module can be
+    disabled with "a2dismod reqtimeout".
+
+ -- Stefan Fritsch <sf@debian.org>  Sat, 28 Aug 2010 20:49:30 +0100
+
+apache2 (2.2.14-6) unstable; urgency=low
+
+  * Apache now uses the environment variables APACHE_RUN_DIR, APACHE_LOCK_DIR,
+    and APACHE_LOG_DIR in the default configuration.  If you have modified
+    /etc/apache2/envvars, make sure that these variables are set and exported.
+  * There is now some support for running multiple instances of Apache on the
+    same machine. See the documentation in /usr/share/doc/apache2.2-common for
+    details.
+
+ -- Stefan Fritsch <sf@debian.org>  Sun, 07 Feb 2010 13:56:59 +0100
+
+apache2 (2.2.13-2) unstable; urgency=high
+
+  * The new support for TLS Server Name Indication added in 2.2.12 causes
+    Apache to be stricter about certain misconfigurations involving name
+    based SSL virtual hosts. This may result in Apache refusing to start
+    with the logged error message:
+
+        Server should be SSL-aware but has no certificate configured
+        [Hint: SSLCertificateFile]
+
+    Up to 2.2.11, Apache accepted configurations where the necessary SSL
+    configuration statements were included in the first (default)
+    <Virtualhost *:443> block but not in subsequent <Virtualhost *:443>
+    blocks. Starting with 2.2.12, every VirtualHost block used with SSL must
+    contain the SSLEngine, SSLCertificateFile, and SSLCertificateKeyFile
+    directives (SSLCertificateKeyFile is optional in some cases).
+
+    When you encounter the above problem, the output of the command
+
+        egrep -ir '^[^#]*(sslcertificate|sslengine|virtualhost)' \
+            /etc/apache2/*conf* /etc/apache2/*enabled
+
+    may be useful to determine which VirtualHost sections need to be changed.
+
+    Also, formerly accidentially working constructs like
+
+        <VirtualHost *:80 *:443>
+
+    where one virtual host definition is used for both a non-ssl and a ssl
+    virtual host do not work anymore. You can achieve a similar effect with
+
+        <VirtualHost *:80>
+        Include /.../vhost.include
+        </VirtualHost>
+        <VirtualHost *:443>
+        SSLEngine on
+        SSLCertificateFile ...
+        Include /.../vhost.include
+        </VirtualHost>
+
+ -- Stefan Fritsch <sf@debian.org>  Wed, 16 Sep 2009 20:14:59 +0200
+
+apache2 (2.2.9-3) unstable; urgency=low
+
+  * The directive "NameVirtualHost *" has been changed to "NameVirtualHost
+    *:80". It has also been moved from sites-available/default to ports.conf.
+    This allows to ship a proper SSL default virtual host config in
+    sites-available/default-ssl, but it means that if you use several name
+    based virtual hosts:
+    
+    - you will have to change <VirtualHost *> to <VirtualHost *:80> in your
+      name based virtual hosts
+
+    - you need to add more NameVirtualHost directives if you use other ports
+      than 80 with name based virtual hosts. You may also have to add these
+      ports to the default virtual host in /etc/apache2/sites-available/default
+      (like this: "<VirtualHost *:80 *:81>").
+    
+    If you prefer to revert to the old setup instead (and don't need the
+    default-ssl host), just change "NameVirtualHost *:80" back to
+    "NameVirtualHost *" in ports.conf and "<VirtualHost *:80>" to
+    "<VirtualHost *>" in sites-available/default.
+
+  * For mod_disk_cache, caching is again disabled in disk_cache.conf by
+    default. It usually makes more sense to enable this on a per-virtual host
+    basis.
+
+ -- Stefan Fritsch <sf@debian.org>  Mon, 30 Jun 2008 19:47:52 +0200
+
+apache2 (2.2.8-5) unstable; urgency=low
+
+  * The suexec helper program needed for mod_suexec is now shipped in a
+    separate package, apache2-suexec, which is not installed by default.
+    You need to install this package manually if you are using mod_suexec.
+
+    There is now also the apache2-suexec-custom package, which contains a
+    customizable version of suexec which can be used with different document
+    roots than /var/www.
+
+ -- Stefan Fritsch <sf@debian.org>  Sun, 04 May 2008 20:24:00 +0200
+
+apache2 (2.2.8-1) unstable; urgency=low
+
+  * The Apache User and Group and the PidFile path are now configured in
+    /etc/apache2/envvars, to make it easier to use them in scripts
+    (like the init and logrotate scripts, and apache2ctl).
+    If you have changed these settings from their default values, you need to
+    adjust /etc/apache2/envvars.
+    This also means that starting apache2 with "apache2 -k start" is no longer
+    possible, you have to use /etc/init.d/apache2 or apache2ctl.
+
+ -- Stefan Fritsch <sf@debian.org>  Tue, 15 Jan 2008 21:41:23 +0100
+
+apache2 (2.2.4-2) unstable; urgency=low
+
+  * This version introduces some changes in the configuration layout and
+    defaults. You will probably have to adjust your configuration accordingly.
+
+    - Module specific configuration has been moved from 
+      /etc/apache2/apache2.conf to /etc/apache2/mods-available/*.conf for the
+      following modules: 
+        actions          alias              autoindex
+        info             mime               negotiation
+        setenvif         status
+
+    - AddDefaultCharset is again disabled by default. See
+      /etc/apache2/conf.d/charset
+
+    - "Listen 443" is automatically enabled in /etc/apache2/ports.conf if
+      mod_ssl is enabled.
+
+  * The NO_START functionality from /etc/default/apache2 has been removed. If
+    you don't want to start apache2 on boot, rename the S*apache2 start
+    symlinks as usual.
+
+  * To ensure that the disk cache does not grow indefinitely, htcacheclean is
+    now started when mod_disk_cache is enabled. The details can be configured
+    in /etc/default/apache2 .
+
+ -- Stefan Fritsch <sf@debian.org>  Mon, 09 Jul 2007 21:50:58 +0200

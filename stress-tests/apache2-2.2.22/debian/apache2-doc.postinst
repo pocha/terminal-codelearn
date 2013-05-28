@@ -1,0 +1,11 @@
+#!/bin/sh -e
+
+if [ -x "/etc/init.d/apache2" ]; then
+        if [ -x /usr/sbin/invoke-rc.d ]; then
+                invoke-rc.d apache2 reload ||true
+        else
+                /etc/init.d/apache2 reload ||true
+        fi
+fi
+
+#DEBHELPER#

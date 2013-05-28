@@ -1,0 +1,75 @@
+Use Linux' capability system to run as a sort of "lesser root"; we drop nearly
+all root privilegies except the ability to setuid. An attacker capable of injecting
+code will still be able to run as any (normal) user on the system, but at least
+he/she cannot directly load kernel code etc.
+
+Index: httpd-2.2.17/server/mpm/experimental/itk/itk.c
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/itk.c
++++ httpd-2.2.17/server/mpm/experimental/itk/itk.c
+@@ -71,6 +71,10 @@
+ #include <sys/processor.h> /* for bindprocessor() */
+ #endif
+ 
++#if HAVE_LIBCAP
++#include <sys/capability.h>
++#endif
++
+ #include <signal.h>
+ #include <sys/times.h>
+ 
+@@ -501,6 +505,15 @@ static void child_main(int child_num_arg
+     apr_bucket_alloc_t *bucket_alloc;
+     int last_poll_idx = 0;
+ 
++#if HAVE_LIBCAP
++    cap_t caps;
++    cap_value_t suidcaps[] = {
++        CAP_SETUID,
++        CAP_SETGID,
++	CAP_DAC_READ_SEARCH,
++    };
++#endif    
++
+     mpm_state = AP_MPMQ_STARTING; /* for benefit of any hooks that run as this
+                                    * child initializes
+                                    */
+@@ -558,6 +571,22 @@ static void child_main(int child_num_arg
+         (void) apr_pollset_add(pollset, &pfd);
+     }
+ 
++#if HAVE_LIBCAP
++    /* Drop as many privileges as we can. We'll still
++     * access files with uid=0, and we can setuid() to anything, but
++     * at least there's tons of other evilness (like loading kernel
++     * modules) we can't do directly.  (The setuid() capability will
++     * go away automatically when we setuid() or exec() -- the former
++     * is likely to come first.)
++     */
++    caps = cap_init();
++    cap_clear(caps);
++    cap_set_flag(caps, CAP_PERMITTED, sizeof(suidcaps)/sizeof(cap_value_t), suidcaps, CAP_SET);
++    cap_set_flag(caps, CAP_EFFECTIVE, sizeof(suidcaps)/sizeof(cap_value_t), suidcaps, CAP_SET);
++    cap_set_proc(caps);
++    cap_free(caps);
++#endif    
++
+     mpm_state = AP_MPMQ_RUNNING;
+ 
+     bucket_alloc = apr_bucket_alloc_create(pchild);
+Index: httpd-2.2.17/server/mpm/config.m4
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/config.m4
++++ httpd-2.2.17/server/mpm/config.m4
+@@ -66,6 +66,11 @@ if ap_mpm_is_experimental; then
+ else
+   MPM_SUBDIR_NAME=$MPM_NAME
+ fi
++
++if test "$apache_cv_mpm" = "itk" ; then
++  AC_CHECK_LIB(cap, cap_init)
++fi
++
+ MPM_DIR=server/mpm/$MPM_SUBDIR_NAME
+ MPM_LIB=$MPM_DIR/lib${MPM_NAME}.la
+ 

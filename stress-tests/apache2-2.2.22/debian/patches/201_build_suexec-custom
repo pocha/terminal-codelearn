@@ -1,0 +1,40 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 201_make_suexec-custom.dpatch by Stefan Fritsch <sf@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: add suexec-custom to the build system
+
+@DPATCH@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -225,7 +225,7 @@
+ 	fi
+ 
+ suexec:
+-	cd support && $(MAKE) suexec
++	cd support && $(MAKE) suexec suexec-custom
+ 
+ x-local-distclean:
+ 	@rm -rf autom4te.cache
+--- a/support/Makefile.in
++++ b/support/Makefile.in
+@@ -1,7 +1,7 @@
+ DISTCLEAN_TARGETS = apxs apachectl dbmmanage log_server_status \
+ 	logresolve.pl phf_abuse_log.cgi split-logfile envvars-std
+ 
+-CLEAN_TARGETS = suexec
++CLEAN_TARGETS = suexec suexec-custom
+ 
+ PROGRAMS = htpasswd htdigest rotatelogs logresolve ab htdbm htcacheclean httxt2dbm $(NONPORTABLE_SUPPORT)
+ TARGETS  = $(PROGRAMS)
+@@ -62,6 +62,10 @@
+ suexec: $(suexec_OBJECTS)
+ 	$(LINK) $(suexec_OBJECTS)
+ 
++suexec-custom_OBJECTS = suexec-custom.lo
++suexec-custom: $(suexec-custom_OBJECTS)
++	$(LINK) $(suexec-custom_OBJECTS)
++
+ htcacheclean_OBJECTS = htcacheclean.lo
+ htcacheclean: $(htcacheclean_OBJECTS)
+ 	$(LINK) $(htcacheclean_LTFLAGS) $(htcacheclean_OBJECTS) $(PROGRAM_LDADD)

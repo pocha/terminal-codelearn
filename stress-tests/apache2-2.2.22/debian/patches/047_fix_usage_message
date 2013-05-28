@@ -1,0 +1,27 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 047_fix_usage_message.dpatch by Stefan Fritsch <sf@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Add -X to the help message
+
+@DPATCH@
+--- a/server/main.c
++++ b/server/main.c
+@@ -353,7 +353,7 @@
+ #endif /* AP_MPM_WANT_SET_GRACEFUL_SHUTDOWN */
+ #endif
+     ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
+-                 "       %*s [-v] [-V] [-h] [-l] [-L] [-t] [-T] [-S]",
++                 "       %*s [-v] [-V] [-h] [-l] [-L] [-t] [-T] [-S] [-X]",
+                  pad_len, " ");
+     ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
+                  "Options:");
+@@ -435,6 +435,8 @@
+                  "  -t                 : run syntax check for config files");
+     ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
+                 "  -T                 : start without DocumentRoot(s) check");
++    ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
++                "  -X                 : debug mode (only one worker, do not detach)");
+ 
+     destroy_and_exit_process(process, 1);
+ }

@@ -1,0 +1,48 @@
+#!/bin/sh
+set -e
+
+if [ "$1" != "configure" ]; then
+        exit 0
+fi
+
+P=apache2-mpm-MPMXXX
+if [ $P = apache2-mpm-prefork ] || [ $P = apache2-mpm-itk ]; then
+	CGI_DIS=cgid
+	CGI_EN=cgi
+else
+	CGI_DIS=cgi
+	CGI_EN=cgid
+fi
+
+#enable cgi/cgid, but only on new installs.
+if [ -z "$2" ]; then
+	a2dismod $CGI_DIS >/dev/null || true
+	a2enmod  $CGI_EN  >/dev/null || echo "It looks like you've deleted /etc/apache2/mods-available/cgid.load, so mod_cgid cannot be enabled.  To fix this, please purge and reinstall apache2.2-common."
+fi
+
+# Migrate our kill symlinks, including ones the user may have done an s/S/K/ to:
+for i in `seq 0 6`; do
+	if [ -L /etc/rc"$i".d/K91apache2 ]; then
+		mv /etc/rc"$i".d/K91apache2 \
+		   /etc/rc"$i".d/K09apache2
+	fi
+done
+
+if [ -x "/etc/init.d/apache2" ]; then
+        if [ -x /usr/sbin/invoke-rc.d ]; then
+                invoke-rc.d apache2 start ||true
+        else
+                /etc/init.d/apache2 start ||true
+        fi
+fi
+
+if dpkg --compare-versions "$2" lt 2.2.11-5~ ; then
+	DOCDIR=/usr/share/doc/$P
+	if [ ! -h $DOCDIR -a -d $DOCDIR ] ; then
+		rmdir $DOCDIR 2> /dev/null && ln -s apache2.2-common $DOCDIR
+	fi
+fi
+
+#DEBHELPER#
+
+exit 0

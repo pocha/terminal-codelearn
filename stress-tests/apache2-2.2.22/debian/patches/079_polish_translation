@@ -1,0 +1,18 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 079_polish_translation.dpatch by Stefan Fritsch <sf@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: #570228
+
+@DPATCH@
+--- a/docs/error/HTTP_NOT_FOUND.html.var
++++ b/docs/error/HTTP_NOT_FOUND.html.var
+@@ -289,7 +289,7 @@
+     o problemie.
+ 
+   <!--#else -->
+-    Je¶li wpisa³e¶ URLa rêcznie, sprawd¼, czy nie siê nie pomyli³e¶.
++    Je¶li wpisa³e¶ URLa rêcznie, sprawd¼, czy siê nie pomyli³e¶.
+ 
+   <!--#endif -->
+ 

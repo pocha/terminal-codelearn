@@ -1,0 +1,97 @@
+#!/bin/sh -e
+
+if [ "$1" != "configure" ]; then
+        exit 0
+fi
+
+mod_is_enabled() {
+    test -L /etc/apache2/mods-enabled/$1.load
+}
+
+#set up default site and dummy error and access logs
+if [ -z "$2" ]; then
+        if [ ! -L /etc/apache2/sites-enabled/000-default -a \
+             ! -f /etc/apache2/sites-enabled/000-default ]; then
+                a2ensite -q default
+        fi
+        touch /var/log/apache2/error.log /var/log/apache2/access.log
+        chown root:adm /var/log/apache2/error.log /var/log/apache2/access.log
+        chmod 0640 /var/log/apache2/error.log /var/log/apache2/access.log
+fi
+
+# Note, this line catches new installs as well as upgrades
+if dpkg --compare-versions "$2" lt 2.2.3-3.1; then
+	a2enmod -q alias
+	a2enmod -q autoindex
+	a2enmod -q dir
+	a2enmod -q env
+	a2enmod -q mime
+	a2enmod -q negotiation
+	a2enmod -q setenvif
+	a2enmod -q status
+	a2enmod -q auth_basic
+	a2enmod -q deflate
+
+        # Those come from mod_auth:
+	a2enmod -q authz_default
+	a2enmod -q authz_user
+	a2enmod -q authz_groupfile
+	a2enmod -q authn_file
+        
+	# This comes from mod_access:
+	a2enmod -q authz_host
+
+fi
+
+if [ -n "$2" ] && dpkg --compare-versions "$2" lt 2.2.15-4~ ; then
+	echo activating new config files ...
+	for a in ldap proxy_balancer proxy_ftp ; do 
+		if mod_is_enabled $a && [ ! -e /etc/apache2/mods-enabled/$a.conf ] ; then
+			a2enmod -q $a
+		fi
+	done
+	echo " done."
+fi
+
+# Note, this line catches new installs as well as upgrades
+if dpkg --compare-versions "$2" lt 2.2.7-1~0; then
+	if [ ! -e /var/www/index.html  -a \
+	     ! -h /var/www/index.html  -a \
+	     ! -e /var/www/index.cgi   -a \
+	     ! -e /var/www/index.pl    -a \
+	     ! -e /var/www/index.php   -a \
+	     ! -e /var/www/index.xhtml -a \
+	     ! -e /var/www/index.htm ] ; then
+		cp /usr/share/apache2/default-site/index.html /var/www/index.html
+	fi
+fi
+
+# DavLockDB format change
+if dpkg --compare-versions "$2" lt 2.2.14-3~; then
+	rm -f /var/lock/apache2/DAVLock.dir /var/lock/apache2/DAVLock.pag
+fi
+
+# Note, this line catches new installs as well as upgrades
+if dpkg --compare-versions "$2" lt 2.2.15-1~0; then
+	a2enmod -q reqtimeout
+fi
+
+# The definition of other_vhost_access.log has been moved.
+# Disable the new definition if the admin has changed the old
+# one (as determined by preinst).
+if [ -e /etc/apache2/disable-other-vhost-access-log.dpkg-apache2.2-common ] ; then
+	echo "Disabling /etc/apache2/conf.d/other-vhosts-access-log"
+	perl -p -i -e 's/^(CustomLog.*)$/#$1/' /etc/apache2/conf.d/other-vhosts-access-log
+	rm  /etc/apache2/disable-other-vhost-access-log.dpkg-apache2.2-common
+fi
+
+rm -f /etc/apache2/ports.conf.dpkg-apache2.2-common.old
+rm -f /etc/default/apache2.dpkg-apache2.2-common.old
+rm -f /etc/apache2/conf.d/charset.dpkg-apache2.2-common.old
+
+[ -f /etc/apache2/httpd.conf ] || touch /etc/apache2/httpd.conf
+
+#DEBHELPER#
+
+exit 0
+

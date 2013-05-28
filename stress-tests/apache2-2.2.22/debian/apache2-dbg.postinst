@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+
+if [ "$1" != "configure" ]; then
+        exit 0
+fi
+
+P=apache2-dbg
+if dpkg --compare-versions "$2" lt 2.2.11-5~ ; then
+	DOCDIR=/usr/share/doc/$P
+	if [ ! -h $DOCDIR -a -d $DOCDIR ] ; then
+		rmdir $DOCDIR 2> /dev/null && ln -s apache2.2-bin $DOCDIR
+	fi
+fi
+
+#DEBHELPER#
+
+exit 0

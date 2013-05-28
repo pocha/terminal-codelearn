@@ -1,0 +1,17 @@
+Debian-apache uses dpatch to make changes to the upstream source.
+
+To apply all of the patches run:
+./debian/rules patch
+
+To unapply all of the patches run:
+./debian/rules unpatch
+
+To add (or edit) a patch run:
+dpatch-edit-patch name_of_patch_goes_here
+#make your changes
+exit
+
+dpatch will make a new patch in debian/patches/ if one with that name doesn't already exist, otherwise it will change the existing one.
+To make it get used add it to debian/patches/00list .
+
+To make a patch not get used remove it from debian/patches/00list .

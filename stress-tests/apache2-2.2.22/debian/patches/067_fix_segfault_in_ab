@@ -1,0 +1,19 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 067_fix_segfault_in_ab.dpatch by Ryan Niebur <ryanryan52@gmail.com>
+##
+## DP: Do not free what SSL_get_peer_cert_chain returns. It returns a
+## pointer to memory that is freed later on with the
+## session. (Bug#495982)
+## Forwarded: https://issues.apache.org/bugzilla/show_bug.cgi?id=46393
+
+@DPATCH@
+--- a/support/ab.c
++++ b/support/ab.c
+@@ -548,7 +548,6 @@
+         for (i=1; i<count; i++) {
+             cert = (X509 *)SK_VALUE(sk, i);
+             ssl_print_cert_info(bio_out, cert);
+-            X509_free(cert);
+     }
+     }
+     cert = SSL_get_peer_certificate(c->ssl);

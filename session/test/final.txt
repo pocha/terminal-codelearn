@@ -1,0 +1,43 @@
+URL:  http://www.codelearn.org:3000/terminals/0/execute?command=ps
+	Http Delay:       0.4671 s
+	Demo-app Delay:   0.08 ms
+	Reel server Time: 2.0137 s
+
+URL:  http://www.codelearn.org:3000/terminals/0/execute?command=cd+..
+	Http Delay:       0.5514 s
+	Demo-app Delay:   1.78 ms
+	Reel server Time: 2.0065 s
+
+URL:  http://www.codelearn.org:3000/terminals/0/execute?command=ls
+	Http Delay:       1.2688 s
+	Demo-app Delay:   1.79 ms
+	Reel server Time: 2.0063 s
+
+URL:  http://www.codelearn.org:3000/terminals/0/execute?command=pwd
+	Http Delay:       0.6457 s
+	Demo-app Delay:   1.97 ms
+	Reel server Time: 2.0157 s
+
+URL:  http://www.codelearn.org:3000/terminals/0/execute?command=cal
+	Http Delay:       0.4501 s
+	Demo-app Delay:   2.09 ms
+	Reel server Time: 2.0054 s
+
+URL:  http://www.codelearn.org:3000/terminals/0/execute?command=df
+	Http Delay:       0.5534 s
+	Demo-app Delay:   1.90 ms
+	Reel server Time: 2.0055 s
+
+URL:  http://www.codelearn.org:3000/terminals/0/execute?command=id
+	Http Delay:       0.5509 s
+	Demo-app Delay:   2.07 ms
+	Reel server Time: 2.0054 s
+
+URL:  http://www.codelearn.org:3000/terminals/0/execute?command=uptime
+	Http Delay:       0.4501 s
+	Demo-app Delay:   2.37 ms
+	Reel server Time: 2.0056 s
+
+Average Http Delay:       0.6172 s
+Average Demo-app Delay:   1.76 ms
+Average Reel server time: 2.0080 s

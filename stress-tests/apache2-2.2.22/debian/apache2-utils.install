@@ -1,0 +1,21 @@
+usr/sbin/ab /usr/bin
+usr/share/man/man1/ab.1
+usr/sbin/checkgid
+usr/sbin/dbmmanage usr/bin/
+usr/share/man/man1/dbmmanage.1
+usr/sbin/htdbm usr/bin/
+usr/share/man/man1/htdbm.1
+usr/sbin/htdigest usr/bin/
+usr/share/man/man1/htdigest.1
+usr/sbin/htpasswd usr/bin/
+usr/share/man/man1/htpasswd.1
+usr/sbin/logresolve /usr/bin
+usr/share/man/man1/logresolve.1
+usr/sbin/rotatelogs
+usr/share/man/man8/rotatelogs.8
+usr/sbin/htcacheclean
+usr/share/man/man8/htcacheclean.8
+usr/sbin/httxt2dbm
+usr/share/man/man1/httxt2dbm.1
+support/check_forensic				usr/sbin
+debian/build-tree/worker/support/split-logfile	usr/sbin

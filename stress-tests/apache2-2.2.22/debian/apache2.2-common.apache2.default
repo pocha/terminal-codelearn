@@ -1,0 +1,26 @@
+### htcacheclean settings ###
+
+## run htcacheclean: yes, no, auto
+## auto means run if /etc/apache2/mods-enabled/disk_cache.load exists
+## default: auto
+HTCACHECLEAN_RUN=auto
+
+## run mode: cron, daemon
+## run in daemon mode or as daily cron job
+## default: daemon
+HTCACHECLEAN_MODE=daemon
+
+## cache size 
+HTCACHECLEAN_SIZE=300M
+
+## interval: if in daemon mode, clean cache every x minutes
+HTCACHECLEAN_DAEMON_INTERVAL=120
+
+## path to cache
+## must be the same as in CacheRoot directive
+HTCACHECLEAN_PATH=/var/cache/apache2/mod_disk_cache
+
+## additional options:
+## -n : be nice
+## -t : remove empty directories
+HTCACHECLEAN_OPTIONS="-n"

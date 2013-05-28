@@ -1,0 +1,77 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 052_logresolve_linelength.dpatch by Stefan Fritsch <sf@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: remove limit of 1024 bytes per line #331631
+
+@DPATCH@
+--- a/support/logresolve.c
++++ b/support/logresolve.c
+@@ -82,7 +82,7 @@
+ #endif
+ 
+ static void cgethost(struct in_addr ipnum, char *string, int check);
+-static int get_line(char *s, int n);
++static int get_line();
+ static void stats(FILE *output);
+ 
+ #ifdef BEOS
+@@ -90,11 +90,6 @@
+ #endif
+ 
+ 
+-/* maximum line length */
+-#ifndef MAXLINE
+-#define MAXLINE 1024
+-#endif
+-
+ /* maximum length of a domain name */
+ #ifndef MAXDNAME
+ #define MAXDNAME 256
+@@ -141,6 +136,8 @@
+ static int resolves = 0;
+ static int withname = 0;
+ static int errors[MAX_ERR + 3];
++static size_t maxline=0;
++static char *line = NULL;
+ 
+ /*
+  * cgethost - gets hostname by IP address, caching, and adding unresolvable
+@@ -287,14 +284,15 @@
+  * gets a line from stdin
+  */
+ 
+-static int get_line (char *s, int n)
++static int get_line ()
+ {
++    ssize_t len;
+     char *cp;
+ 
+-    if (!fgets(s, n, stdin))
++    if ( (len = getline(&line, &maxline, stdin)) == -1 )
+         return (0);
+-    cp = strchr(s, '\n');
+-    if (cp)
++    cp = line + len -1;
++    if (*cp == '\n')
+         *cp = '\0';
+     return (1);
+ }
+@@ -302,7 +300,7 @@
+ int main (int argc, char *argv[])
+ {
+     struct in_addr ipnum;
+-    char *bar, hoststring[MAXDNAME + 1], line[MAXLINE], *statfile;
++    char *bar, hoststring[MAXDNAME + 1], *statfile;
+     int i, check;
+ 
+ #if defined(WIN32) || (defined(NETWARE) && defined(USE_WINSOCK))
+@@ -337,7 +335,7 @@
+     for (i = 0; i < MAX_ERR + 2; i++)
+         errors[i] = 0;
+ 
+-    while (get_line(line, MAXLINE)) {
++    while (get_line()) {
+         if (line[0] == '\0')
+             continue;
+         entries++;

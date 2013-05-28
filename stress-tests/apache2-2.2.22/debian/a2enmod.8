@@ -1,0 +1,73 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH A2ENMOD 8 "12 October 2006"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+a2enmod, a2dismod \- enable or disable an apache2 module
+.SH SYNOPSIS
+.B a2enmod
+.RI [ module ]
+.PP
+.B a2dismod
+.RI [ module ]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B a2enmod
+and
+.B a2dismod
+commands.
+.PP
+.B a2enmod
+is a script that enables the specified module within the
+.B apache2
+configuration.  It does this by creating symlinks within
+.BR /etc/apache2/mods-enabled .
+Likewise,
+.B a2dismod
+disables a module by removing those symlinks.  It is not an error to
+enable a module which is already enabled, or to disable one which is
+already disabled.
+.PP
+Note that many modules have, in addition to a .load file, an
+associated .conf file.  Enabling the module puts the configuration
+directives in the .conf file as directives into the main server context of
+.B apache2
+.SH EXAMPLES
+.RS
+.B "a2enmod imagemap"
+.br
+.B "a2dismod mime_magic"
+.RE
+.PP
+Enables the
+.B mod_imagemap
+module, and disables the
+.B mod_mime_magic
+module.
+.SH FILES
+.TP
+.B /etc/apache2/mods-available
+Directory with files giving information on available modules.
+.TP
+.B /etc/apache2/mods-enabled
+Directory with links to the files in
+.B mods-available
+for enabled modules.
+.SH "SEE ALSO"
+.BR apache2ctl (8).
+.SH AUTHOR
+This manual page was written by Daniel Stone <daniel@sfarc.net> for the Debian
+GNU/Linux distribution, as it is a Debian-specific script with the package.

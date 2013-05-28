@@ -1,0 +1,218 @@
+Add the base functionality of mpm_itk over prefork; parse the new configuration
+options, fork on each new connection, and setuid() as required.
+
+Index: httpd-2.2.17/server/mpm/experimental/itk/itk.c
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/itk.c
++++ httpd-2.2.17/server/mpm/experimental/itk/itk.c
+@@ -26,6 +26,11 @@
+ #include "apr_thread_proc.h"
+ #include "apr_signal.h"
+ 
++# define _DBG(text,par...) \
++    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, \
++                "(itkmpm: pid=%d uid=%d, gid=%d) %s(): " text, \
++                getpid(), getuid(), getgid(), __FUNCTION__, par)
++
+ #define APR_WANT_STDIO
+ #define APR_WANT_STRFUNC
+ #include "apr_want.h"
+@@ -47,6 +52,7 @@
+ #include "http_config.h"
+ #include "http_core.h"          /* for get_remote_host */
+ #include "http_connection.h"
++#include "http_request.h"       /* for ap_hook_post_perdir_config */
+ #include "scoreboard.h"
+ #include "ap_mpm.h"
+ #include "unixd.h"
+@@ -146,6 +152,15 @@ char tpf_server_name[INETD_SERVNAME_LENG
+ 
+ static volatile int die_now = 0;
+ 
++typedef struct
++{
++    uid_t uid;
++    gid_t gid;
++    char *username;
++} itk_per_dir_conf;
++
++module AP_MODULE_DECLARE_DATA mpm_itk_module;
++
+ #ifdef GPROF
+ /*
+  * change directory for gprof to plop the gmon.out file
+@@ -512,10 +527,6 @@ static void child_main(int child_num_arg
+         clean_child_exit(APEXIT_CHILDFATAL);
+     }
+ 
+-    if (unixd_setup_child()) {
+-        clean_child_exit(APEXIT_CHILDFATAL);
+-    }
+-
+     ap_run_child_init(pchild, ap_server_conf);
+ 
+     ap_create_sb_handle(&sbh, pchild, my_child_num, 0);
+@@ -663,10 +674,38 @@ static void child_main(int child_num_arg
+          * socket options, file descriptors, and read/write buffers.
+          */
+ 
+-        current_conn = ap_run_create_connection(ptrans, ap_server_conf, csd, my_child_num, sbh, bucket_alloc);
+-        if (current_conn) {
+-            ap_process_connection(current_conn, csd);
+-            ap_lingering_close(current_conn);
++        {
++            pid_t pid = fork(), child_pid;
++            int status;
++            switch (pid) {
++            case -1:
++                ap_log_error(APLOG_MARK, APLOG_ERR, errno, NULL, "fork: Unable to fork new process");
++                break;
++            case 0: /* child */
++                apr_proc_mutex_child_init(&accept_mutex, ap_lock_fname, pchild);
++                current_conn = ap_run_create_connection(ptrans, ap_server_conf, csd, my_child_num, sbh, bucket_alloc);
++                if (current_conn) {
++                    ap_process_connection(current_conn, csd);
++                    ap_lingering_close(current_conn);
++                }
++                exit(0);
++            default: /* parent; just wait for child to be done */
++                do {
++                    child_pid = waitpid(pid, &status, 0);
++                } while (child_pid == -1 && errno == EINTR);
++
++                if (child_pid != pid || !WIFEXITED(status)) {
++                    if (WIFSIGNALED(status)) {
++                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, ap_server_conf, "child died with signal %u", WTERMSIG(status));
++                    } else if (WEXITSTATUS(status) != 0) {
++                        ap_log_error(APLOG_MARK, APLOG_ERR, 0, ap_server_conf, "child exited with non-zero exit status %u", WEXITSTATUS(status));
++                    } else {
++                        ap_log_error(APLOG_MARK, APLOG_ERR, errno, NULL, "waitpid() failed");
++                    }
++                    clean_child_exit(1);
++                }
++                break;
++            }
+         }
+ 
+         /* Check the pod and the generation number after processing a
+@@ -684,6 +723,10 @@ static void child_main(int child_num_arg
+              */
+             die_now = 1;
+         }
++
++        /* if we have already setuid(), die (we can't be used anyhow) */
++        if (getuid())
++            die_now = 1;
+     }
+     /* This apr_pool_clear call is redundant, should be redundant, but compensates
+      * a flaw in the apr reslist code.  This should be removed once that flaw has
+@@ -1351,6 +1394,56 @@ static int itk_pre_config(apr_pool_t *p,
+     return OK;
+ }
+ 
++static int itk_post_perdir_config(request_rec *r)
++{
++    uid_t wanted_uid;
++    gid_t wanted_gid;
++    const char *wanted_username;
++    int err = 0;
++
++    itk_per_dir_conf *dconf =
++        (itk_per_dir_conf *) ap_get_module_config(r->per_dir_config, &mpm_itk_module);
++
++    strncpy(ap_scoreboard_image->servers[my_child_num][0].vhost, r->server->server_hostname, 31);
++    ap_scoreboard_image->servers[my_child_num][0].vhost[31] = 0;
++
++    wanted_uid = dconf->uid;
++    wanted_gid = dconf->gid;
++    wanted_username = dconf->username;
++
++    if (wanted_uid == -1 || wanted_gid == -1) {
++        wanted_uid = unixd_config.user_id;
++        wanted_gid = unixd_config.group_id;
++        wanted_username = unixd_config.user_name;
++    }
++
++    if (wanted_uid != -1 && wanted_gid != -1 && (getuid() != wanted_uid || getgid() != wanted_gid)) {
++        if (setgid(wanted_gid)) {
++            _DBG("setgid(%d): %s", wanted_gid, strerror(errno));
++            err = 1;
++        } else if (initgroups(wanted_username, wanted_gid)) {
++            _DBG("initgroups(%s, %d): %s", wanted_username, wanted_gid, strerror(errno));
++            err = 1;
++        } else if (setuid(wanted_uid)) {
++            _DBG("setuid(%d): %s", wanted_uid, strerror(errno));
++            err = 1;
++        }
++    }
++
++    /*
++     * Most likely a case of switching uid/gid within a persistent
++     * connection; the RFCs allow us to just close the connection
++     * at anytime, so we excercise our right. :-)
++     */
++    if (err) {
++        ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, \
++            "Couldn't set uid/gid, closing connection.");
++        ap_lingering_close(r->connection);
++        exit(0);
++    }
++    return OK;
++}
++
+ static void itk_hooks(apr_pool_t *p)
+ {
+     /* The itk open_logs phase must run before the core's, or stderr
+@@ -1368,6 +1461,9 @@ static void itk_hooks(apr_pool_t *p)
+      * to retrieve it, so register as REALLY_FIRST
+      */
+     ap_hook_pre_config(itk_pre_config, NULL, NULL, APR_HOOK_REALLY_FIRST);
++
++    /* set the uid as fast as possible, but not before merging per-dit config */
++    ap_hook_header_parser(itk_post_perdir_config, NULL, NULL, APR_HOOK_REALLY_FIRST);
+ }
+ 
+ static const char *set_daemons_to_start(cmd_parms *cmd, void *dummy, const char *arg)
+@@ -1480,6 +1576,15 @@ static const char *set_server_limit (cmd
+     return NULL;
+ }
+ 
++static const char *assign_user_id (cmd_parms *cmd, void *ptr, const char *user_name, const char *group_name)
++{
++    itk_per_dir_conf *dconf = (itk_per_dir_conf *) ptr;
++    dconf->username = apr_pstrdup(cmd->pool, user_name);
++    dconf->uid = ap_uname2id(user_name);
++    dconf->gid = ap_gname2id(group_name);
++    return NULL;
++}
++
+ static const command_rec itk_cmds[] = {
+ UNIX_DAEMON_COMMANDS,
+ LISTEN_COMMANDS,
+@@ -1493,14 +1598,25 @@ AP_INIT_TAKE1("MaxClients", set_max_clie
+               "Maximum number of children alive at the same time"),
+ AP_INIT_TAKE1("ServerLimit", set_server_limit, NULL, RSRC_CONF,
+               "Maximum value of MaxClients for this run of Apache"),
++AP_INIT_TAKE2("AssignUserID", assign_user_id, NULL, RSRC_CONF|ACCESS_CONF,
++              "Tie a virtual host to a specific child process."),
+ AP_GRACEFUL_SHUTDOWN_TIMEOUT_COMMAND,
+ { NULL }
+ };
+ 
++/* == allocate a private per-dir config structure == */
++static void *itk_create_dir_config(apr_pool_t *p, char *dummy)
++{
++    itk_per_dir_conf *c = (itk_per_dir_conf *)
++        apr_pcalloc(p, sizeof(itk_per_dir_conf));
++    c->uid = c->gid = -1;
++    return c;
++}
++
+ module AP_MODULE_DECLARE_DATA mpm_itk_module = {
+     MPM20_MODULE_STUFF,
+     ap_mpm_rewrite_args,        /* hook to run before apache parses args */
+-    NULL,                       /* create per-directory config structure */
++    itk_create_dir_config,      /* create per-directory config structure */
+     NULL,                       /* merge per-directory config structures */
+     NULL,                       /* create per-server config structure */
+     NULL,                       /* merge per-server config structures */

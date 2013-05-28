@@ -1,0 +1,56 @@
+apache2.2-mpm-itk 2.2.17-01, released 2011-03-21:
+
+  * Fixed CVE-2011-1176: If NiceValue was set, the default with no
+    AssignUserID was to run as root:root instead of the default Apache user
+    and group, due to the configuration merger having an incorrect default
+    configuration.
+  * Rebase against Apache 2.2.17.
+  * Fix an issue where users can sometimes get spurious 403s on persistent
+    connections, if the .htaccess files are not world readable.
+  * In the config merger, don't reallocate the username, since it's already
+    in the correct pool. (This is not a memory leak, only a small inefficiency.)
+
+apache2.2-mpm-itk 2.2.11-02, released 2009-04-14:
+
+  * Really fix the waitpid() code; thanks to Dave Cundiff for spotting the typo.
+  * Add CAP_DAC_READ_SEARCH to the list of capabilities, so Apache can read
+    .htaccess files that are not world readable. This should fix some of the
+    "permission denied" problems that cropped up in 2.2.11-01, although you
+    will still see the problem if you use root-squashed NFS.
+
+apache2.2-mpm-itk 2.2.11-01, released 2009-03-21:
+
+  * NOTE: This release contains major new functionality. As with mpm-itk in
+    general, you may want to consider closely whether you actually want to
+    put it in production. Also note that Apache 2.0 is no longer supported.
+  * Updated for Apache 2.2.11 (in particular, prefork had a few minor changes
+    that are now incorporated).
+  * Allow uid/gid and nice value to be set per-directory (actually per-location)
+    in addition to per-vhost. Adapted from patch by Knut Auvor Grythe.
+  * Some minor code cleanups.
+  * If waitpid() is interrupted by a signal (returning EINTR), try again.
+    This fixes a race condition where a graceful restart could fail and hang
+    the child forever. Adapted from patch by Jan Boysen, who also diagnosed and
+    reported the bug.
+  * As a side effect of the per-directory patches doing proper config merging,
+    you can now set default values for all options outside the vhost definitions
+    and have them get properly overridden by settings in more specific scopes.
+  * Fix a small memory leak on reload by using apr_pstrdup() instead of
+    strdup().
+
+apache2.2-mpm-itk 2.2.6-02, released 2008-07-27:
+
+  * Fix a typo in the autoconf snippet that would prevent building with
+    capability dropping support. Note that you'll need to run autoheader before
+    autoconf to get -lcap detected (the Debian/Ubuntu packages was missing
+    this, so others might as well).
+
+apache2.2-mpm-itk 2.2.6-01, released 2008-01-05:
+
+  * Updated 01-copy-prefork.patch to let prefork.c come from Apache 2.2.6
+    instead of 2.2.3. Updated all the patches so they apply cleanly
+    afterwards. In other words, there is no mpm-itk-specific functionality
+    in this release, it's only a maintenance release against the latest
+    Apache.
+  * Removed a few instances of trailing whitespace in the patches.
+  * Added this changelog.

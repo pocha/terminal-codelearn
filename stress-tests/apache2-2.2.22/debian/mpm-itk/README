@@ -1,0 +1,121 @@
+This is a copy of the documentation available at http://mpm-itk.sesse.net/,
+dumped with the Lynx web browser and edited briefly.
+
+                              The Apache 2 ITK MPM
+
+   apache2-mpm-itk (just mpm-itk for short) is an MPM (Multi-Processing
+   Module) for the [1]Apache web server. mpm-itk allows you to run each of
+   your vhost under a separate uid and gid -- in short, the scripts and
+   configuration files for one vhost no longer have to be readable for all
+   the other vhosts.
+
+   There are already MPMs available that do this; however, I am not aware
+   of any besides mpm-itk that are actively developed. (If you only run
+   CGI scripts, suexec will probably solve most of your problems with any
+   MPM.)
+
+   mpm-itk is based on the traditional prefork MPM, which means it's
+   non-threaded; in short, this means you can run non-thread-aware code
+   (like many [2]PHP extensions) without problems. On the other hand, you
+   lose out to any performance benefit you'd get with threads, of course;
+   you'd have to decide for yourself if that's worth it or not. You will
+   also take an additional performance hit over prefork, since there's an
+   extra fork per request.
+
+Installation
+
+   If you can't apply a patch, you probably should not be using this. :-)
+   However, several distributions now include mpm-itk as a choice
+   alongside the other MPMs; in alphabetical order:
+     * [3]Arch Linux
+     * [4]Debian GNU/Linux
+     * [5]FreeBSD ports
+     * [6]Gentoo Linux
+     * [7]Mandriva
+     * [8]Ubuntu
+
+   If you know of any I missed, or if you have included mpm-itk in your
+   favourite distribution, please drop me a note (see below). I'd always
+   be happy to expand this list :-)
+
+Configuration
+
+   The new configuration settings compared to the prefork MPM are:
+     * AssignUserID: Takes two parameters, uid and gid (or really, user
+       name and group name); specifies what uid and gid the vhost will run
+       as (after parsing the request etc., of course). Note that if you do
+       not assign a user ID, the default one from Apache will be used.
+     * MaxClientsVHost: A separate MaxClients for the vhost. This can be
+       useful if, say, half of your vhosts depend on some NFS server (like
+       on our setup); if the NFS server goes down, you do not want the
+       children waiting forever on NFS to take the non-NFS-dependent hosts
+       down. This can thus act as a safety measure, giving "server too
+       busy" on the NFS-dependent vhosts while keeping the other ones
+       happily running. (Of course, you could use it to simply keep one
+       site from eating way too much resources, but there are probably
+       better ways of doing that.)
+     * NiceValue: Lets you nice some requests down, to give them less CPU
+       time.
+
+   AssignUserID and NiceValue can be set wherever you'd like in the Apache
+   configuration, except in .htaccess. MaxClientsVHost can only be set
+   inside a VirtualHost directive.
+
+Quirks and warnings
+
+   Since mpm-itk has to be able to setuid(), it runs as root (although
+   restricted with POSIX capabilities where possible) until the request is
+   parsed and the vhost determined. This means that any security hole
+   before the request is parsed will be a root security hole. (The most
+   likely place is probably in mod_ssl.) This is not going to change in
+   the near future, as the most likely alternative solution (socket
+   passing and its variants) is very hard to get to work properly in a
+   number of common use cases, like SSL.
+
+   The lack of socket passing also leads to another minor quirk: if you
+   connect to httpd, make a request and then make a request on the same
+   connection that gets handled by a different uid, mpm-itk simply shuts
+   down the connection. This is perfectly legal according to RFC2616, and
+   all major clients seem to handle it well; the web server simply
+   simulates a timeout, and the client just opens a new connection and
+   retries the request. However, there is a small performance hit, and
+   thus you should avoid including content from multiple uids in the same
+   page.
+
+   Note that mpm-itk is experimental software; and we've done a fair
+   amount of stress testing, but it's nowhere as tested as, say, prefork.
+   That being said, it's being run in production at several sites in the
+   world, both hobbyist and commercial, some as large as ~10 million hits
+   a day.
+
+   People have reported issues with mpm-itk and mod_python, mod_ruby and
+   FastCGI. I believe the mod_python and FastCGI problems have been
+   largely solved by updates to those packages, but as I use neither, I
+   can't really guarantee anything. YMMV, test before use.
+
+Licensing
+
+   mpm-itk is licensed under the Apache License, version 2.0, like the
+   rest of Apache.
+
+Contact
+
+   mpm-itk is developed by Steinar H. Gunderson; e-mail address is at my
+   [9]home page.
+
+   There is a user mailing list at mpm-itk [at] lists.err.no. Visit the
+   [10]mailing list page to subscribe, or send a blank e-mail to
+   mpm-itk-subscribe [at] lists.err.no.
+
+References
+
+   1. http://www.apache.org/
+   2. http://www.php.net/
+   3. http://www.archlinux.org/
+   4. http://www.debian.org/
+   5. http://www.freebsd.org/
+   6. http://www.gentoo.org/
+   7. http://www.mandriva.com/
+   8. http://www.ubuntu.com/
+   9. http://www.sesse.net/
+  10. http://lists.err.no/mailman/listinfo/mpm-itk

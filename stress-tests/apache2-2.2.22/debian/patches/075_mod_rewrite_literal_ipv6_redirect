@@ -1,0 +1,51 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 075_mod_rewrite_literal_ipv6_redirect.dpatch by Stefan Fritsch <sf@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Add [] to literal ipv6 hosts in URLs (bug #557015)
+
+@DPATCH@
+--- a/modules/mappers/mod_rewrite.c
++++ b/modules/mappers/mod_rewrite.c
+@@ -840,6 +840,23 @@
+ }
+ 
+ /*
++ * Get the current server name from the request for the purposes
++ * of using in a URL.  If the server name is an IPv6 literal
++ * address, it will be returned in URL format (e.g., "[fe80::1]").
++ */
++static const char *get_server_name_for_url(request_rec *r)
++{
++    const char *plain_server_name = ap_get_server_name(r);
++
++#if APR_HAVE_IPV6
++    if (ap_strchr_c(plain_server_name, ':')) { /* IPv6 literal? */
++        return apr_psprintf(r->pool, "[%s]", plain_server_name);
++    }
++#endif
++    return plain_server_name;
++}
++
++/*
+  * add 'http[s]://ourhost[:ourport]/' to URI
+  * if URI is still not fully qualified
+  */
+@@ -853,7 +870,7 @@
+         char *thisport;
+         int port;
+ 
+-        thisserver = ap_get_server_name(r);
++        thisserver = get_server_name_for_url(r);
+         port = ap_get_server_port(r);
+         thisport = ap_is_default_port(port, r)
+                    ? ""
+@@ -4290,7 +4307,7 @@
+      */
+ 
+     /* add the canonical URI of this URL */
+-    thisserver = ap_get_server_name(r);
++    thisserver = get_server_name_for_url(r);
+     port = ap_get_server_port(r);
+     if (ap_is_default_port(port, r)) {
+         thisport = "";

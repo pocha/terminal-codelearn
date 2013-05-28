@@ -1,0 +1,10 @@
+Document: apache2-manual
+Title: Apache HTTP Server Version 2.2 Documentation
+Abstract: This documentation describes the configuration of the Apache Web
+ server and the included modules.
+Section: web
+
+Format: HTML
+Index: /usr/share/doc/apache2-doc/manual/en/index.html
+Files: /usr/share/doc/apache2-doc/manual/*/*.html
+ /usr/share/doc/apache2-doc/manual/*/*/*.html

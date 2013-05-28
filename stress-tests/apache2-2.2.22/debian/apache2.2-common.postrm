@@ -1,0 +1,79 @@
+#! /bin/sh
+
+set -e
+
+# Allow apache 2.4 to override what we do.
+if [ -x /etc/apache2/upgrade-to-2.4-in-progress ] ; then
+	set +e
+	/etc/apache2/upgrade-to-2.4-in-progress $0 "$@"
+	ret=$?
+	set -e
+	case $ret in
+	42)
+		exit 0
+		;;
+	43)
+		DONT_PURGE=1
+		;;
+	0)
+		: # do nothing
+		;;
+	*)
+		exit $ret
+		;;
+	esac
+fi
+
+
+if [ "$1" = purge -a "$DONT_PURGE" != 1 ] ; then
+	rm -f 	/etc/apache2/httpd.conf \
+		/var/cache/apache2/reload \
+		/var/log/apache2/access.log* \
+		/var/log/apache2/other_vhosts_access.log* \
+		/var/log/apache2/error.log*
+	
+	rm -rf 	/var/cache/apache2/proxy \
+		/var/cache/apache2/mod_disk_cache \
+		/var/run/apache2 \
+		/var/lock/apache2
+
+	for f in /etc/apache2/sites-enabled/* \
+		 /etc/apache2/mods-enabled/* ; do
+		[ -L "$f" ] && rm -f "$f" 
+	done
+	
+	for d in /etc/apache2/sites-enabled/ \
+		/etc/apache2/mods-enabled/ \
+		/etc/apache2/conf.d \
+		/etc/apache2 \
+		/var/log/apache2 \
+		/var/cache/apache2 ; do
+		rmdir $d 2> /dev/null || true
+	done
+
+fi
+
+restore_conffile() {
+	if [ -e $1.dpkg-apache2.2-common.old ] ; then
+		echo Restoring previous version of $1 ...
+		mv $1.dpkg-apache2.2-common.old $1
+	fi
+}
+
+if [ "$1" = abort-upgrade ] ; then
+	restore_conffile /etc/default/apache2
+	restore_conffile /etc/apache2/ports.conf
+	restore_conffile /etc/apache2/conf.d/charset
+fi
+
+if [ "$1" = remove ] ; then
+	MD5SUM="`md5sum /var/www/index.html 2>/dev/null | cut -d ' ' -f 1`"
+	case "$MD5SUM" in
+		5388f60d7695cb57b87c799ee62d20b2|\
+		21dde95d9d269cbb2fa6560309dca40c)
+			rm -f /var/www/index.html
+			;;
+	esac
+fi
+
+#DEBHELPER#

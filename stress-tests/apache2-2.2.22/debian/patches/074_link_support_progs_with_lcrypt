@@ -1,0 +1,37 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 074_support_link_lcrypt.dpatch by Stefan Fritsch <sf@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Link support programs with -lcrypt where necessary. Required by
+## DP: binutils-gold (bug #553946)
+
+@DPATCH@
+--- a/configure
++++ b/configure
+@@ -14831,11 +14831,11 @@
+ 
+ fi
+ 
+-htpasswd_LTFLAGS=""
++htpasswd_LTFLAGS="-lcrypt"
+ htdigest_LTFLAGS=""
+ rotatelogs_LTFLAGS=""
+ logresolve_LTFLAGS=""
+-htdbm_LTFLAGS=""
++htdbm_LTFLAGS="-lcrypt"
+ ab_LTFLAGS=""
+ checkgid_LTFLAGS=""
+ htcacheclean_LTFLAGS=""
+--- a/support/config.m4
++++ b/support/config.m4
+@@ -1,8 +1,8 @@
+-htpasswd_LTFLAGS=""
++htpasswd_LTFLAGS="-lcrypt"
+ htdigest_LTFLAGS=""
+ rotatelogs_LTFLAGS=""
+ logresolve_LTFLAGS=""
+-htdbm_LTFLAGS=""
++htdbm_LTFLAGS="-lcrypt"
+ ab_LTFLAGS=""
+ checkgid_LTFLAGS=""
+ htcacheclean_LTFLAGS=""

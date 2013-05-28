@@ -1,0 +1,3 @@
+apache2.2-common: setuid-binary usr/lib/apache2/suexec 4754 root/www-data
+apache2.2-common: non-standard-dir-perm var/log/apache2/ 0750 != 0755
+apache2.2-common: package-contains-empty-directory usr/lib/cgi-bin/

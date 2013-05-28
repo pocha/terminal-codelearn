@@ -1,0 +1,60 @@
+Add an extra hook right after merging per-directory configuration.
+This makes sure we are able to setuid() as early as possible (that
+is, as soon as know what uid/gid to use for this location), so we
+won't run all sorts of subrequests and other stuff as root.
+
+Index: httpd-2.2.17/include/http_request.h
+===================================================================
+--- httpd-2.2.17.orig/include/http_request.h
++++ httpd-2.2.17/include/http_request.h
+@@ -356,6 +356,15 @@ AP_DECLARE_HOOK(int,auth_checker,(reques
+  */
+ AP_DECLARE_HOOK(void,insert_filter,(request_rec *r))
+ 
++/**
++ * This hook allows modules to affect the request immediately after the
++ * per-directory configuration for the request has been generated. This allows
++ * modules to make decisions based upon the current directory configuration
++ * @param r The current request
++ * @return OK or DECLINED
++ */
++AP_DECLARE_HOOK(int,post_perdir_config,(request_rec *r))
++ 
+ AP_DECLARE(int) ap_location_walk(request_rec *r);
+ AP_DECLARE(int) ap_directory_walk(request_rec *r);
+ AP_DECLARE(int) ap_file_walk(request_rec *r);
+Index: httpd-2.2.17/server/request.c
+===================================================================
+--- httpd-2.2.17.orig/server/request.c
++++ httpd-2.2.17/server/request.c
+@@ -67,6 +67,7 @@ APR_HOOK_STRUCT(
+     APR_HOOK_LINK(auth_checker)
+     APR_HOOK_LINK(insert_filter)
+     APR_HOOK_LINK(create_request)
++    APR_HOOK_LINK(post_perdir_config)
+ )
+ 
+ AP_IMPLEMENT_HOOK_RUN_FIRST(int,translate_name,
+@@ -86,6 +87,8 @@ AP_IMPLEMENT_HOOK_RUN_FIRST(int,auth_che
+ AP_IMPLEMENT_HOOK_VOID(insert_filter, (request_rec *r), (r))
+ AP_IMPLEMENT_HOOK_RUN_ALL(int, create_request,
+                           (request_rec *r), (r), OK, DECLINED)
++AP_IMPLEMENT_HOOK_RUN_ALL(int,post_perdir_config,
++                          (request_rec *r), (r), OK, DECLINED)
+ 
+ 
+ static int decl_die(int status, char *phase, request_rec *r)
+@@ -164,6 +167,13 @@ AP_DECLARE(int) ap_process_request_inter
+         return access_status;
+     }
+ 
++    /* First chance to handle the request after per-directory configuration is
++     * generated 
++     */
++    if ((access_status = ap_run_post_perdir_config(r))) {
++        return access_status;
++    }
++
+     /* Only on the main request! */
+     if (r->main == NULL) {
+         if ((access_status = ap_run_header_parser(r))) {

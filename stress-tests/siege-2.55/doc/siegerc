@@ -1,0 +1,212 @@
+# Updated by Siege 2.55, March-08-2013
+# Copyright 2001, 2002 by Jeffrey Fulmer
+# 
+# Siege configuration file -- edit as necessary
+# For more information about configuring and running
+# this program, visit: http://www.joedog.org
+
+#
+# signify verbose mode, true turns on verbose output
+# ex: verbose = true|false
+#
+verbose = true
+
+#
+# default logging status, true turns logging on.
+# ex: logging = true|false
+#
+logging = true
+
+#
+# show logfile location.  By default, siege displays the
+# logfile location at the end of every run when logging
+# You can turn this message off with this directive.
+# ex: show-logfile = false
+#
+show-logfile = true 
+
+#
+# logfile, the default siege logfile is $PREFIX/var/siege.log
+# This directive allows you to choose an alternative log file.
+# ex: logfile = /home/jeff/var/log/siege.log
+#
+# logfile = 
+
+#
+# HTTP protocol.  Options HTTP/1.1 and HTTP/1.0.
+# Some webservers have broken implementation of the
+# 1.1 protocol which skews throughput evaluations.
+# If you notice some siege clients hanging for
+# extended periods of time, change this to HTTP/1.0
+# ex: protocol = HTTP/1.1
+#     protocol = HTTP/1.0
+#
+protocol = HTTP/1.1
+
+#
+# Connection directive. Options "close" and "keep-alive"
+# This directive is only supported by HTTP/1.1 protocol.
+# For best throughput use "close" as keep-alive connections
+# on dynamic content will hang until the socket times out.
+# ex: connection = close
+#     connection = keep-alive
+connection = close
+
+#
+# default number of simulated  concurrent users
+# ex: concurrent = 25
+#
+concurrent = 15
+
+#
+# default duration of the siege.  The right hand argument has
+# a modifier which specifies the time units, H=hours, M=minutes,
+# and S=seconds. If a modifier is not specified, then minutes 
+# are assumed.
+# ex: time = 50M
+#
+# time =
+
+#
+# repetitions.  The length of siege may be specified in client
+# reps rather then a time duration.  Instead of specifying a time
+# span, you can tell each siege instance to hit the server X number
+# of times.  So if you chose 'reps = 20' and you've selected 10 
+# concurrent users, then siege will hit the server 200 times.
+# ex: reps = 20
+#
+# reps = 
+
+#
+# default delay value, see the siege( 1 ) man page.  
+# This value is used for load testing, it is not used 
+# for benchmarking.
+# ex: delay = 3
+#
+delay = 1
+
+#
+# connection timeout value. Set the value in seconds for 
+# socket connection timeouts. The default value is 30 seconds.
+# You might want to increased that number under heavy load.
+# ex: timeout = 30
+#
+# timeout = 
+
+#
+# failures: This is the number of total socket failures allowed
+# before siege aborts. Socket failures (timeouts, connection 
+# failures, etc.) are combined with 400 and 500 level errors in
+# the final stats, but those errors do not count against the
+# abort total. So if you set this total to 10, then siege will 
+# abort after ten socket timeouts, but it will not abort after 
+# ten 404s. The default value is 20.
+# ex: failures = 20
+#
+# failures = 
+
+#
+# internet simulation. If true, siege clients will hit
+# the URLs in the urls.txt file randomly, thereby simulating
+# internet usage.  If false, siege will run through the 
+# urls.txt file in order from first to last and back again.
+# ex: internet = true
+#
+internet = false
+
+#
+# default benchmarking value, If true, there is NO delay
+# between server requests, siege runs as fast as the web
+# server and the network will let it.  Set this to false 
+# for load testing.
+# ex: benchmark = true
+# 
+benchmark = false
+
+#
+# default URLs file, set at configuration time, the default
+# file is PREFIX/etc/urls.txt.  So if you configured siege
+# with --prefix=/usr/local then the urls.txt file is installed
+# int /usr/local/etc/urls.txt.  Use the "file = " directive to
+# configure an alternative URLs file.
+# ex: file = /export/home/jdfulmer/MYURLS.txt
+#
+# file =  
+
+#
+# default URL, this is a single URL that you want to test. This
+# is usually set at the command line with the -u option.  When 
+# used, this option overrides the urls.txt (-f FILE/--file=FILE) 
+# option. You will HAVE to comment this out for in order to use
+# the urls.txt file option.
+# ex: url = https://shemp.whoohoo.com/docs/index.jsp
+#
+# url = 
+
+#
+# set the siege User-Agent to identify yourself at the
+# host, the default is: JoeDog/1.00 [en] (X11; I; Siege #.##) 
+# But that wreaks of corporate techno speak.  Feel free
+# to make it more interesting :-)  Since Limey is recovering
+# from minor surgery as I write this, I'll dedicate the 
+# example to him...
+# ex: user-agent = Limey The Bulldog
+# 
+# user-agent =
+
+#
+# WWW-Authenticate username and password.  When siege
+# hits a webpage that requires authentication, it will
+# send this user name and password to the server.  Note
+# this is NOT form based authentication.  You will have
+# to construct URLs for that.
+#
+# ex: username = jdfulmer
+#     password = whoohoo
+#
+# username = 
+# password =
+
+#
+# Login URL. This is the first URL to be hit by every siege
+# client. This feature was designed to allow you to login to 
+# a server and establish a session. It will only be hit once
+# so if you need to hit this URL more then once, make sure it
+# also appears in your urls.txt file.
+#
+# ex: login-url = http://eos.haha.com/login.jsp POST name=jeff&pass=foo
+#
+# login-url = 
+
+#
+# Proxy protocol. This option allows you to select a proxy
+# server stress testing. The proxy will request the URL(s) 
+# specified by -u"my.url.org" OR from the urls.txt file.
+# 
+# ex: proxy-host = proxy.whoohoo.org
+#     proxy-port = 8080
+#
+# proxy-host = 
+# proxy-port = 
+
+#
+# Redirection support.  This option allows to to control
+# whether a Location: hint will be followed.  Most users
+# will want to follow redirection information, but sometimes
+# it's desired to just get the Location information.
+#
+# ex: follow-location = false
+#
+# follow-location = 
+
+# Zero-length data.  siege can be configured to disregard
+# results in which zero bytes are read after the headers.
+# Alternatively, such results can be counted in the final
+# tally of outcomes.
+#
+# ex: zero-data-ok = false 
+#
+# zero-data-ok =
+
+#
+# end of siegerc

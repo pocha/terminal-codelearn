@@ -1,0 +1,51 @@
+If apache crashes or freezes, it is helpful if you include a backtrace in the
+bug report.
+
+
+
+In case of a crash, do the following:
+
+1) Install the packages apache2-dbg libapr1-dbg libaprutil1-dbg gdb. 
+
+2) Add "CoreDumpDirectory /var/cache/apache2" to your apache configuration.
+
+3) Execute as root:
+	/etc/init.d/apache2 stop
+	ulimit -c unlimited
+	/etc/init.d/apache2 start
+
+4) Do whatever it takes to reproduce the crash. There should now be the file
+/var/cache/apache2/core .
+
+5) If you use apache2-mpm-prefork, execute:
+	
+	gdb /usr/sbin/apache2 /var/cache/apache2/core
+	(gdb) bt full
+	...
+	(gdb) quit
+
+If you use a threaded mpm, execute:
+
+	gdb /usr/sbin/apache2 /var/cache/apache2/core
+        (gdb) thread apply all bt full
+	...
+	(gdb) quit
+
+Include the backtrace in the bug report.
+
+6) Undo the change to your configuration, uninstall the debug packages, remove
+/var/cache/apache2/core
+
+
+
+In case of a hanging process, you don't need a core dump and you can skip steps 2 and 3.
+
+4) Reproduce the problem. Get the pid of a hanging process.
+
+5) Start gdb with
+
+	gdb -p pid
+
+and continue as described above. It may also be helpful to include the output of
+
+	strace -p pid

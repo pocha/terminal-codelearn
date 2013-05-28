@@ -1,0 +1,5 @@
+usr/lib/debug/usr/sbin
+usr/lib/debug/usr/lib/apache2/mpm-worker
+usr/lib/debug/usr/lib/apache2/mpm-prefork
+usr/lib/debug/usr/lib/apache2/mpm-event
+usr/lib/debug/usr/lib/apache2/mpm-itk

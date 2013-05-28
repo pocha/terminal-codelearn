@@ -1,0 +1,200 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 202_suexec-custom.dpatch by Stefan Fritsch <sf@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: the actual patch to make suexec-custom read a config file
+
+@DPATCH@
+--- a/support/suexec-custom.c
++++ b/support/suexec-custom.c
+@@ -29,6 +29,7 @@
+  *
+  *
+  */
++#define SUEXEC_CONFIG_DIR "/etc/apache2/suexec/"
+ 
+ #include "apr.h"
+ #include "ap_config.h"
+@@ -39,6 +40,7 @@
+ #include <sys/types.h>
+ #include <string.h>
+ #include <time.h>
++#include <ctype.h>
+ #if APR_HAVE_UNISTD_H
+ #include <unistd.h>
+ #endif
+@@ -203,6 +205,26 @@
+     return;
+ }
+ 
++static int read_line(char *buf, FILE *file) {
++    char *p;
++    p = fgets(buf, AP_MAXPATH+1, file);
++    if (!p) return 0;
++    if (*p == '\0') return 1;
++
++    p = buf;
++    while (*p)
++        p++;
++    p--;
++
++    /* remove trailing space and slash */
++    while ( isspace(*p) && p >= buf )
++        *p-- = '\0';
++    while ( *p == '/' && p >= buf )
++        *p-- = '\0';
++
++    return 1;
++}
++
+ static void clean_env(void)
+ {
+     char pathbuf[512];
+@@ -266,6 +288,10 @@
+     struct stat dir_info;   /* directory info holder     */
+     struct stat prg_info;   /* program info holder       */
+     int cwdh;               /* handle to cwd             */
++    char *suexec_docroot        = NULL;
++    char *suexec_userdir_suffix = NULL;
++    char *filename              = NULL;
++    FILE *configfile;
+ 
+     /*
+      * Start with a "clean" environment
+@@ -296,15 +322,10 @@
+             || (! strcmp(AP_HTTPD_USER, pw->pw_name)))
+ #endif /* _OSD_POSIX */
+         ) {
+-#ifdef AP_DOC_ROOT
+-        fprintf(stderr, " -D AP_DOC_ROOT=\"%s\"\n", AP_DOC_ROOT);
+-#endif
++	fprintf(stderr, " -D SUEXEC_CONFIG_DIR=%s\n", SUEXEC_CONFIG_DIR);
+ #ifdef AP_GID_MIN
+         fprintf(stderr, " -D AP_GID_MIN=%d\n", AP_GID_MIN);
+ #endif
+-#ifdef AP_HTTPD_USER
+-        fprintf(stderr, " -D AP_HTTPD_USER=\"%s\"\n", AP_HTTPD_USER);
+-#endif
+ #ifdef AP_LOG_EXEC
+         fprintf(stderr, " -D AP_LOG_EXEC=\"%s\"\n", AP_LOG_EXEC);
+ #endif
+@@ -317,9 +338,6 @@
+ #ifdef AP_UID_MIN
+         fprintf(stderr, " -D AP_UID_MIN=%d\n", AP_UID_MIN);
+ #endif
+-#ifdef AP_USERDIR_SUFFIX
+-        fprintf(stderr, " -D AP_USERDIR_SUFFIX=\"%s\"\n", AP_USERDIR_SUFFIX);
+-#endif
+         exit(0);
+     }
+     /*
+@@ -334,23 +352,6 @@
+     target_gname = argv[2];
+     cmd = argv[3];
+ 
+-    /*
+-     * Check to see if the user running this program
+-     * is the user allowed to do so as defined in
+-     * suexec.h.  If not the allowed user, error out.
+-     */
+-#ifdef _OSD_POSIX
+-    /* User name comparisons are case insensitive on BS2000/OSD */
+-    if (strcasecmp(AP_HTTPD_USER, pw->pw_name)) {
+-        log_err("user mismatch (%s instead of %s)\n", pw->pw_name, AP_HTTPD_USER);
+-        exit(103);
+-    }
+-#else  /*_OSD_POSIX*/
+-    if (strcmp(AP_HTTPD_USER, pw->pw_name)) {
+-        log_err("user mismatch (%s instead of %s)\n", pw->pw_name, AP_HTTPD_USER);
+-        exit(103);
+-    }
+-#endif /*_OSD_POSIX*/
+ 
+     /*
+      * Check for a leading '/' (absolute path) in the command to be executed,
+@@ -375,6 +376,63 @@
+     }
+ 
+     /*
++     * Check to see if the user running this program
++     * is the user allowed to do so as defined in
++     * SUEXEC_CONFIG_DIR/username
++     * If not, error out.
++     */
++    filename = malloc(AP_MAXPATH+1);
++    suexec_docroot = malloc(AP_MAXPATH+1);
++    suexec_userdir_suffix = malloc(AP_MAXPATH+1);
++    if (!filename || !suexec_docroot || !suexec_userdir_suffix) {
++        log_err("malloc failed\n");
++	exit(120);
++    }
++
++    strncpy(filename, SUEXEC_CONFIG_DIR, AP_MAXPATH);
++    strncat(filename, pw->pw_name, AP_MAXPATH);
++    filename[AP_MAXPATH] = '\0';
++
++    configfile = fopen(filename, "r");
++    if (!configfile) {
++    	log_err("User %s not allowed: Could not open config file %s\n", pw->pw_name, filename);
++	exit(123);
++    }
++
++    if (!read_line(suexec_docroot, configfile)) {
++    	log_err("Could not read docroot from %s\n", filename);
++	exit(124);
++    }
++
++    if (!read_line(suexec_userdir_suffix, configfile)) {
++    	log_err("Could not read userdir suffix from %s\n", filename);
++	exit(125);
++    }
++
++    fclose(configfile);
++
++    if (userdir) {
++        if ( !isalnum(*suexec_userdir_suffix) && suexec_userdir_suffix[0] != '.') {
++		log_err("userdir suffix disabled in %s\n", filename);
++		exit(126);
++	}
++    }
++    else {
++    	if (suexec_docroot[0] != '/') {
++		log_err("docroot disabled in %s\n", filename);
++		exit(127);
++    	}
++
++    	if (suexec_docroot[1] == '/' ||
++	    suexec_docroot[1] == '.' ||
++	    suexec_docroot[1] == '\0' )
++	{
++		log_err("invalid docroot %s in %s\n", suexec_docroot, filename);
++		exit(128);
++    	}
++    }
++    
++    /*
+      * Error out if the target username is invalid.
+      */
+     if (strspn(target_uname, "1234567890") != strlen(target_uname)) {
+@@ -508,7 +566,7 @@
+ 
+     if (userdir) {
+         if (((chdir(target_homedir)) != 0) ||
+-            ((chdir(AP_USERDIR_SUFFIX)) != 0) ||
++            ((chdir(suexec_userdir_suffix)) != 0) ||
+             ((getcwd(dwd, AP_MAXPATH)) == NULL) ||
+             ((fchdir(cwdh)) != 0)) {
+             log_err("cannot get docroot information (%s)\n", target_homedir);
+@@ -516,10 +574,10 @@
+         }
+     }
+     else {
+-        if (((chdir(AP_DOC_ROOT)) != 0) ||
++        if (((chdir(suexec_docroot)) != 0) ||
+             ((getcwd(dwd, AP_MAXPATH)) == NULL) ||
+             ((fchdir(cwdh)) != 0)) {
+-            log_err("cannot get docroot information (%s)\n", AP_DOC_ROOT);
++            log_err("cannot get docroot information (%s)\n", suexec_docroot);
+             exit(113);
+         }
+     }

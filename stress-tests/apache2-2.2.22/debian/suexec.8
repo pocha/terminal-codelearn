@@ -1,0 +1,68 @@
+.TH suexec 8 "April 2008"
+.\" Copyright 1999-2004 The Apache Software Foundation
+.\" Copyright 2008 Stefan Fritsch
+.\"
+.\" Licensed under the Apache License, Version 2.0 (the "License");
+.\" you may not use this file except in compliance with the License.
+.\" You may obtain a copy of the License at
+.\"
+.\"     http://www.apache.org/licenses/LICENSE-2.0
+.\"
+.\" Unless required by applicable law or agreed to in writing, software
+.\" distributed under the License is distributed on an "AS IS" BASIS,
+.\" WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+.\" See the License for the specific language governing permissions and
+.\" limitations under the License.
+.\"
+.SH NAME
+suexec \- Switch User For Exec
+.SH SYNOPSIS
+.B suexec -V
+.PP
+This is a customized version that can be configured with
+config files in /etc/apache2/suexec.
+.PP
+No other synopsis for usage, because this program
+is otherwise only used internally by the Apache HTTP server.
+.PP
+.SH DESCRIPTION
+.B suexec
+is the "wrapper" support program for the suexec behaviour for the
+Apache HTTP server.  It is run from within the server automatically
+to switch the user when an external program has to be run under a
+different user. For more information about suexec in general, see the online
+document `Apache suexec Support' on the HTTP server project's
+Web site at  http://httpd.apache.org/docs/suexec.html .
+.PP
+This version of suexec reads a config file on every execution. Therefore
+it is a bit slower than the standard suexec version from the apache2-suexec
+package.
+.SH CONFIGURATION
+If suexec is called by a user with name 'username', it will look into
+/etc/apache2/suexec/username for configuration. If the file does not exist,
+suexec will abort. By creating several config files, you can allow several
+different apache run users to use suexec.
+.PP
+The first line in the file is used as the document root (/var/www in the
+standard suexec) and the second line in the file is used as the suffix that is
+appended to users' home directories (public_html in standard suexec).
+.PP
+If any of the lines is commented out (with #), suexec will refuse the
+corresponding type of request. It is recommended to comment out the 
+userdir suffix if you don't need it.
+.SH SECURITY
+Do not set the document root to a path that includes users' home directories
+(like /home or /var) or directories where users can mount removable media.
+Doing so would create local security issues. Suexec does not allow to set the
+document root to the root directory / .
+.SH OPTIONS
+.IP -V
+Display the list of compile-time settings used when \fBsuexec\fP
+was built.  No other action is taken.
+.PD
+.SH FILES
+.BR /etc/apache2/suexec/www-data
+.SH SEE ALSO
+.BR apache2(8) ,
+.BR /usr/share/doc/apache2.2-common/README.Debian.gz ,
+.BR dpkg-statoverride(8)

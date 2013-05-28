@@ -1,0 +1,38 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 033_dbm_read_hash_or_btree by Adam Conrad <adconrad@0c3.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Be more liberal in the sorts of DBM files we accept.
+
+@DPATCH@
+--- a/support/dbmmanage.in
++++ b/support/dbmmanage.in
+@@ -25,7 +25,7 @@
+ BEGIN { @AnyDBM_File::ISA = qw(DB_File NDBM_File GDBM_File SDBM_File) }
+ use strict;
+ use Fcntl;
+-use AnyDBM_File ();
++use DB_File ();
+ 
+ sub usage {
+     my $cmds = join "|", sort keys %dbmc::;
+@@ -155,7 +155,9 @@
+ my($mode, $flags) = $command =~
+     /^(?:view|check)$/ ? (0644, O_RDONLY) : (0644, O_RDWR|O_CREAT);
+ 
+-tie (%DB, "AnyDBM_File", $file, $flags, $mode) || die "Can't tie $file: $!";
++tie (%DB, "DB_File", $file, $flags, $mode, $DB_File::DB_HASH) ||
++    tie (%DB, "DB_File", $file, $flags, $mode, $DB_File::DB_BTREE) ||
++    die "Can't tie $file: $!";
+ dbmc->$command();
+ untie %DB;
+ 
+@@ -167,7 +169,7 @@
+         srand (time ^ $$ or time ^ ($$ + ($$ << 15)));
+     }
+     else {
+-        for (qw(-xlwwa -le)) {
++        for (qw(xlwwa -le)) {
+             `ps $_ 2>/dev/null`;
+             $psf = $_, last unless $?;
+         }

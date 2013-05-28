@@ -1,0 +1,36 @@
+# load terminal
+http://localhost:3001/user_3/0/execute/
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+# execute linux commands
+http://localhost:3001/user_3/0/execute/rm%20-rf%20test-app
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/execute/pwd
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/execute/whoami
+http://localhost:3001/user_3/0/get
+#execute rails commands
+http://localhost:3001/user_3/0/execute/rails%20new%20test-app%20--skip-bundle
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/execute/cd%20test-app
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/execute/bundle%20install%20--local
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/execute/rails%20server
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/kill
+http://localhost:3001/user_3/0/get
+http://localhost:3001/user_3/0/get

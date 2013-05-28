@@ -1,0 +1,27 @@
+#!/bin/sh -e
+
+# Apache2 prerm
+# Thom May <thom@debian.org>
+
+case "$1" in
+        upgrade|remove)
+		if [ -x "/etc/init.d/apache2" ]; then
+			if [ -x /usr/sbin/invoke-rc.d ]; then
+				invoke-rc.d apache2 stop || true
+			else
+				/etc/init.d/apache2 stop || true
+			fi
+		fi
+		sleep 2
+        ;;
+        deconfigure|failed-upgrade)
+        ;;
+        *)
+                echo "prerm called with unknown argument \`$1'" >&2
+                exit 1
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

@@ -1,0 +1,140 @@
+Support a per-location nice value. Note that since we now have two different settings
+in the per-dir configuration, we need to introduce a merge function.
+
+Index: httpd-2.2.17/server/mpm/experimental/itk/itk.c
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/itk.c
++++ httpd-2.2.17/server/mpm/experimental/itk/itk.c
+@@ -156,11 +156,14 @@ char tpf_server_name[INETD_SERVNAME_LENG
+ 
+ static volatile int die_now = 0;
+ 
++#define UNSET_NICE_VALUE 100
++
+ typedef struct
+ {
+     uid_t uid;
+     gid_t gid;
+     char *username;
++    int nice_value;
+ } itk_per_dir_conf;
+ 
+ typedef struct
+@@ -511,6 +514,7 @@ static void child_main(int child_num_arg
+         CAP_SETUID,
+         CAP_SETGID,
+ 	CAP_DAC_READ_SEARCH,
++        CAP_SYS_NICE,
+     };
+ #endif    
+ 
+@@ -1461,6 +1465,12 @@ static int itk_post_perdir_config(reques
+     strncpy(ap_scoreboard_image->servers[my_child_num][0].vhost, r->server->server_hostname, 31);
+     ap_scoreboard_image->servers[my_child_num][0].vhost[31] = 0;
+ 
++    if (dconf->nice_value != UNSET_NICE_VALUE &&
++        setpriority(PRIO_PROCESS, 0, dconf->nice_value)) {
++        _DBG("setpriority(): %s", strerror(errno));
++        err = 1;
++    }
++
+     wanted_uid = dconf->uid;
+     wanted_gid = dconf->gid;
+     wanted_username = dconf->username;
+@@ -1471,7 +1481,7 @@ static int itk_post_perdir_config(reques
+         wanted_username = unixd_config.user_name;
+     }
+ 
+-    if (wanted_uid != -1 && wanted_gid != -1 && (getuid() != wanted_uid || getgid() != wanted_gid)) {
++    if (!err && wanted_uid != -1 && wanted_gid != -1 && (getuid() != wanted_uid || getgid() != wanted_gid)) {
+         if (setgid(wanted_gid)) {
+             _DBG("setgid(%d): %s", wanted_gid, strerror(errno));
+             err = 1;
+@@ -1491,7 +1501,7 @@ static int itk_post_perdir_config(reques
+      */
+     if (err) {
+         ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL, \
+-            "Couldn't set uid/gid, closing connection.");
++            "Couldn't set uid/gid/priority, closing connection.");
+         ap_lingering_close(r->connection);
+         exit(0);
+     }
+@@ -1647,6 +1657,27 @@ static const char *set_max_clients_vhost
+     return NULL;
+ }
+ 
++static const char *set_nice_value (cmd_parms *cmd, void *ptr, const char *arg)
++{
++    itk_per_dir_conf *dconf = (itk_per_dir_conf *) ptr;
++    int nice_value = atoi(arg);
++
++    if (nice_value < -20) {
++        ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
++                     "WARNING: NiceValue of %d is below -20, increasing NiceValue to -20.",
++                     nice_value);
++        nice_value = -20;
++    }
++    else if (nice_value > 19) {
++        ap_log_error(APLOG_MARK, APLOG_STARTUP, 0, NULL,
++                     "WARNING: NiceValue of %d is above 19, lowering NiceValue to 19.",
++                     nice_value);
++        nice_value = 19;
++    }
++    dconf->nice_value = nice_value;
++    return NULL;
++}
++
+ static const command_rec itk_cmds[] = {
+ UNIX_DAEMON_COMMANDS,
+ LISTEN_COMMANDS,
+@@ -1664,6 +1695,8 @@ AP_INIT_TAKE2("AssignUserID", assign_use
+               "Tie a virtual host to a specific child process."),
+ AP_INIT_TAKE1("MaxClientsVHost", set_max_clients_vhost, NULL, RSRC_CONF,
+               "Maximum number of children alive at the same time for this virtual host."),
++AP_INIT_TAKE1("NiceValue", set_nice_value, NULL, RSRC_CONF|ACCESS_CONF,
++              "Set nice value for the given vhost, from -20 (highest priority) to 19 (lowest priority)."),
+ AP_GRACEFUL_SHUTDOWN_TIMEOUT_COMMAND,
+ { NULL }
+ };
+@@ -1674,6 +1707,32 @@ static void *itk_create_dir_config(apr_p
+     itk_per_dir_conf *c = (itk_per_dir_conf *)
+         apr_pcalloc(p, sizeof(itk_per_dir_conf));
+     c->uid = c->gid = -1;
++    c->nice_value = UNSET_NICE_VALUE;
++    return c;
++}
++
++/* == merge the parent per-dir config structure into ours == */
++static void *itk_merge_dir_config(apr_pool_t *p, void *parent_ptr, void *child_ptr)
++{
++    itk_per_dir_conf *c = (itk_per_dir_conf *)
++        itk_create_dir_config(p, NULL);
++    itk_per_dir_conf *parent = (itk_per_dir_conf *) parent_ptr;
++    itk_per_dir_conf *child = (itk_per_dir_conf *) child_ptr;
++
++    if (child->username != NULL) {
++      c->username = child->username;
++      c->uid = child->uid;
++      c->gid = child->gid;
++    } else {
++      c->username = parent->username;
++      c->uid = parent->uid;
++      c->gid = parent->gid;
++    }
++    if (child->nice_value != UNSET_NICE_VALUE) {
++      c->nice_value = child->nice_value;
++    } else {
++      c->nice_value = parent->nice_value;
++    }
+     return c;
+ }
+ 
+@@ -1690,7 +1749,7 @@ module AP_MODULE_DECLARE_DATA mpm_itk_mo
+     MPM20_MODULE_STUFF,
+     ap_mpm_rewrite_args,        /* hook to run before apache parses args */
+     itk_create_dir_config,      /* create per-directory config structure */
+-    NULL,                       /* merge per-directory config structures */
++    itk_merge_dir_config,       /* merge per-directory config structures */
+     itk_create_server_config,   /* create per-server config structure */
+     NULL,                       /* merge per-server config structures */
+     itk_cmds,                   /* command apr_table_t */

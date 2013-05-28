@@ -1,0 +1,36 @@
+# load terminal
+/pocha/execute/
+/pocha/get
+/pocha/get
+# execute linux commands
+/pocha/execute/rm%20-rf%20test-app
+/pocha/get
+/pocha/execute/pwd
+/pocha/get
+/pocha/execute/whoami
+/pocha/get
+#execute rails commands
+/pocha/execute/rails%20new%20test-app%20--skip-bundle
+/pocha/get
+/pocha/get
+/pocha/get
+/pocha/get
+/pocha/get
+/pocha/execute/cd%20test-app
+/pocha/get
+/pocha/get
+/pocha/execute/bundle%20install%20--local
+/pocha/get
+/pocha/get
+/pocha/get
+/pocha/get
+/pocha/get
+/pocha/execute/rails%20server
+/pocha/get
+/pocha/get
+/pocha/get
+/pocha/get
+/pocha/get
+/pocha/kill
+/pocha/get
+/pocha/get

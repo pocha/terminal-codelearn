@@ -1,0 +1,2 @@
+usr/lib/apache2/mpm-MPMXXX/apache2			usr/sbin/apache2
+usr/share/bug/apache2.2-common/script			usr/share/bug/apache2-mpm-MPMXXX/script

@@ -1,0 +1,20 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 032_suexec_is_shared by Adam Conrad <adconrad@0c3.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Patch to allow suEXEC as shared.
+
+@DPATCH@
+--- a/os/unix/unixd.c
++++ b/os/unix/unixd.c
+@@ -266,6 +266,10 @@
+ 
+     /* Check for suexec */
+     unixd_config.suexec_enabled = 0;
++    /* If mod_suexec isn't linked in, we shouldn't test for the binary */
++    if (ap_find_linked_module("mod_suexec.c") == NULL) {
++	return;
++    }
+     if ((apr_stat(&wrapper, SUEXEC_BIN,
+                   APR_FINFO_NORM, ptemp)) != APR_SUCCESS) {
+         return;

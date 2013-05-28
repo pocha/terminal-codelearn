@@ -1,0 +1,7 @@
+debian/a2enmod.8
+debian/a2dismod.8
+debian/apache2.8
+debian/apachectl.8
+debian/apache2ctl.8
+debian/a2ensite.8
+debian/a2dissite.8

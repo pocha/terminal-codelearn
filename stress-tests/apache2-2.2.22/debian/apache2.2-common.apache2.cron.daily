@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# run htcacheclean
+
+set -e
+set -u
+
+[ -e /usr/sbin/htcacheclean ] || exit 0
+[ -e /etc/default/apache2 ]   || exit 0
+
+
+# edit /etc/default/apache2 to change this
+HTCACHECLEAN_MODE=daemon
+HTCACHECLEAN_RUN=auto
+HTCACHECLEAN_SIZE=300M
+HTCACHECLEAN_PATH=/var/cache/apache2/mod_disk_cache
+HTCACHECLEAN_OPTIONS=""
+
+. /etc/default/apache2
+
+[ "$HTCACHECLEAN_MODE" = "cron" ] || exit 0
+
+[ "$HTCACHECLEAN_RUN" = "yes"	] || 
+( [ "$HTCACHECLEAN_RUN" = "auto" ] && \
+  [ -e /etc/apache2/mods-enabled/disk_cache.load ] )  || exit 0
+
+/usr/sbin/htcacheclean  ${HTCACHECLEAN_OPTIONS}	\
+			-p${HTCACHECLEAN_PATH}	\
+			-l${HTCACHECLEAN_SIZE}
+

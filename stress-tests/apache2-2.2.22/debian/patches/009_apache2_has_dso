@@ -1,0 +1,40 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 009_apache2_has_dso by Adam Conrad <adconrad@0c3.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Make apxs usable without having apache2 installed.
+
+@DPATCH@
+--- a/support/apxs.in
++++ b/support/apxs.in
+@@ -198,18 +198,19 @@
+     ($httpd = $0) =~ s:support/apxs$::;
+ }
+ 
+-unless (-x "$httpd") {
+-	error("$httpd not found or not executable");
+-	exit 1;
+-}
++#commented out for Debian GNU/Linux. We know that apache2 has dso support
++#unless (-x "$httpd") {
++#	error("$httpd not found or not executable");
++#	exit 1;
++#}
+ 
+-unless (grep /mod_so/, `. $envvars && $httpd -l`) {
+-    error("Sorry, no shared object support for Apache");
+-    error("available under your platform. Make sure");
+-    error("the Apache module mod_so is compiled into");
+-    error("your server binary `$httpd'.");
+-    exit 1;
+-}
++#unless (grep /mod_so/, `. $envvars && $httpd -l`) {
++#    error("Sorry, no shared object support for Apache");
++#    error("available under your platform. Make sure");
++#    error("the Apache module mod_so is compiled into");
++#    error("your server binary `$httpd'.");
++#    exit 1;
++#}
+ 
+ sub get_config_vars{
+     my ($file, $rh_config) = @_;

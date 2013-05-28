@@ -1,0 +1,3 @@
+debian/check_forensic.8
+debian/checkgid.8
+debian/split-logfile.8

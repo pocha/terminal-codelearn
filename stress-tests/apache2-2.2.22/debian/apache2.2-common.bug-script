@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Text::Wrap;
+$Text::Wrap::columns = 70;
+
+open (my $out, ">&=3") or die "could not open FD 3\n";
+
+my $apache = ". /etc/apache2/envvars && /usr/sbin/apache2";
+my $res = `$apache -t 2>&1`;
+my @modules;
+my $php;
+if ($res !~ "Syntax OK") {
+	# if we are not root, syntax check will fail because ssl private keys
+	# are not readable
+	print $out "Config file syntax check failed.\n" if $> == 0;
+	@modules = sort glob("/etc/apache2/mods-enabled/*.load");
+	map { s{^/etc/apache2/mods-enabled/(.*)\.load$}{$1} } @modules;
+	print $out "List of /etc/apache2/mods-enabled/*.load:\n";
+}
+else {
+	@modules = sort `$apache -M 2>&1`;
+	@modules = map { /^ (.*)_module \(shared\)/ ? ($1) : () } @modules;
+	print $out "List of enabled modules from 'apache2 -M':\n";
+}
+if (! scalar @modules) {
+	print $out "Could not determine module list\n";
+}
+else {
+	my $missing;
+	foreach my $m (@modules) {
+		if (-e "/etc/apache2/mods-available/$m.conf" and
+		    ! -e "/etc/apache2/mods-enabled/$m.conf") {
+			$m .= "*";
+			$missing = 1;
+		}
+		if ($m =~ /^(php\d)/) {
+			$php = $1;
+		}
+	}
+
+	print $out wrap("  ", "  ", "@modules\n");
+
+	print $out
+	    wrap("  ", "   ", 
+		"(A * means that the .conf file for that module is not " .
+		"enabled in /etc/apache2/mods-enabled/)\n") 
+	    if $missing;
+}
+if (defined $php) {
+	my @exts = qx{egrep ^extension= /etc/$php/apache2/php.ini /etc/$php/apache2/conf.d/* 2>/dev/null};
+	if (scalar @exts) {
+		chomp @exts;
+		@exts = grep { ! m{\.dpkg-(?:bak|dist):} } @exts;
+		@exts = sort grep { s{^.*:extension=(\S+)\.\S+}{$1} } @exts;
+		print $out "List of enabled $php extensions:\n";
+		print $out wrap("  ", "  ", "@exts\n");
+	}
+}
+

@@ -1,0 +1,4 @@
+usr/lib/debug/usr/lib/apache2/mpm-itk/apache2-mpm-itk		usr/lib/debug/usr/sbin/apache2-mpm-itk
+usr/lib/debug/usr/lib/apache2/mpm-prefork/apache2-mpm-prefork	usr/lib/debug/usr/sbin/apache2-mpm-prefork
+usr/lib/debug/usr/lib/apache2/mpm-worker/apache2-mpm-worker	usr/lib/debug/usr/sbin/apache2-mpm-worker
+usr/lib/debug/usr/lib/apache2/mpm-event/apache2-mpm-event	usr/lib/debug/usr/sbin/apache2-mpm-event

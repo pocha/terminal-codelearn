@@ -1,0 +1,30 @@
+#!/bin/sh -e
+
+#Debian preinstall handling for apache2
+# Thom May <thom@debian.org>
+
+if [ "$2" ] && dpkg --compare-versions "$2" lt 2.2; then
+    if [ -x "/etc/init.d/apache2" ]; then
+        if [ -x /usr/sbin/invoke-rc.d ]; then
+                invoke-rc.d apache2 stop || true
+        else
+                /etc/init.d/apache2 stop || true
+        fi
+    fi
+    chmod -x /usr/sbin/apache2
+fi
+
+case "$1" in
+	install)
+		rm -f /var/cache/apache2/reload
+		;;
+	upgrade)
+		if [ -d /var/cache/apache2 ]; then
+			touch /var/cache/apache2/reload
+		fi
+		;;
+	*)
+		;;
+esac
+
+#DEBHELPER#

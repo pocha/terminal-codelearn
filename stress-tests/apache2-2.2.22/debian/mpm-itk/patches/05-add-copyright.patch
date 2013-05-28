@@ -1,0 +1,87 @@
+Add copyright notices, as the next patches are going to add code.
+
+Index: httpd-2.2.17/server/mpm/experimental/itk/itk.c
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/itk.c
++++ httpd-2.2.17/server/mpm/experimental/itk/itk.c
+@@ -12,6 +12,12 @@
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
++ * 
++ * Portions copyright 2005-2009 Steinar H. Gunderson <sgunderson@bigfoot.com>.
++ * Licensed under the same terms as the rest of Apache.
++ *
++ * Portions copyright 2008 Knut Auvor Grythe <knut@auvor.no>.
++ * Licensed under the same terms as the rest of Apache.
+  */
+ 
+ #include "apr.h"
+Index: httpd-2.2.17/server/mpm/experimental/itk/mpm.h
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/mpm.h
++++ httpd-2.2.17/server/mpm/experimental/itk/mpm.h
+@@ -12,6 +12,12 @@
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
++ *
++ * Portions copyright 2005-2009 Steinar H. Gunderson <sgunderson@bigfoot.com>.
++ * Licensed under the same terms as the rest of Apache.
++ *
++ * Portions copyright 2008 Knut Auvor Grythe <knut@auvor.no>.
++ * Licensed under the same terms as the rest of Apache.
+  */
+ 
+ /**
+Index: httpd-2.2.17/server/mpm/experimental/itk/mpm_default.h
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/mpm_default.h
++++ httpd-2.2.17/server/mpm/experimental/itk/mpm_default.h
+@@ -12,6 +12,12 @@
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
++ * 
++ * Portions copyright 2005-2009 Steinar H. Gunderson <sgunderson@bigfoot.com>.
++ * Licensed under the same terms as the rest of Apache.
++ * 
++ * Portions copyright 2008 Knut Auvor Grythe <knut@auvor.no>.
++ * Licensed under the same terms as the rest of Apache.
+  */
+ 
+ /**
+Index: httpd-2.2.17/include/http_request.h
+===================================================================
+--- httpd-2.2.17.orig/include/http_request.h
++++ httpd-2.2.17/include/http_request.h
+@@ -12,6 +12,12 @@
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
++ * 
++ * Portions copyright 2005-2009 Steinar H. Gunderson <sgunderson@bigfoot.com>.
++ * Licensed under the same terms as the rest of Apache.
++ * 
++ * Portions copyright 2008 Knut Auvor Grythe <knut@auvor.no>.
++ * Licensed under the same terms as the rest of Apache.
+  */
+ 
+ /**
+Index: httpd-2.2.17/server/request.c
+===================================================================
+--- httpd-2.2.17.orig/server/request.c
++++ httpd-2.2.17/server/request.c
+@@ -12,6 +12,12 @@
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
++ * 
++ * Portions copyright 2005-2009 Steinar H. Gunderson <sgunderson@bigfoot.com>.
++ * Licensed under the same terms as the rest of Apache.
++ * 
++ * Portions copyright 2008 Knut Auvor Grythe <knut@auvor.no>.
++ * Licensed under the same terms as the rest of Apache.
+  */
+ 
+ /*

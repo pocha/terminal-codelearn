@@ -1,0 +1,2 @@
+usr/sbin/suexec usr/lib/apache2
+usr/share/man/man8/suexec.8

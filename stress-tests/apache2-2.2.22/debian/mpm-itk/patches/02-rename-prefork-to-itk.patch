@@ -1,0 +1,157 @@
+Rename prefork to itk in the copy that was created in 01-copy-prefork.patch.
+
+Index: httpd-2.2.17/server/mpm/experimental/itk/Makefile.in
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/Makefile.in
++++ httpd-2.2.17/server/mpm/experimental/itk/Makefile.in
+@@ -1,5 +1,5 @@
+ 
+-LTLIBRARY_NAME    = libprefork.la
+-LTLIBRARY_SOURCES = prefork.c
++LTLIBRARY_NAME    = libitk.la
++LTLIBRARY_SOURCES = itk.c
+ 
+ include $(top_srcdir)/build/ltlib.mk
+Index: httpd-2.2.17/server/mpm/experimental/itk/config.m4
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/config.m4
++++ httpd-2.2.17/server/mpm/experimental/itk/config.m4
+@@ -1,3 +1,3 @@
+-if test "$MPM_NAME" = "prefork" ; then
++if test "$MPM_NAME" = "itk" ; then
+     APACHE_FAST_OUTPUT(server/mpm/$MPM_NAME/Makefile)
+ fi
+Index: httpd-2.2.17/server/mpm/experimental/itk/itk.c
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/itk.c
++++ httpd-2.2.17/server/mpm/experimental/itk/itk.c
+@@ -1267,7 +1267,7 @@ int ap_mpm_run(apr_pool_t *_pconf, apr_p
+ /* This really should be a post_config hook, but the error log is already
+  * redirected by that point, so we need to do this in the open_logs phase.
+  */
+-static int prefork_open_logs(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s)
++static int itk_open_logs(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s)
+ {
+     apr_status_t rv;
+ 
+@@ -1288,7 +1288,7 @@ static int prefork_open_logs(apr_pool_t
+     return OK;
+ }
+ 
+-static int prefork_pre_config(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp)
++static int itk_pre_config(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp)
+ {
+     static int restart_num = 0;
+     int no_detach, debug, foreground;
+@@ -1345,9 +1345,9 @@ static int prefork_pre_config(apr_pool_t
+     return OK;
+ }
+ 
+-static void prefork_hooks(apr_pool_t *p)
++static void itk_hooks(apr_pool_t *p)
+ {
+-    /* The prefork open_logs phase must run before the core's, or stderr
++    /* The itk open_logs phase must run before the core's, or stderr
+      * will be redirected to a file, and the messages won't print to the
+      * console.
+      */
+@@ -1357,11 +1357,11 @@ static void prefork_hooks(apr_pool_t *p)
+     (void) set42sig();
+ #endif
+ 
+-    ap_hook_open_logs(prefork_open_logs, NULL, aszSucc, APR_HOOK_MIDDLE);
++    ap_hook_open_logs(itk_open_logs, NULL, aszSucc, APR_HOOK_MIDDLE);
+     /* we need to set the MPM state before other pre-config hooks use MPM query
+      * to retrieve it, so register as REALLY_FIRST
+      */
+-    ap_hook_pre_config(prefork_pre_config, NULL, NULL, APR_HOOK_REALLY_FIRST);
++    ap_hook_pre_config(itk_pre_config, NULL, NULL, APR_HOOK_REALLY_FIRST);
+ }
+ 
+ static const char *set_daemons_to_start(cmd_parms *cmd, void *dummy, const char *arg)
+@@ -1474,7 +1474,7 @@ static const char *set_server_limit (cmd
+     return NULL;
+ }
+ 
+-static const command_rec prefork_cmds[] = {
++static const command_rec itk_cmds[] = {
+ UNIX_DAEMON_COMMANDS,
+ LISTEN_COMMANDS,
+ AP_INIT_TAKE1("StartServers", set_daemons_to_start, NULL, RSRC_CONF,
+@@ -1491,13 +1491,13 @@ AP_GRACEFUL_SHUTDOWN_TIMEOUT_COMMAND,
+ { NULL }
+ };
+ 
+-module AP_MODULE_DECLARE_DATA mpm_prefork_module = {
++module AP_MODULE_DECLARE_DATA mpm_itk_module = {
+     MPM20_MODULE_STUFF,
+     ap_mpm_rewrite_args,        /* hook to run before apache parses args */
+     NULL,                       /* create per-directory config structure */
+     NULL,                       /* merge per-directory config structures */
+     NULL,                       /* create per-server config structure */
+     NULL,                       /* merge per-server config structures */
+-    prefork_cmds,               /* command apr_table_t */
+-    prefork_hooks,              /* register hooks */
++    itk_cmds,                   /* command apr_table_t */
++    itk_hooks,                  /* register hooks */
+ };
+Index: httpd-2.2.17/server/mpm/experimental/itk/mpm.h
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/mpm.h
++++ httpd-2.2.17/server/mpm/experimental/itk/mpm.h
+@@ -15,10 +15,10 @@
+  */
+ 
+ /**
+- * @file prefork/mpm.h
+- * @brief Unix Prefork MPM (default for Uinx systems)
++ * @file itk/mpm.h
++ * @brief ITK MPM (setuid per-vhost, no threads)
+  *
+- * @defgroup APACHE_MPM_PREFORK Unix Prefork
++ * @defgroup APACHE_MPM_ITK Apache ITK
+  * @ingroup  APACHE_MPM APACHE_OS_UNIX
+  * @{
+  */
+@@ -28,12 +28,12 @@
+ #include "scoreboard.h"
+ #include "unixd.h"
+ 
+-#ifndef APACHE_MPM_PREFORK_H
+-#define APACHE_MPM_PREFORK_H
++#ifndef APACHE_MPM_ITK_H
++#define APACHE_MPM_ITK_H
+ 
+-#define PREFORK_MPM
++#define ITK_MPM
+ 
+-#define MPM_NAME "Prefork"
++#define MPM_NAME "ITK"
+ 
+ #define AP_MPM_WANT_RECLAIM_CHILD_PROCESSES
+ #define AP_MPM_WANT_WAIT_OR_TIMEOUT
+@@ -58,5 +58,5 @@
+ extern int ap_threads_per_child;
+ extern int ap_max_daemons_limit;
+ extern server_rec *ap_server_conf;
+-#endif /* APACHE_MPM_PREFORK_H */
++#endif /* APACHE_MPM_ITK_H */
+ /** @} */
+Index: httpd-2.2.17/server/mpm/experimental/itk/mpm_default.h
+===================================================================
+--- httpd-2.2.17.orig/server/mpm/experimental/itk/mpm_default.h
++++ httpd-2.2.17/server/mpm/experimental/itk/mpm_default.h
+@@ -15,10 +15,10 @@
+  */
+ 
+ /**
+- * @file  prefork/mpm_default.h
+- * @brief Prefork MPM defaults
++ * @file  itk/mpm_default.h
++ * @brief ITK MPM defaults
+  *
+- * @addtogroup APACHE_MPM_PREFORK
++ * @addtogroup APACHE_MPM_ITK
+  * @{
+  */
+ 

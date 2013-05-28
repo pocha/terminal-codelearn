@@ -1,0 +1,184 @@
+
+
+Started GET "/" for 127.0.0.1 at 2013-05-15 16:28:12 +0530
+Connecting to database specified by database.yml
+Processing by TerminalsController#index as HTML
+  Rendered terminals/index.html.erb within layouts/application (50.6ms)
+Completed 200 OK in 307ms (Views: 306.9ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/application.css?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /application.css - 200 OK (25ms)
+
+
+Started GET "/assets/jquery_ujs.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /jquery_ujs.js - 200 OK (2ms)
+
+
+Started GET "/assets/twitter-bootstrap-static/bootstrap.css?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter-bootstrap-static/bootstrap.css - 200 OK (53ms)
+
+
+Started GET "/assets/twitter-bootstrap-static/fontawesome.css?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter-bootstrap-static/fontawesome.css - 200 OK (4ms)
+
+
+Started GET "/assets/bootstrap_and_overrides.css?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /bootstrap_and_overrides.css - 200 OK (6ms)
+
+
+Started GET "/assets/terminals.css?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /terminals.css - 200 OK (1ms)
+
+
+Started GET "/assets/jquery.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /jquery.js - 200 OK (7ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-transition.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-transition.js - 200 OK (6ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-alert.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-alert.js - 200 OK (3ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-modal.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-modal.js - 200 OK (3ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-dropdown.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-dropdown.js - 200 OK (4ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-scrollspy.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-scrollspy.js - 200 OK (3ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-tab.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-tab.js - 200 OK (7ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-tooltip.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-tooltip.js - 200 OK (3ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-popover.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-popover.js - 200 OK (6ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-button.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-button.js - 200 OK (6ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-collapse.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-collapse.js - 200 OK (6ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-carousel.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-carousel.js - 200 OK (5ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-typeahead.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-typeahead.js - 200 OK (3ms)
+
+
+Started GET "/assets/twitter/bootstrap/bootstrap-affix.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap/bootstrap-affix.js - 200 OK (11ms)
+
+
+Started GET "/assets/twitter/bootstrap.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /twitter/bootstrap.js - 200 OK (28ms)
+
+
+Started GET "/assets/bootstrap.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /bootstrap.js - 200 OK (1ms)
+
+
+Started GET "/assets/jquery.form.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /jquery.form.js - 200 OK (1ms)
+
+
+Started GET "/assets/terminals.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /terminals.js - 200 OK (2ms)
+
+
+Started GET "/assets/application.js?body=1" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /application.js - 200 OK (87ms)
+
+
+Started GET "/assets/loading51.gif" for 127.0.0.1 at 2013-05-15 16:28:14 +0530
+Served asset /loading51.gif - 200 OK (4ms)
+
+
+Started GET "/terminals/0/execute/" for 127.0.0.1 at 2013-05-15 16:28:15 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"terminal_id"=>"0"}
+Completed 200 OK in 7649ms (Views: 0.6ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/terminals/1/execute/" for 127.0.0.1 at 2013-05-15 16:28:22 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"terminal_id"=>"1"}
+Completed 500 Internal Server Error in 2128ms
+
+Curl::Err::RecvError (Curl::Err::RecvError):
+  app/controllers/terminals_controller.rb:18:in `execute'
+
+
+  Rendered /home/pocha/.rvm/gems/ruby-1.9.3-p194/gems/actionpack-3.2.11/lib/action_dispatch/middleware/templates/rescues/_trace.erb (3.4ms)
+  Rendered /home/pocha/.rvm/gems/ruby-1.9.3-p194/gems/actionpack-3.2.11/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (2.2ms)
+  Rendered /home/pocha/.rvm/gems/ruby-1.9.3-p194/gems/actionpack-3.2.11/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (21.8ms)
+
+
+Started GET "/assets/favicon.ico" for 127.0.0.1 at 2013-05-15 16:28:24 +0530
+Served asset /favicon.ico - 404 Not Found (7ms)
+
+ActionController::RoutingError (No route matches [GET] "/assets/favicon.ico"):
+  actionpack (3.2.11) lib/action_dispatch/middleware/debug_exceptions.rb:21:in `call'
+  actionpack (3.2.11) lib/action_dispatch/middleware/show_exceptions.rb:56:in `call'
+  railties (3.2.11) lib/rails/rack/logger.rb:32:in `call_app'
+  railties (3.2.11) lib/rails/rack/logger.rb:16:in `block in call'
+  activesupport (3.2.11) lib/active_support/tagged_logging.rb:22:in `tagged'
+  railties (3.2.11) lib/rails/rack/logger.rb:16:in `call'
+  actionpack (3.2.11) lib/action_dispatch/middleware/request_id.rb:22:in `call'
+  rack (1.4.5) lib/rack/methodoverride.rb:21:in `call'
+  rack (1.4.5) lib/rack/runtime.rb:17:in `call'
+  activesupport (3.2.11) lib/active_support/cache/strategy/local_cache.rb:72:in `call'
+  rack (1.4.5) lib/rack/lock.rb:15:in `call'
+  actionpack (3.2.11) lib/action_dispatch/middleware/static.rb:62:in `call'
+  railties (3.2.11) lib/rails/engine.rb:479:in `call'
+  railties (3.2.11) lib/rails/application.rb:223:in `call'
+  railties (3.2.11) lib/rails/railtie/configurable.rb:30:in `method_missing'
+  thin (1.5.0) lib/thin/connection.rb:81:in `block in pre_process'
+  thin (1.5.0) lib/thin/connection.rb:79:in `catch'
+  thin (1.5.0) lib/thin/connection.rb:79:in `pre_process'
+  thin (1.5.0) lib/thin/connection.rb:54:in `process'
+  thin (1.5.0) lib/thin/connection.rb:39:in `receive_data'
+  eventmachine (1.0.3) lib/eventmachine.rb:187:in `run_machine'
+  eventmachine (1.0.3) lib/eventmachine.rb:187:in `run'
+  thin (1.5.0) lib/thin/backends/base.rb:63:in `start'
+  thin (1.5.0) lib/thin/server.rb:159:in `start'
+  thin (1.5.0) lib/thin/controllers/controller.rb:86:in `start'
+  thin (1.5.0) lib/thin/runner.rb:187:in `run_command'
+  thin (1.5.0) lib/thin/runner.rb:152:in `run!'
+  thin (1.5.0) bin/thin:6:in `<top (required)>'
+  /home/pocha/.rvm/gems/ruby-1.9.3-p194/bin/thin:23:in `load'
+  /home/pocha/.rvm/gems/ruby-1.9.3-p194/bin/thin:23:in `<main>'
+
+
+  Rendered /home/pocha/.rvm/gems/ruby-1.9.3-p194/gems/actionpack-3.2.11/lib/action_dispatch/middleware/templates/rescues/routing_error.erb within rescues/layout (0.9ms)
+
+
+Started GET "/terminals/0/execute/" for 127.0.0.1 at 2013-05-15 16:28:25 +0530
+Processing by TerminalsController#execute as */*
+  Parameters: {"terminal_id"=>"0"}
+Completed 500 Internal Server Error in 39ms
+
+Curl::Err::ConnectionFailedError (Curl::Err::ConnectionFailedError):
+  app/controllers/terminals_controller.rb:18:in `execute'
+
+
+  Rendered /home/pocha/.rvm/gems/ruby-1.9.3-p194/gems/actionpack-3.2.11/lib/action_dispatch/middleware/templates/rescues/_trace.erb (3.1ms)
+  Rendered /home/pocha/.rvm/gems/ruby-1.9.3-p194/gems/actionpack-3.2.11/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (3.1ms)
+  Rendered /home/pocha/.rvm/gems/ruby-1.9.3-p194/gems/actionpack-3.2.11/lib/action_dispatch/middleware/templates/rescues/diagnostics.erb within rescues/layout (25.6ms)

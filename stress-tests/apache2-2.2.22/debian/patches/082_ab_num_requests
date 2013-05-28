@@ -1,0 +1,44 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 082_ab_num_requests.dpatch by Stefan Fritsch <sf@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Upstream r940526, Debian bug #541158
+
+@DPATCH@
+--- a/support/ab.c
++++ b/support/ab.c
+@@ -628,6 +628,10 @@
+ 
+ static void write_request(struct connection * c)
+ {
++    if (started >= requests) {
++        return;
++    }
++
+     do {
+         apr_time_t tnow;
+         apr_size_t l = c->rwrite;
+@@ -690,6 +694,7 @@
+         new_pollfd.client_data = c;
+         apr_pollset_add(readbits, &new_pollfd);
+     }
++    started++;
+ }
+ 
+ /* --------------------------------------------------------- */
+@@ -1239,7 +1244,6 @@
+ 
+     /* connected first time */
+     c->state = STATE_CONNECTED;
+-    started++;
+ #ifdef USE_SSL
+     if (c->ssl) {
+         ssl_proceed_handshake(c);
+@@ -1768,7 +1772,6 @@
+                     }
+                     else {
+                         c->state = STATE_CONNECTED;
+-                        started++;
+ #ifdef USE_SSL
+                         if (c->ssl)
+                             ssl_proceed_handshake(c);

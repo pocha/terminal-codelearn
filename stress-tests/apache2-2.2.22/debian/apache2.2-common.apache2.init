@@ -1,0 +1,282 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          apache2
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Start/stop apache2 web server
+### END INIT INFO
+
+set -e
+
+SCRIPTNAME="${0##*/}"
+SCRIPTNAME="${SCRIPTNAME##[KS][0-9][0-9]}"
+if [ -n "$APACHE_CONFDIR" ] ; then
+	if [ "${APACHE_CONFDIR##/etc/apache2-}" != "${APACHE_CONFDIR}" ] ; then
+		DIR_SUFFIX="${APACHE_CONFDIR##/etc/apache2-}"
+	else
+		DIR_SUFFIX=
+	fi
+elif [ "${SCRIPTNAME##apache2-}" != "$SCRIPTNAME" ] ; then
+	DIR_SUFFIX="-${SCRIPTNAME##apache2-}"
+	APACHE_CONFDIR=/etc/apache2$DIR_SUFFIX
+else
+	DIR_SUFFIX=
+	APACHE_CONFDIR=/etc/apache2
+fi
+if [ -z "$APACHE_ENVVARS" ] ; then
+	APACHE_ENVVARS=$APACHE_CONFDIR/envvars
+fi
+export APACHE_CONFDIR APACHE_ENVVARS
+
+ENV="env -i LANG=C PATH=/usr/local/bin:/usr/bin:/bin"
+if [ "$APACHE_CONFDIR" != /etc/apache2 ] ; then
+	ENV="$ENV APACHE_CONFDIR=$APACHE_CONFDIR"
+fi
+if [ "$APACHE_ENVVARS" != "$APACHE_CONFDIR/envvars" ] ; then
+	ENV="$ENV APACHE_ENVVARS=$APACHE_ENVVARS"
+fi
+
+
+#edit /etc/default/apache2 to change this.
+HTCACHECLEAN_RUN=auto
+HTCACHECLEAN_MODE=daemon
+HTCACHECLEAN_SIZE=300M
+HTCACHECLEAN_DAEMON_INTERVAL=120
+HTCACHECLEAN_PATH=/var/cache/apache2$DIR_SUFFIX/mod_disk_cache
+HTCACHECLEAN_OPTIONS=""
+
+APACHE_HTTPD=$(. $APACHE_ENVVARS && echo $APACHE_HTTPD)
+if [ -z "$APACHE_HTTPD" ] ; then
+	APACHE_HTTPD=/usr/sbin/apache2
+fi
+if [ ! -x $APACHE_HTTPD ] ; then
+	echo "No apache MPM package installed"
+	exit 0
+fi
+
+. /lib/lsb/init-functions
+
+test -f /etc/default/rcS && . /etc/default/rcS
+
+if [ -f /etc/default/apache2$DIR_SUFFIX ] ; then
+	. /etc/default/apache2$DIR_SUFFIX
+elif [ -f /etc/default/apache2 ] ; then
+	. /etc/default/apache2
+fi
+
+APACHE2CTL="$ENV /usr/sbin/apache2ctl"
+HTCACHECLEAN="$ENV /usr/sbin/htcacheclean"
+
+PIDFILE=$(. $APACHE_ENVVARS && echo $APACHE_PID_FILE)
+if [ -z "$PIDFILE" ] ; then
+	echo ERROR: APACHE_PID_FILE needs to be defined in $APACHE_ENVVARS >&2
+	exit 2
+fi
+
+
+check_htcacheclean() {
+	[ "$HTCACHECLEAN_MODE" = "daemon" ] || return 1
+
+	[ "$HTCACHECLEAN_RUN"  = "yes"    ] && return 0
+
+	MODSDIR=$(. $APACHE_ENVVARS && echo $APACHE_MODS_ENABLED)
+	[ "$HTCACHECLEAN_RUN"  = "auto" \
+	  -a -e ${MODSDIR:-$APACHE_CONFDIR/mods-enabled}/disk_cache.load ] && \
+		return 0
+	
+	return 1
+}
+
+start_htcacheclean() {
+	if [ ! -d "$HTCACHECLEAN_PATH" ] ; then
+		echo "... directory $HTCACHECLEAN_PATH does not exist!" >&2
+		return 1
+	fi	
+	$HTCACHECLEAN $HTCACHECLEAN_OPTIONS -d$HTCACHECLEAN_DAEMON_INTERVAL \
+			-i -p$HTCACHECLEAN_PATH -l$HTCACHECLEAN_SIZE
+}
+
+stop_htcacheclean() {
+	pkill -P 1 -f "htcacheclean.* -p$HTCACHECLEAN_PATH " 2> /dev/null || echo ...not running
+}
+
+pidof_apache() {
+	# if there is actually an apache2 process whose pid is in PIDFILE,
+	# print it and return 0.
+	if [ -e "$PIDFILE" ]; then
+		if pidof apache2 | tr ' ' '\n' | grep -w $(cat $PIDFILE); then
+			return 0
+		fi
+	fi
+	return 1
+}
+
+apache_stop() {
+	if $APACHE2CTL configtest > /dev/null 2>&1; then
+		# if the config is ok than we just stop normaly
+                $APACHE2CTL stop 2>&1 | grep -v 'not running' >&2 || true
+	else
+		# if we are here something is broken and we need to try
+		# to exit as nice and clean as possible
+		PID=$(pidof_apache) || true
+
+		if [ "${PID}" ]; then
+			# in this case it is everything nice and dandy and we kill apache2
+			echo
+			log_warning_msg "The apache2$DIR_SUFFIX configtest failed, so we are trying to kill it manually. This is almost certainly suboptimal, so please make sure your system is working as you'd expect now!"
+                        kill $PID
+		elif [ "$(pidof apache2)" ]; then
+			if [ "$VERBOSE" != no ]; then
+                                echo " ... failed!"
+			        echo "You may still have some apache2 processes running.  There are"
+ 			        echo "processes named 'apache2' which do not match your pid file,"
+			        echo "and in the name of safety, we've left them alone.  Please review"
+			        echo "the situation by hand."
+                        fi
+                        return 1
+		fi
+	fi
+}
+
+apache_wait_stop() {
+	# running ?
+	PIDTMP=$(pidof_apache) || true
+	if kill -0 "${PIDTMP:-}" 2> /dev/null; then
+	    PID=$PIDTMP
+	fi
+
+	apache_stop
+
+	# wait until really stopped
+	if [ -n "${PID:-}" ]; then
+		i=0
+		while kill -0 "${PID:-}" 2> /dev/null;  do
+        		if [ $i = '60' ]; then
+        			break;
+        	 	else
+        			if [ $i = '0' ]; then
+                			echo -n " ... waiting "
+        			else
+                	      		echo -n "."
+        		 	fi
+        			i=$(($i+1))
+        			sleep 1
+        	      fi
+		 done
+	fi
+}
+
+case $1 in
+	start)
+		log_daemon_msg "Starting web server" "apache2"
+		if $APACHE2CTL start; then
+			if check_htcacheclean ; then
+				log_progress_msg htcacheclean
+				start_htcacheclean || log_end_msg 1
+			fi
+                        log_end_msg 0
+                else
+                        log_end_msg 1
+                fi
+	;;
+	stop)
+		if check_htcacheclean ; then
+			log_daemon_msg "Stopping web server" "htcacheclean"
+			stop_htcacheclean
+			log_progress_msg "apache2"
+		else
+			log_daemon_msg "Stopping web server" "apache2"
+		fi
+		if apache_wait_stop; then
+                        log_end_msg 0
+                else
+                        log_end_msg 1
+                fi
+	;;
+	graceful-stop)
+		if check_htcacheclean ; then
+			log_daemon_msg "Stopping web server" "htcacheclean"
+			stop_htcacheclean
+			log_progress_msg "apache2"
+		else
+			log_daemon_msg "Stopping web server" "apache2"
+		fi
+		if $APACHE2CTL graceful-stop; then
+                        log_end_msg 0
+                else
+                        log_end_msg 1
+                fi
+	;;
+	reload | force-reload | graceful)
+		if ! $APACHE2CTL configtest > /dev/null 2>&1; then
+                    $APACHE2CTL configtest || true
+                    log_end_msg 1
+                    exit 1
+                fi
+                log_daemon_msg "Reloading web server config" "apache2"
+		if pidof_apache > /dev/null ; then
+                    if $APACHE2CTL graceful $2 ; then
+                        log_end_msg 0
+                    else
+                        log_end_msg 1
+                    fi
+                fi
+	;;
+	restart)
+		if ! $APACHE2CTL configtest > /dev/null 2>&1; then
+		    $APACHE2CTL configtest || true
+		    log_end_msg 1
+		    exit 1
+		fi
+		if check_htcacheclean ; then
+			log_daemon_msg "Restarting web server" "htcacheclean"
+			stop_htcacheclean
+			log_progress_msg apache2
+		else
+			log_daemon_msg "Restarting web server" "apache2"
+		fi
+		PID=$(pidof_apache) || true
+		if ! apache_wait_stop; then
+                        log_end_msg 1 || true
+                fi
+		if $APACHE2CTL start; then
+			if check_htcacheclean ; then
+				start_htcacheclean || log_end_msg 1
+			fi
+                        log_end_msg 0
+                else
+                        log_end_msg 1
+                fi
+	;;
+	start-htcacheclean)
+		log_daemon_msg "Starting htcacheclean"
+		start_htcacheclean || log_end_msg 1
+		log_end_msg 0
+	;;
+	stop-htcacheclean)
+		log_daemon_msg "Stopping htcacheclean"
+			stop_htcacheclean
+			log_end_msg 0
+	;;
+	status)
+		PID=$(pidof_apache) || true
+		if [ -n "$PID" ]; then
+			echo "Apache2$DIR_SUFFIX is running (pid $PID)."
+			exit 0
+		else
+			echo "Apache2$DIR_SUFFIX is NOT running."
+			if [ -e "$PIDFILE" ]; then
+				exit 1
+			else
+				exit 3
+			fi
+		fi
+	;;
+	*)
+		log_success_msg "Usage: /etc/init.d/apache2$DIR_SUFFIX {start|stop|graceful-stop|restart|reload|force-reload|start-htcacheclean|stop-htcacheclean|status}"
+		exit 1
+	;;
+esac

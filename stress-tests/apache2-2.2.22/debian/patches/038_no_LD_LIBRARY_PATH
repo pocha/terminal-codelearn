@@ -1,0 +1,17 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 038_no_LD_LIBRARY_PATH by Adam Conrad <adconrad@0c3.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Remove LD_LIBRARY_PATH from envvars-std
+
+@DPATCH@
+--- a/support/envvars-std.in
++++ b/support/envvars-std.in
+@@ -18,7 +18,4 @@
+ #
+ # This file is generated from envvars-std.in
+ #
+-@SHLIBPATH_VAR@="@exp_libdir@:$@SHLIBPATH_VAR@"
+-export @SHLIBPATH_VAR@
+-#
+ @OS_SPECIFIC_VARS@

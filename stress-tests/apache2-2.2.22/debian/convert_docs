@@ -1,0 +1,109 @@
+#!/usr/bin/perl -w
+
+use strict;
+use File::Path;
+use Fatal qw/mkpath symlink open close/;
+use File::Copy;
+use File::Find;
+
+
+scalar @ARGV == 1 or die;
+
+my $TGT=$ARGV[0];
+my $SRC=$TGT.".orig";
+
+move($TGT, $SRC);
+
+# list of languages
+my @lang = glob("$SRC/index.html.*") or die;
+map { s{^.*html\.}{} }  @lang;
+
+# map "ja.euc-jp" to "ja/", ...
+my %lpath;
+foreach my $l (@lang) {
+	my $t=$l;
+	$t =~ s{\..*$}{};
+	$lpath{$l}="$t/";
+}
+
+my @html;
+find(sub { $File::Find::name =~ s/^$SRC\///; push(@html, $File::Find::name) if $File::Find::name =~ /\.html$/; }, $SRC);
+
+foreach my $h (@html) {
+	my $dir="";
+	if ($h =~ m{^(.*/)}) {
+		$dir=$1;
+	}
+	
+	for my $l (@lang) {
+		my $tdir="$TGT/$lpath{$l}";
+		-d "$tdir$dir" || mkpath("$tdir$dir");
+		
+		my $updir=$dir;
+		$updir =~ s{[^/]+}{..}g;
+		
+		if ($l eq "en") {
+			conv("$SRC/$h.en", "$tdir$h", $h);
+		}
+		elsif ( -f "$SRC/$h.$l" ) {
+			conv("$SRC/$h.$l", "$tdir$h", $h);
+		}
+		else {
+			symlink("${updir}../en/$h", "$tdir$h");
+		}
+		
+	}
+}
+
+open(my $out, ">", "$TGT/index.html");
+print $out '<html><head>',
+	   '<meta http-equiv="refresh" content="0; URL=en/index.html">',
+	   "</head>\n<body>\n<table>";
+foreach my $l (sort values %lpath) {
+	print $out qq{<tr><td><a href="${l}index.html">$l</a></td></tr>\n};
+}
+print $out '</table></body></html>';
+
+move("$SRC/images", "$TGT/images");
+move("$SRC/style", "$TGT/style");
+rmdir("$TGT/style/lang");
+rmdir("$TGT/style/xsl/util");
+rmdir("$TGT/style/xsl");
+rmtree("$SRC");
+
+
+### END
+
+
+sub conv {
+	my ($old, $new, $name) = @_;
+	
+	open(my $in, "<", $old);
+	local $/;
+	my $file = <$in>;
+	close($in);
+
+	# /mod/ -> /mod/index.html
+	$file =~ s{href="([^:"]*/)"}{href="${1}index.html"}g;
+
+	# style and images now one level up
+	$file =~ s{(src|href)="\.\./(style|images)}{$1="../../$2}g;
+	$file =~ s{(src|href)="(?:\./)?(style|images)}{$1="../$2}g;
+
+	foreach my $l (values %lpath) {
+		# language directories one level up
+		$file =~ s{href="\.\./$l}{href="../../$l}g;
+		$file =~ s{href="(?:\./)?$l}{href="../$l}g;
+		$file =~ s{apachectl(?!\.html)}{apache2ctl}g;
+	}
+
+	# Debian tweaks
+	$file =~ s{/usr/local/apache2/conf/httpd[.]conf}{/etc/apache2/apache2.conf}g;
+	$file =~ s{httpd[.]conf}{apache2.conf}g;
+	$file =~ s{apachectl(?!\.html)}{apache2ctl}g;
+
+
+	open(my $out, ">", $new);
+	print $out $file;
+	close($out);
+}
