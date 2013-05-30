@@ -1,16 +1,20 @@
 class ProcessIncoming
 
+  @@latency = {}
+
   def incoming(message, callback)
-    puts "#{Time.now} Incoming - #{message['channel']}: #{message.inspect}"
     if message['channel'] == "/input"
+    	#puts "#{Time.now} Incoming - #{message['channel']}: #{message.inspect}"
+		@@latency[message['data']["user"]] = Time.now
 		ActiveUsers.handle_request(message['data'])
     end
     callback.call(message)
   end
 
   def outgoing(message,callback)
-	if message['channel'] == "/input" or message['channel'] =~ /\/output/
-    	puts "#{Time.now} Outgoing - #{message['channel']}: #{message.inspect} "
+	if message['channel'] =~ /\/output/ and !message['data'].nil?
+		user = message['channel'].split("/")[2]
+    	puts "#{Time.now - @@latency[user]} #{user}: #{message.inspect} "
 	end
 	callback.call(message)
   end 
