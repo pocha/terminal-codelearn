@@ -6,15 +6,22 @@ USER = "pocha"
 EM.run {
   client = Faye::Client.new('http://localhost:3000/remote/faye')
 
-  client.subscribe('/input/*') do |message|
-    puts "input - #{message.inspect}"
+  subscription = client.subscribe('/output/**') do |message|
+	  puts "#{Time.now} output - #{message.inspect}"
+	  if /(\$|>)\s*\z/.match(message['data']) 
+	  puts "-----------------"
+		  message = {:user => "pocha", :terminal_no => 0, :type => "execute", :command => "whoami"}
+		  puts "#{Time.now} sending input #{message.inspect}"
+		  client.publish('/input', message)
+	  end 
   end
-  client.subscribe('/output/*') do |message|
-    puts "output - #{message.inspect}"
+
+  subscription.callback do
+	  puts "#{Time.now} sending input"
+	  message = {:user => "pocha", :terminal_no => 0}
+	  client.publish('/input', message.merge({:type => "create"}))
+	  #client.publish('/input', message.merge({:type => "destroy"}))
   end
-	
+
   #sending inputs
-  puts "sending input"
-  client.publish('/input/pocha',"hey")
-  client.publish('/input/tocha',"hi")
 }

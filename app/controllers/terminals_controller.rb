@@ -5,7 +5,6 @@ class TerminalsController < ApplicationController
   end
 
   def index
-	  http = Curl.get("http://localhost:3001/#{current_user}/#{params[:terminal_id]}")
   end
 
 =begin
