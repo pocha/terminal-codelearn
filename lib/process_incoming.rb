@@ -5,17 +5,30 @@ class ProcessIncoming
   def incoming(message, callback)
     if message['channel'] == "/input"
     	#puts "#{Time.now} Incoming - #{message['channel']}: #{message.inspect}"
-		@@latency[message['data']["user"]] = Time.now
-		ActiveUsers.handle_request(message['data'])
-    end
+			@@latency[message['data']["user"]] = Time.now
+			ActiveUsers.handle_request(message['data'])
+   	elsif message['channel'] =~ /\/output/
+			user = message['channel'].split("/")[2]
+			diff = Time.now - @@latency[user]	
+			
+			File.open("../execute.txt" , 'a+') do |file|			
+				file.puts "Processing Time: #{diff}\n"
+			end		
+
+		end
     callback.call(message)
   end
 
   def outgoing(message,callback)
-	if message['channel'] =~ /\/output/ and !message['data'].nil?
-		user = message['channel'].split("/")[2]
-    	puts "#{Time.now - @@latency[user]} #{user}: #{message.inspect} "
-	end
+		if message['channel'] =~ /\/output/ and !message['data'].nil?
+			user = message['channel'].split("/")[2]
+			diff = Time.now  - @@latency[user]
+
+			File.open("../execute.txt" , 'a+') do |file|			    	
+				file.puts "Server Time: #{diff}"
+			end	
+
+		end
 	callback.call(message)
   end 
 
