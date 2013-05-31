@@ -7,7 +7,7 @@ class ProcessIncoming
     	#puts "#{Time.now} Incoming - #{message['channel']}: #{message.inspect}"
 			@@latency[message['data']["user"]] = Time.now
 			ActiveUsers.handle_request(message['data'])
-   	elsif message['channel'] =~ /\/output/
+   	elsif message['channel'] =~ /\/output/ and message['data']["command"] =~ /(\$|>)$/
 			user = message['channel'].split("/")[2]
 			diff = Time.now - @@latency[user]	
 			
