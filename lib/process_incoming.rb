@@ -7,7 +7,7 @@ class ProcessIncoming
     	#puts "#{Time.now} Incoming - #{message['channel']}: #{message.inspect}"
 			@@latency[message['data']["user"]] = Time.now
 			ActiveUsers.handle_request(message['data'])
-   	elsif message['channel'] =~ /\/output/ and message['data']["command"] =~ /(\$|>)$/
+   	elsif message['channel'] =~ /\/output/ and message['data'][:data] =~ /(\$|>)\s*$/
 			user = message['channel'].split("/")[2]
 			diff = Time.now - @@latency[user]	
 			
@@ -20,7 +20,7 @@ class ProcessIncoming
   end
 
   def outgoing(message,callback)
-		if message['channel'] =~ /\/output/ and !message['data'].nil?
+		if message['channel'] =~ /\/output/ and !message['data'].nil? and message['data'][:data] =~ /(\$|>)\s*$/
 			user = message['channel'].split("/")[2]
 			diff = Time.now  - @@latency[user]
 
