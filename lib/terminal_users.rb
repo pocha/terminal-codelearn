@@ -60,6 +60,9 @@ class ActiveUsers
 			puts "inside handle_request #{hash.inspect}"
 			user, terminal_no, command, type = hash.values_at("user", "terminal_no", "command", "type")
 			#put begin rescue to check if the user exists. destroy & recreate the user if needed
+			$mongodb_session.with(safe: false) do |safe| 
+				safe[:commands].insert(user: user, terminal_no: terminal_no, command: (command.nil? ? "/#{type}" : CGI::unescape(command)), type: 'input', time: "#{Time.now}")
+			end
 			begin
 				case type
 				when "execute"
@@ -97,8 +100,11 @@ class TerminalUser
 		@bash.outproc = lambda {|out| 
 			#@output << out
 			#@status = ( /(\$|>)\s*\z/.match(out) ) ? "complete" : "waiting"
-			FAYE_CLIENT.publish("/output/#{@user}/#{@terminal_no}", {:status => "success", :data => sanitize_ansi_data(out)})
-			#TODO - insert into mongodb	
+			data  = sanitize_ansi_data(out)
+			FAYE_CLIENT.publish("/output/#{@user}/#{@terminal_no}", {:status => "success", :data => data})
+			$mongodb_session.with(safe: false) do |safe|
+                                safe[:commands].insert(user: user, terminal_no: terminal_no, command: data.gsub(%r{</?[^>]+?>}, ''), type: 'output', time: "#{Time.now}")
+                        end
 		}
 		#@status = "waiting"
 		@bash._initialize
