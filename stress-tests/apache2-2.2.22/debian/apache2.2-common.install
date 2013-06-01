@@ -1,9 +1,0 @@
-usr/share/apache2/icons
-debian/icons/*.png	usr/share/apache2/icons
-usr/share/apache2/error
-usr/sbin/envvars-std	usr/share/apache2/build
-etc/apache2		usr/share/doc/apache2.2-common/examples
-debian/config-dir/*	etc/apache2
-debian/a2enmod		usr/sbin
-debian/apache2ctl	usr/sbin
-debian/apache2.py	usr/share/apport/package-hooks

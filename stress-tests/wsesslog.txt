@@ -1,6 +1,0 @@
-/user_1/execute/
-	/user_1/get
-	/user_1/get
-/user_2/execute/
-	/user_2/get
-	/user_2/get

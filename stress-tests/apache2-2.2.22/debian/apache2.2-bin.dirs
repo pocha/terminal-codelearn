@@ -1,4 +1,0 @@
-usr/lib/apache2/mpm-worker
-usr/lib/apache2/mpm-prefork
-usr/lib/apache2/mpm-event
-usr/lib/apache2/mpm-itk

@@ -1,3 +1,0 @@
-debian/setup-instance
-debian/secondary-init-script
-debian/apache2.monit

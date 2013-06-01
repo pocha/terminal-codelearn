@@ -1,2 +1,0 @@
-# Depends: cache
-LoadModule mem_cache_module /usr/lib/apache2/modules/mod_mem_cache.so

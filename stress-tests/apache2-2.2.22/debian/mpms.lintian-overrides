@@ -1,2 +1,0 @@
-binary-without-manpage usr/sbin/apache2
-debug-package-should-be-named-dbg usr/lib/debug/usr/

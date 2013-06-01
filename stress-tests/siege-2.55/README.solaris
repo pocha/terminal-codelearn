@@ -1,3 +1,0 @@
-You'll have to set your log file location in $HOME/.siegerc
-Look for the "logfile = " directive in that file...
-
