@@ -1,0 +1,17 @@
+<script src="http://cdn.sockjs.org/sockjs-0.3.min.js">
+  </script>
+
+
+<script>
+	var socket = new SockJS('http://localhost:9999/echo');
+	socket.onopen = function(callback) {
+		console.log('open');
+	};
+	socket.onmessage = function(e) {
+		console.log('message', e.data);
+	};
+	socket.onclose = function() {
+		console.log('close');
+	};
+</script>
+
