@@ -31,15 +31,15 @@ EM.run {
   receiving_time = nil
 
   subscription = client.subscribe('/output/**') do |message|
-		diff = Time.now - sending_time
-		times << diff	  
-		puts "#{diff} output - #{message.inspect}"
-		i=i.next
-		if(i > TIMES)
-			EM.stop
-		end
 		if /(\$|>)\s*\z/.match(message['data']) 
-	  	  puts "#{i}.-----------------"
+			diff = Time.now - sending_time
+			times << diff	  
+			puts "#{diff} output - #{message.inspect}"
+			i=i.next
+			if(i > TIMES)
+				EM.stop
+			end
+	  	puts "#{i}.-----------------"
 		  message = {:user => USER, :terminal_no => 0, :type => "execute", :command => "whoami"}
 		  sending_time = Time.now
 		  puts "sending input #{message.inspect}"
