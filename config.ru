@@ -5,6 +5,8 @@ require 'faye'
 require ::File.expand_path("../lib/terminal_users.rb",  __FILE__)
 require ::File.expand_path("../lib/process_incoming.rb",  __FILE__)
 
+Faye::WebSocket.load_adapter('thin')
+
 faye_server = Faye::RackAdapter.new(:mount => "/faye", :timeout => 5)
 faye_server.add_extension(ProcessIncoming.new)
 

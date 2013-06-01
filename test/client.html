@@ -1,0 +1,31 @@
+<script type="text/javascript" 
+	src="http://www.codelearn.org:3000/remote/faye/client.js">
+</script>
+
+<script type="text/javascript">
+	var client = new Faye.Client('http://www.codelearn.org:3000/remote/faye');
+
+	var subscription = client.subscribe('/output/**', function(message) {
+		console.timeEnd('timer');
+		console.log(message.data)
+
+		var final_output = /(\$|>)\s*$/ 
+		if (final_output.test(message.data)){
+			console.log("Sending Input")			
+			var message = {"user":"ubuntu","terminal_no":0,"type":"execute","command":"whoami"}
+			console.time('timer');
+			client.publish('/input',message);
+		}
+
+	});
+
+	subscription.callback(function() {
+		console.log("Sending create command")		
+		var message = {"user":"ubuntu","terminal_no":0,"type":'create'}
+	  client.publish('/input', message)
+	});
+
+	subscription.errback(function(error) {
+		alert('There was a problem: ' + error.message);
+	});
+</script>
