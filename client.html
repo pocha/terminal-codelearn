@@ -1,0 +1,25 @@
+<script src="http://cdn.sockjs.org/sockjs-0.3.min.js">
+  </script>
+
+
+<script>
+	var socket = new SockJS('http://www.codelearn.org:3000/echo');
+	socket.onopen = function(callback) {	
+		console.log('open');
+		socket.send("Hi");
+	};
+	socket.onmessage = function(e) {
+		console.timeEnd('timer');		
+		console.log('message', e.data);		
+		console.time('timer');		
+		socket.send("Hi");	
+	};
+	socket.onclose = function() {
+		console.log('close');
+	};
+	socket.onerror = function(evt) { 
+		console.log(evt);
+	};
+
+</script>
+
