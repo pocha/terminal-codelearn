@@ -30,25 +30,28 @@
 <script>
 	$(document).ready(function(){
 
+		var pre = jQuery('#output');
+		
 		$('#execute').button({disabled: true});
 
+		var host = window.location.host
+		var socket = new SockJS('http://'+host+'/echo');
 		
-		var socket = new SockJS('http://www.codelearn.org:3000/echo');
 		socket.onopen = function() {	
 			console.log('open');
 			$('#execute').button({disabled: false});
 		};
 
 		socket.onmessage = function(e) {				
-					
-			
 			$('#output').append(colorReplace(e.data,true));
+			pre.scrollTop(pre.prop('scrollHeight'));
 
 			var end_of_output = /(\$|>)\s*$/;
 	
 			if(end_of_output.test(e.data)){		
 				$('#execute').button({disabled: false});	
 			};
+
 
 		};
 
@@ -64,7 +67,6 @@
 		});		
 
 		$("#execute").click(function(){
-			console.log('button clicked!!!');			
 			command = $("input[name='command']").val();			
 			socket.send(command);
 			$("input[name='command']").val('');
