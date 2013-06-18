@@ -1,0 +1,152 @@
+<html>
+
+<head>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js" type="text/javascript"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" type="text/javascript"></script>
+	<script src="//cdn.sockjs.org/sockjs-0.3.min.js" type="text/javascript"></script>
+	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+</head>
+
+<body style="margin: 100px;">
+			<pre id="output" style="height:300px; overflow:auto;"></pre>
+
+			<div class="row-fluid">	
+				<div class="span6">
+					<form id="myForm" class="form-inline" onsubmit="return false;">
+						<input type="text" class="input-xlarge" style="width:70%; height:30px" name="command" placeholder="Enter Command" autocomplete="off">
+						<button id="execute" class="btn btn-primary">Go!</button>
+					</form>
+				</div>
+				<div class="span6">
+						<button id="kill" class="btn">Kill Process</button>
+						<button id="reset" class="btn">Reset</button>						
+				</div>
+			</div>
+
+<script>
+	$(document).ready(function(){
+
+		
+		var conn = function(){
+			
+			socket = new SockJS('http://'+host+'/echo');
+
+			socket.onopen = function() {	
+				console.log('open');
+				$('#output').html('');				
+				$('#execute').button({disabled: false});
+			};
+
+			socket.onmessage = function(e) {				
+				//console.log(e.data);			
+				$('#output').append(colorReplace(e.data));
+				pre.scrollTop(pre.prop('scrollHeight'));
+
+				var end_of_output = /(\$|>)\s*$/;
+	
+				if(end_of_output.test(e.data)){		
+					$('#execute').button({disabled: false});	
+				};
+
+
+			};
+
+			socket.onclose = function() {
+				console.log('close');
+				$('#execute').button({disabled: true});
+			};		
+		
+			return socket;
+	
+		};
+	
+		var pre = jQuery('#output');
+		
+		$('#execute').button({disabled: true});
+
+		var host = window.location.host
+		var socket = new conn();
+		
+		
+		
+		$("#myForm").submit(function(){
+			if($('#execute').is(':disabled') == false){
+				$('#execute').click();
+			};
+		});		
+
+		$("#execute").click(function(){
+			command = $("input[name='command']").val();			
+			socket.send(command+'\r');
+			$("input[name='command']").val('');
+			$('#execute').button({disabled: true});
+		});
+
+		$("#kill").click(function(){
+			socket.send(String.fromCharCode(3));
+			$('#execute').button({disabled: true});
+		});
+		
+		$("#reset").click(function(){
+			socket.close();		
+			socket = new conn();			
+			$('#execute').button({disabled: true});
+		});
+
+		function colorReplace(input) {
+        
+			var span = "<span style='";
+			var color = "color: ";
+			var bold = " font-weight: bold;";
+			var underline = " text-decoration: underline;";
+			var span_fin = "'>";			
+			var span_end = "</span>";
+			var reset = /\033\[0+m/;
+		
+			input = input.replace(reset,"<span>");
+						
+			var replaceColors = {
+            "31" : "red;",
+            "01;31" : "red;" + bold,
+
+            "32" : "green;",
+            "01;32" : "green;" + bold,
+
+            "33" : "yellow;",
+            "01;33" : "yellow;" + bold,
+
+            "34" : "blue;",
+            "01;34" : "blue;" + bold,
+
+            "35" : "purple;",
+            "01;35" : "purple;" + bold,
+
+            "36" : "cyan;",
+            "01;36" : "cyan;" +bold,
+						"04;36" : "cyan;" +underline,
+
+            "37" : "white;",
+            "01;37" : "white;" +bold,
+
+            "01;30" : bold,
+						"01" : bold
+
+        };
+				
+
+        for( k in replaceColors )
+        {
+            var re = new RegExp( "\\033\\[" + k + "m", "g" );
+						var re_str  = span_end  + span + color + replaceColors[ k ] + span_fin;
+            input = input.replace( re,re_str);
+        };
+
+				input = input.replace(/\033\[0+m/g,span_end);			
+        
+				return input;
+    };		
+		
+	});
+</script>
+</body>
+</html>
