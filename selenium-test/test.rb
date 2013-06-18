@@ -5,7 +5,7 @@ class TerminalTests < Test::Unit::TestCase
     def setup
         # create selenium objects
 		@driver = Selenium::WebDriver.for :firefox
-		@driver.navigate.to 'http://www.codelearn.org:1134/client.html'
+		@driver.navigate.to 'http://localhost:1134/test_client.html'
 		@wait = Selenium::WebDriver::Wait.new :timeout => 4
 
 		@output = @driver.find_element(:id, 'output')
@@ -22,15 +22,16 @@ class TerminalTests < Test::Unit::TestCase
 		@driver.execute_script("document.getElementById('output').innerHTML = ''")
 	end
 
-	def test_pwd
+	def test_whoami
 
-		@input.send_keys("pwd")
+		@input.send_keys("whoami")
 		@execute.click
 
 		@wait.until {@execute.enabled?}		
-		dir = `pwd`	
+		user = `whoami`.strip	
 
-		assert(@output.text[/#{dir}/],"Output does not contain '#{dir}' when command 'pwd' is executed")
+		result = @output.text.split("\n")[1]
+		assert(result[/#{user}/],"Output does not contain '#{user}' when command 'whoami' is executed")
 	end
 
 	def test_kill_process
