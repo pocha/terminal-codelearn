@@ -5,7 +5,7 @@ class TerminalTests < Test::Unit::TestCase
     def setup
         # create selenium objects
 		@driver = Selenium::WebDriver.for :firefox
-		@driver.navigate.to 'http://www.codelearn.org:3000/client.html'
+		@driver.navigate.to 'http://www.codelearn.org:1134/client.html'
 		@wait = Selenium::WebDriver::Wait.new :timeout => 4
 
 		@output = @driver.find_element(:id, 'output')
