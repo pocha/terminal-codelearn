@@ -15,7 +15,10 @@
         "node-static" : ">=0.6.9"
     },
 	 "devDependencies": {
-        "ws" : ">=0.4.25"
+        "ws" : ">=0.4.25",
+        "mocha" : ">=1.10.0",
+        "should" : ">=1.2.2",
+        "async" : ">=0.2.9"
     },
     "main": "./lib/Terminal"
 }
