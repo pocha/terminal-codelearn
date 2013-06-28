@@ -6,7 +6,7 @@
 */
 
 var totalMsgs =  500;
-var URL = "ws://localhost:1134/echo/websocket";
+var URL = "ws://www.codelearn.org:1134/echo/websocket";
 
 /*****************************************************************/
 var fs = require('fs');
@@ -63,14 +63,9 @@ var end_of_output = /(\$|>)\s*$/;
 	new conn();
 
 	var updateStatus = setInterval(function(){
-		if(connected == totalUsers){
 			console.log("-----------------------------------------------");	
-			for(var i=0;i<totalUsers;i++){
-				console.log("Messages sent",totalMsgs - msgsToBeSent[i]);
-			}
-			console.log("-----------------------------------------------");	
-		}	
-
+				console.log("Messages sent",totalMsgs - msgsToBeSent);
+			console.log("-----------------------------------------------");		
 	},5000);
 
 	function printDelays(){
