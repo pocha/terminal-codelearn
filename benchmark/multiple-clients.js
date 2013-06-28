@@ -1,24 +1,31 @@
 /* These variables define the test parameters
-*  totalUsers: total number of connections to the server
-*  totalMsgPerUser: total number messages to send through each connection
+*
+*  totalUsersArray: total number of connections to the server
+*                   for which the script is run each time 
+*  totalMsgPerUser: total number of messages to send through each connection
+*  URL : url of the server to make the connection
+*
 */
 
-var totalUsersArray  = [10,40,70,100,130,160,190,220,250];
+var totalUsersArray  = [10,40,70]//,100,130,160,190,220,250];
 var totalMsgPerUser =  5;
-var URL = "ws://www.codelearn.org:1134/echo/websocket";
+var URL = "ws://localhost:1134/echo/websocket";
 
 /*******************************/
+var fs = require('fs');
+
+if(fs.existsSync('output-multiple.dat'))
+	fs.unlinkSync('output-multiple.dat');
 
 var Async = require('async');
 var Websocket = require('ws');
-var fs = require('fs');
-var mainTime = new Array();
-	var delay = new Array();
+
 
 asyncLoop(totalUsersArray.length, function(mainLoop) {
 
 	var totalUsers = totalUsersArray[mainLoop.iteration()];
 
+	var delay = new Array();
 	var Sockets  = new Array();
 	var msgsToBeSent  = new Array();
 	var timeStart = new Array();
@@ -71,8 +78,10 @@ asyncLoop(totalUsersArray.length, function(mainLoop) {
 		Sockets[num].onclose = function() {
 			closed++; 			
 			console.log("Client ",num+1,"/",totalUsers," disconnected.")
-			if(closed == totalUsers)
+			if(closed == totalUsers){
+				clearInterval(updateStatus);	
 				printDelays();
+			}
 		};		
 
 		return Sockets[num];
@@ -86,27 +95,12 @@ asyncLoop(totalUsersArray.length, function(mainLoop) {
 
 
 	function queue(func,num){
-		//console.log("Users logged",parallelIndex)	
-/*		if(!done){
-			console.log("still executing previous queue, deffering request");
-			setTimeout(function(){queue(func,num)},100);
-		} else {
-			if(!callInParallel[num]){
-*/				//console.log("Logging request for client",num+1); 				
 		callInParallel[num] = func;
 		parallelIndex++;
 		if(parallelIndex == (totalUsers - closed)){
-					//if(done){		
-						//console.log("EXECUTING QUEUE");				
 			p();	
-					//}
 		}	
-/*			}else {
-				console.log("user", num+1 ,"already logged, deffering request");					
-				setTimeout(function(){queue(func,num)},100);
-			}
-		}				
-*/	}
+	}
 	
 	function p(){
 		if(done){		
@@ -123,11 +117,6 @@ asyncLoop(totalUsersArray.length, function(mainLoop) {
 
 	var updateStatus = setInterval(function(){
 
-		/*if(closed == totalUsers){
-			clearInterval(updateStatus);				
-			printDelays();
-			return;
-		}*/
 	
 		if(connected == totalUsers){
 			console.log("-----------------------------------------------");	
@@ -138,7 +127,7 @@ asyncLoop(totalUsersArray.length, function(mainLoop) {
 		}	
 
 		if(closed > 0)
-			console.log("Clients disconnected",closed,"but close sent to",closedSent);
+			console.log("Clients disconnected",closed);
 
 	},5000);
 
@@ -155,18 +144,15 @@ asyncLoop(totalUsersArray.length, function(mainLoop) {
 			console.log('Total Average Delay:',totalDelay/totalUsers);	
 			console.log('***********************************************');
 	
-			mainTime[mainLoop.iteration()] = totalDelay/totalUsers;
-	
+			buff =""
+			buff+= totalUsersArray[mainLoop.iteration()] + "	" + totalDelay/totalUsers + "\n";	
+
+			fs.appendFileSync("output-multiple.dat",buff);
+
 			mainLoop.next();
 	}
-},
-	function(){
-		buff =""
-		for(var i=0;i<totalUsersArray.length;i++)
-			buff+= totalUsersArray[i] + "	" + mainTime[i] + "\n";	
-		fs.writeFileSync("output.dat",buff);
-	}
-);
+},function(){});
+
 function asyncLoop(iterations, func, callback) {
     var index = 0;
     var done = false;
