@@ -4,6 +4,7 @@ var Client = function(){
 	socket = new SockJS(SOCKETURL)
 
 	socket.onopen = function(){
+		socket.send(''); //Send a username here to make the pty spawn as that user
 		$('#output').html('');
 	}
 
@@ -64,7 +65,6 @@ $("#myForm").submit(function(){
 		socket.reset();
 		$('#execute').attr("disabled",true);
 	});
-
 
 function colorReplace(input) {
 

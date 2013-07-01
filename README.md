@@ -61,7 +61,7 @@ The blue lines give the minimum and the maximum of the dataset while the green o
 ##Multiple Clients#
 This test tries to emulate multiple browsers connecting and interacting with the server.
 
-The graph below shows the average time taken by the server to respond to a request . This time is measured on the server because the  client script introduces delay in processing the messages it recieves from the server.
+The Y-axis of the graph below shows the average time taken by the server to respond to a request . This time is measured on the server because the  client script introduces delay in processing the messages it recieves from the server.
 
 The X-axis of the graph gives the total number of concurrent users connected to the server. 
 
