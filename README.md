@@ -49,6 +49,7 @@ The scripts in Benchmark directory were used to generate the graphs.The server a
  
 Server to Client ping delay = 98.9 ms
 
+Each message sent to the server was the 'whoami' command of which the server returned the output.
 
 ##Single Client#
 The graph below shows the client side delay measured when a single client is connected to the server.
@@ -58,9 +59,13 @@ The graph below shows the client side delay measured when a single client is con
 The blue lines give the minimum and the maximum of the dataset while the green one shows the average of the whole data
 
 ##Multiple Clients#
-The graph below shows the average time taken by the server to respond to a request once it has recieved a message from the client when particular number of clients are connected and sending messages concurrently.
+This test tries to emulate multiple browsers connecting and interacting with the server.
+
+The graph below shows the average time taken by the server to respond to a request . This time is measured on the server because the  client script introduces delay in processing the messages it recieves from the server.
+
+The X-axis of the graph gives the total number of concurrent users connected to the server. 
 
 ![Multiple Clients Graph](https://raw.github.com/pocha/terminal-codelearn/master/graphs/multiple-clients.png)
 
-This graph measures the time taken upto 506 clients only. More than 506 clients are not able to connect because 'pty' modules gives error that 'forkpty(3) failed'.
+This graph measures the time taken upto 506 clients only. More than 506 clients are not able to connect because 'pty.js' modules gives error that 'forkpty(3) failed'.
 
