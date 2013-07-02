@@ -1,7 +1,8 @@
 $('#execute').attr("disabled",true);
 
 var Client = function(){
-	socket = new SockJS(SOCKETURL)
+
+	var socket = new SockJS(SOCKET_URL)
 
 	socket.onopen = function(){
 		socket.send(''); //Send a username here to make the pty spawn as that user
@@ -40,7 +41,7 @@ var Client = function(){
 	return socket;	
 }
 
-socket = new Client();
+var socket = new Client();
 
 $("#myForm").submit(function(){
 	if($('#execute').is(':disabled') == false){

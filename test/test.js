@@ -10,12 +10,12 @@ Terminal.listen();
 
 var htmlFile = fs.readFileSync("./public/client.html").toString();
 
-	SockJS = require('ws');
-	SOCKETURL = "ws://"+Config.host+":"+Config.port+Config.prefix+"/websocket"
+GLOBAL.SockJS = require('ws');
+GLOBAL.SOCKET_URL = "ws://"+Config.host+":"+Config.port+Config.prefix+"/websocket"
 
-window = jsdom.jsdom(htmlFile).createWindow();
+GLOBAL.window = jsdom.jsdom(htmlFile).createWindow();
 
-$ = jQuery.create(window);
+GLOBAL.$ = jQuery.create(window);
 
 require("../public/assets/terminal-client.js");
 
