@@ -1,6 +1,7 @@
 $('#execute').attr("disabled",true);
 
 var state = false;
+var client1;
 
 var Client = function(){
 
@@ -45,13 +46,13 @@ var Client = function(){
 		socket.close();
 		$('#output').html('');
 		$('#output').append("\nConnecting...");
-		socket = new Client();
+		client1 = new Client();
 	};
 
 	return socket;	
 }
 
-var socket = new Client();
+client1 = new Client();
 
 $("#myForm").submit(function(){
 	if($('#execute').is(':disabled') == false){
@@ -62,18 +63,18 @@ $("#myForm").submit(function(){
 //Buttons
 	$("#execute").click(function(){
 		command = $("input[name='command']").val();			
-		socket.execute(command);
+		client1.execute(command);
 		$("input[name='command']").val('');
 		$('#execute').attr("disabled",true);
 	});
 
 	$("#kill").click(function(){
-		socket.kill();
+		client1.kill();
 		$('#execute').attr("disabled",true);
 	});
 
 	$("#reset").click(function(){
-		socket.reset();
+		client1.reset();
 		$('#execute').attr("disabled",true);
 	});
 
