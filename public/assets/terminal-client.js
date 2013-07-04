@@ -78,6 +78,10 @@ $("#myForm").submit(function(){
 		$('#execute').attr("disabled",true);
 	});
 
+timerFired = function (){
+	client1.close();
+}
+
 function colorReplace(input) {
 
 	var span = "<span style='";

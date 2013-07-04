@@ -176,7 +176,8 @@ describe('Connection',function(){
 			},
 			function(callback){
 				$('#output').html().should.match(/connection to server closed/i);
-				callback();
+				$('#reset').click();
+				check(callback);
 			}
 		],
 		function(){
@@ -195,7 +196,30 @@ describe('Connection',function(){
 			},
 			function(callback){
 				$('#output').html().should.match(/could not connect/i);
-				Terminal.listen(callback);	
+				Terminal.listen(callback);
+			},
+			function(callback){
+				$('#reset').click();
+				check(callback);	
+			},
+		],
+		function(){
+			$('#output').html('');
+			done();	
+		});
+
+	});
+	
+	it("should display connection closed message when I manually call the function passed to idle timer",function(done){
+		async.series([
+			function(callback){
+				timerFired()
+				setTimeout(callback,50);	
+			},
+			function(callback){
+				$('#output').html().should.match(/connection to server closed/i);
+				$('#reset').click();
+				check(callback);
 			}
 		],
 		function(){
