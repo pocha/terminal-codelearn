@@ -1,5 +1,7 @@
 $('#execute').attr("disabled",true);
 
+var state = false;
+
 var Client = function(){
 
 	var socket = new SockJS(SOCKET_URL)
@@ -7,6 +9,7 @@ var Client = function(){
 	socket.onopen = function(){
 		socket.send(''); //Send a username here to make the pty spawn as that user
 		$('#output').html('');
+		state = true;
 	}
 
 	socket.onmessage = function(e){
@@ -20,8 +23,13 @@ var Client = function(){
 		};
 	}
 
-	socket.onclose = function(){
+	socket.onclose = socket.onerror = function(){
 		$('#execute').attr("disabled",true);
+		if(state)		
+			$('#output').append("\nConnection to server closed.... Please click 'Reset' to reconnect");
+		else
+			$('#output').append("\nCould not connect.... Please click 'Reset' to retry");
+		state = false;	
 	}
 
 
@@ -34,7 +42,9 @@ var Client = function(){
 	}	
 
 	socket.reset = function() {
-		socket.close()
+		socket.close();
+		$('#output').html('');
+		$('#output').append("\nConnecting...");
 		socket = new Client();
 	};
 

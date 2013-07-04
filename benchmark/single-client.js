@@ -32,6 +32,7 @@ var end_of_output = /(\$|>)\s*$/;
 		Socket = new Websocket(URL);
 
 		Socket.onopen = function() {	
+			Socket.send('');
 			console.log("Client connected.")
 		};
 

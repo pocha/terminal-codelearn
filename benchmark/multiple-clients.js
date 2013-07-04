@@ -51,6 +51,7 @@ asyncLoop(totalUsersArray.length, function(mainLoop) {
 		Sockets[num] = new Websocket(URL);
 
 		Sockets[num].onopen = function() {	
+			Socket[num].send('');
 			console.log("Client ",num+1,"/",totalUsers," connected.")
 			connected++;
 		};

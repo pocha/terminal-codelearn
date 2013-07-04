@@ -1,4 +1,3 @@
-var Terminal = require ('./lib/Terminal');
+var Terminal = require ('./lib/main');
 
 Terminal.listen();
-

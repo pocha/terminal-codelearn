@@ -1,10 +1,11 @@
-var Terminal = require('../lib/Terminal.js');
-var Config = require('../lib/Config.js');
+var Terminal = require('../lib/main');
+var Config = require('../lib/config');
 var jsdom = require('jsdom');
 var async = require('async');
 var jQuery = require('jQuery');
 var fs = require('fs');
 var exec = require('child_process').exec;
+var spawn = require('child_process').spawn;
 
 Terminal.listen();
 
@@ -46,7 +47,7 @@ describe('Connection',function(){
 	});
 	
 	it("should stop the command execution when I press kill",function(done){
-		var buff;
+		var buff = '';
 
 		async.series([
 			function(callback){
@@ -84,9 +85,9 @@ describe('Connection',function(){
 		
 	});
 
-	it("should return a different pid when I press reset",function(done){
+	it("should close background processes and return a different pid when I press reset",function(done){
 
-		var pid1, pid2;
+		var pid1, pid2,buff = '';
 
 		async.series([
 			function(callback){
@@ -96,10 +97,22 @@ describe('Connection',function(){
 			},
 			function(callback){
 				pid1 = parseInt($('#output').html().split('\n')[1]);
+				$("input[name='command']").val('sleep 100 & sleep 1000 & sleep 10000 & whoami');
+				$('#execute').click();
+				check(callback);
+			},
+			function(callback){
 				$('#reset').click();
 				check(callback)			
 			},
 			function(callback){
+				exec("ps -ef | grep "+pid1,function(error,stdout,stderr){
+					buff += stdout;
+					callback();		
+				});			
+			},
+			function(callback){
+				buff.split("\n").should.have.lengthOf(3);
 				$('#output').html('');
 				$("input[name='command']").val('echo $$');
 				$('#execute').click();
@@ -119,9 +132,9 @@ describe('Connection',function(){
 		
 	});
 
-	it("should be owned by '"+process.env.USER+"' and have the node's script pid as its parent pid",function(done){
+	it("should be owned by '"+process.env.USER+"'",function(done){
 
-		var pid,buff = '';		
+		var buff = '';		
 
 		async.series([
 			function(callback){
@@ -131,7 +144,7 @@ describe('Connection',function(){
 			},
 			function(callback){
 				pid = parseInt($('#output').html().split('\n')[1]);
-				exec("ps -ef | grep "+pid+" | head -1 | awk '{print $1"+'"\t"'+"$3}'", function(error,stdout,stderr){
+				exec("ps -ef | grep "+pid+" | head -1 | awk '{print $1}'", function(error,stdout,stderr){
 					buff += stdout;
 					callback();		
 				});			
@@ -139,8 +152,6 @@ describe('Connection',function(){
 			function(callback){
 				var result = buff.split("\t");
 				result[0].should.match(new RegExp(process.env.USER));
-				var ppid = parseInt(result[1]);
-				ppid.should.equal(process.pid);
 				callback();
 			}
 		],
@@ -151,17 +162,47 @@ describe('Connection',function(){
 
 	});
 
-	it("should have exit in output and go button disabled when I send 'exit'",function(done){
-		$("input[name='command']").val('exit');
-		$('#execute').click();
-		setTimeout(function(){
-			var result  = $('#output').html().split("\n");
-			result[0].should.match(/exit/);
-			result[1].should.match(/exit/);
-			$('#execute').is(':disabled').should.be.true;
+	it("should display the connection closed message as well as close background processes when I send 'exit'",function(done){
+		async.series([
+			function(callback){
+				$("input[name='command']").val('sleep 100 & sleep 1000 & sleep 10000 & whoami');
+				$('#execute').click();
+				check(callback);
+			},
+			function(callback){
+				$("input[name='command']").val('exit');
+				$('#execute').click();
+				setTimeout(callback,50);
+			},
+			function(callback){
+				$('#output').html().should.match(/connection to server closed/i);
+				callback();
+			}
+		],
+		function(){
 			$('#output').html('');
-			done();			
-		},50);	
+			done();	
+		});		
+ 
+	});
+
+	it("should display the could not connect message when I connect to already stopped server",function(done){
+		async.series([
+			function(callback){
+				Terminal.close();
+				$('#reset').click();
+				setTimeout(callback,50);	
+			},
+			function(callback){
+				$('#output').html().should.match(/could not connect/i);
+				Terminal.listen(callback);	
+			}
+		],
+		function(){
+			$('#output').html('');
+			done();	
+		});
+
 	});
 
 	after(function(){
