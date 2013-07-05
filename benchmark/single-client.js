@@ -6,7 +6,7 @@
 */
 
 var totalMsgs =  500;
-var URL = "ws://www.codelearn.org:1134/echo/websocket";
+var URL = "ws://localhost:1134/_sockjs/websocket";
 
 /*****************************************************************/
 var fs = require('fs');
