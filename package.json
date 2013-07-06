@@ -1,7 +1,7 @@
 {
     "name" : "terminal-codelearn",
     "author" : "Ashish Sharma",
-    "version" : "0.0.1",
+    "version" : "0.0.3",
 	 "contributors" : ["Aviral Agarwal"],
     "description" : "This application creates a linux terminal like utility in your browser window. It uses sockjs node to communicate with the server",
     "keywords" : ["terminal"],
@@ -12,13 +12,16 @@
     "dependencies": {
         "sockjs" : "0.3.7",
         "pty.js" : ">=0.2.2",
-        "node-static" : ">=0.6.9"
+        "node-static" : ">=0.6.9",
+        "nodemailer" : ">=0.5.0"
     },
-	 "devDependencies": {
+    "devDependencies": {
         "ws" : ">=0.4.25",
         "mocha" : ">=1.10.0",
         "should" : ">=1.2.2",
-        "async" : ">=0.2.9"
+        "async" : ">=0.2.9",
+        "jsdom" : ">=0.6.5",
+        "jQuery" : ">=1.7.4"
     },
     "main": "./lib/main"
 }
