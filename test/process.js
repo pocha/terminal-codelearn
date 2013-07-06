@@ -41,7 +41,7 @@ describe('Connection',function(){
 			function(callback){
 				$("input[name='command']").val('exit');
 				$('#execute').click();
-				check(function(){return checkLength(4)},callback);
+				check(function(){return checkLength(2)},callback);
 			},
 			function(callback){
 				$('#output').html().should.match(/connection to server closed/i);
@@ -61,7 +61,7 @@ describe('Connection',function(){
 			function(callback){
 				Terminal.close();
 				$('#reset').click();
-				check(function(){return checkLength(4)},callback);
+				check(function(){return checkLength(3)},callback);
 			},
 			function(callback){
 				$('#output').html().should.match(/could not connect/i);
@@ -82,7 +82,7 @@ describe('Connection',function(){
 	it("should display connection closed message when I manually call the function passed to idle timer",function(done){
 		async.series([
 			function(callback){
-				timerFired()
+				timerFired();
 				check(function(){return checkLength(2)},callback);
 			},
 			function(callback){
