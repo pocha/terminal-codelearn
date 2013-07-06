@@ -3,7 +3,7 @@ require('./common');
 describe('Connection',function(){
 		
 	before(function(done){
-		check(done);
+		check(buttonDisabled,done);
 	});
 
 	it("should be owned by '"+process.env.USER+"'",function(done){
@@ -14,7 +14,7 @@ describe('Connection',function(){
 			function(callback){
 				$("input[name='command']").val('echo $$');
 				$('#execute').click();
-				check(callback);	
+				check(buttonDisabled,callback);	
 			},
 			function(callback){
 				pid = parseInt($('#output').html().split('\n')[1]);
@@ -36,22 +36,17 @@ describe('Connection',function(){
 
 	});
 
-	it("should display the connection closed message as well as close background processes when I send 'exit'",function(done){
+	it("should display the connection closed message when I send 'exit'",function(done){
 		async.series([
-			function(callback){
-				$("input[name='command']").val('sleep 100 & sleep 1000 & sleep 10000 & whoami');
-				$('#execute').click();
-				check(callback);
-			},
 			function(callback){
 				$("input[name='command']").val('exit');
 				$('#execute').click();
-				setTimeout(callback,50);
+				check(function(){return checkLength(4)},callback);
 			},
 			function(callback){
 				$('#output').html().should.match(/connection to server closed/i);
 				$('#reset').click();
-				check(callback);
+				check(buttonDisabled,callback);
 			}
 		],
 		function(){
@@ -66,7 +61,7 @@ describe('Connection',function(){
 			function(callback){
 				Terminal.close();
 				$('#reset').click();
-				setTimeout(callback,50);	
+				check(function(){return checkLength(4)},callback);
 			},
 			function(callback){
 				$('#output').html().should.match(/could not connect/i);
@@ -74,7 +69,7 @@ describe('Connection',function(){
 			},
 			function(callback){
 				$('#reset').click();
-				check(callback);	
+				check(buttonDisabled,callback);	
 			},
 		],
 		function(){
@@ -88,12 +83,12 @@ describe('Connection',function(){
 		async.series([
 			function(callback){
 				timerFired()
-				setTimeout(callback,50);	
+				check(function(){return checkLength(2)},callback);
 			},
 			function(callback){
 				$('#output').html().should.match(/connection to server closed/i);
 				$('#reset').click();
-				check(callback);
+				check(buttonDisabled,callback);
 			}
 		],
 		function(){

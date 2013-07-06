@@ -21,12 +21,20 @@ GLOBAL.$ = jQuery.create(window);
 
 require("../public/assets/terminal-client.js");
 
-GLOBAL.check = function (callback){
-	if($('#execute').is(':disabled')){
+GLOBAL.check = function (cond,callback){
+	if(cond()){
 		setTimeout(function(){
-			check(callback);
+			check(cond,callback);
 		},20);				
 	} else {	
 		callback();
 	}
 };
+
+GLOBAL.buttonDisabled = function(){
+	return $('#execute').is(':disabled')
+}
+
+GLOBAL.checkLength = function(len){
+	return ($('#output').html().split('\n').length < len);
+}

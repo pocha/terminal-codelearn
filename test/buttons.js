@@ -2,7 +2,7 @@ require('./common');
 
 describe('Client terminal',function(){
 	before(function(done){
-		check(done);
+		check(buttonDisabled,done);
 	});
 
 	it("should return '"+process.env.USER+"' when I send 'whoami'",function(done){
@@ -10,7 +10,7 @@ describe('Client terminal',function(){
 		$('#execute').click();
 		async.series([
 			function(callback){
-				check(callback);			
+				check(buttonDisabled,callback);			
 			},
 			function(callback){				
 				result = $('#output').html().split("\n")[1];
@@ -71,17 +71,17 @@ describe('Client terminal',function(){
 			function(callback){
 				$("input[name='command']").val('echo $$');
 				$('#execute').click();
-				check(callback);	
+				check(buttonDisabled,callback);	
 			},
 			function(callback){
 				pid1 = parseInt($('#output').html().split('\n')[1]);
 				$("input[name='command']").val('sleep 100 & sleep 1000 & sleep 10000 & whoami');
 				$('#execute').click();
-				check(callback);
+				check(buttonDisabled,callback);
 			},
 			function(callback){
 				$('#reset').click();
-				check(callback)			
+				check(buttonDisabled,callback)			
 			},
 			function(callback){
 				exec("ps -ef | grep "+pid1,function(error,stdout,stderr){
@@ -94,7 +94,7 @@ describe('Client terminal',function(){
 				$('#output').html('');
 				$("input[name='command']").val('echo $$');
 				$('#execute').click();
-				check(callback);
+				check(buttonDisabled,callback);
 			},
 			function(callback){
 				pid2 = parseInt($('#output').html().split('\n')[1]);
