@@ -5,7 +5,7 @@
 	 "contributors" : ["Aviral Agarwal"],
     "description" : "This application creates a linux terminal like utility in your browser window. It uses sockjs node to communicate with the server",
     "keywords" : ["terminal"],
-    "scripts" : {"start" : "node ./app.js"},
+    "scripts" : {"start" : "node app.js"},
     "repository": {"type": "git",
                    "url": "https://github.com/pocha/terminal-codelearn.git"
     },
@@ -17,11 +17,11 @@
     },
     "devDependencies": {
         "ws" : ">=0.4.25",
-        "mocha" : ">=1.10.0",
         "should" : ">=1.2.2",
         "async" : ">=0.2.9",
         "jsdom" : ">=0.6.5",
-        "jQuery" : ">=1.7.4"
+        "jQuery" : ">=1.7.4",
+        "xmlhttprequest" : ">=1.5.0"
     },
     "main": "./lib/main"
 }
