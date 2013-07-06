@@ -14,9 +14,8 @@ var Client = function(){
 	}
 
 	socket.onmessage = function(e){
-		$('#output').append(colorReplace(e.data));
-		$('#output').scrollTop($('#output').prop('scrollHeight'));
-
+		appendOutput(colorReplace(e.data));
+		
 		var end_of_output = /(\$|>)\s*$/;
 
 		if(end_of_output.test(e.data)){		
@@ -27,9 +26,9 @@ var Client = function(){
 	socket.onclose = socket.onerror = function(){
 		$('#execute').attr("disabled",true);
 		if(state)		
-			$('#output').append("\nConnection to server closed.... Please click 'Reset' to reconnect");
+			appendOutput("\nConnection to server closed.... Please click 'Reset' to reconnect");
 		else
-			$('#output').append("\nCould not connect.... Please click 'Reset' to retry");
+			appendOutput("\nCould not connect.... Please click 'Reset' to retry");
 		state = false;	
 	}
 
@@ -45,7 +44,7 @@ var Client = function(){
 	socket.reset = function() {
 		socket.close();
 		$('#output').html('');
-		$('#output').append("\nConnecting...");
+		appendOutput("\nConnecting...");
 		client1 = new Client();
 	};
 
@@ -80,6 +79,11 @@ $("#myForm").submit(function(){
 
 timerFired = function (){
 	client1.close();
+}
+
+function appendOutput(data){
+	$('#output').append(data);
+	$('#output').scrollTop($('#output').prop('scrollHeight'));
 }
 
 function colorReplace(input) {
