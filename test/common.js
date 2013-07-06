@@ -25,7 +25,7 @@ GLOBAL.check = function (cond,callback){
 	if(cond()){
 		setTimeout(function(){
 			check(cond,callback);
-		},20);				
+		},100);				
 	} else {	
 		callback();
 	}
