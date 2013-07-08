@@ -6,7 +6,7 @@
 */
 
 var totalMsgs =  500;
-var URL = "ws://www.codelearn.org:1134/echo/websocket";
+var URL = "ws://localhost:1134/_sockjs/websocket";
 
 /*****************************************************************/
 var fs = require('fs');
@@ -32,6 +32,7 @@ var end_of_output = /(\$|>)\s*$/;
 		Socket = new Websocket(URL);
 
 		Socket.onopen = function() {	
+			Socket.send('');
 			console.log("Client connected.")
 		};
 

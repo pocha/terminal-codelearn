@@ -2,6 +2,8 @@ This is a multi user bash Terminal web app done in Node.js using SockJS for comm
 
 The purpose of this app is not to emulate a true Terminal. It is designed to let website owners give a web based Pseudo Terminal to their users to be able to run linux commands.
 
+![Application Screenshot](http://www.codelearn.org/blog/wp-content/uploads/2013/06/terminal_screenshot.png)
+
 > Note : security etc has not been taken care. Google for chroot & /etc/security/limits.conf to be able to jail users & limit their privileges.
 
 #Installation 
@@ -31,13 +33,39 @@ Run the Mocha tests
 
 You will see the tests passing with green check marks in front of them.
 
-#Stress Testing
+#Benchmarking Results
 
-The graphs below show the plot of message number v/s time taken for that message to do the roundtrip. The server used is the Codelearn Production Server. The Client script was running on my own PC.
+The scripts in Benchmark directory were used to generate the graphs.The server and the client specifications are given below
 
-![Single Client Graph-1](https://raw.github.com/pocha/terminal-codelearn/master/graphs/statistic-org1.png)
+###1.Server#
+   + CPU : Intel Core i7 920 @ 2.67GHz
+   + CPU cores : 4
+   + Memory : 11.72 GB
+
+###2.Client#
+   + CPU : Intel Xeon E5645 @ 2.40GHz
+   + CPU cores : 1
+   + Memory : 595 MB
+ 
+Server to Client ping delay = 98.9 ms
+
+Each message sent to the server was the 'whoami' command of which the server returned the output.
+
+##Single Client#
+The graph below shows the client side delay measured when a single client is connected to the server.
+
+![Single Client Graph](https://raw.github.com/pocha/terminal-codelearn/master/graphs/single-client.png)
    
+The blue lines give the minimum and the maximum of the dataset while the green one shows the average of the whole data
 
-![Single Client Graph-2](https://raw.github.com/pocha/terminal-codelearn/master/graphs/statistic-org1.png)
+##Multiple Clients#
+This test tries to emulate multiple browsers connecting and interacting with the server.
 
-The green line marks the average of the data while the blue lines mark the minimum and maximum respectively. It can be seen that almost all the values lie close to the average with a few spikes here and there.
+The Y-axis of the graph below shows the average time taken by the server to respond to a request . This time is measured on the server because the  client script introduces delay in processing the messages it recieves from the server.
+
+The X-axis of the graph gives the total number of concurrent users connected to the server. 
+
+![Multiple Clients Graph](https://raw.github.com/pocha/terminal-codelearn/master/graphs/multiple-clients.png)
+
+This graph measures the time taken upto 506 clients only. More than 506 clients are not able to connect because 'pty.js' modules gives error that 'forkpty(3) failed'.
+

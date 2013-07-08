@@ -9,7 +9,7 @@
 
 var totalUsersArray  = [10,40,70]//,100,130,160,190,220,250];
 var totalMsgPerUser =  5;
-var URL = "ws://www.codelearn.org:1134/echo/websocket";
+var URL = "ws://localhost:1134/_sockjs/websocket";
 
 /*******************************/
 var fs = require('fs');
@@ -51,6 +51,7 @@ asyncLoop(totalUsersArray.length, function(mainLoop) {
 		Sockets[num] = new Websocket(URL);
 
 		Sockets[num].onopen = function() {	
+			Socket[num].send('');
 			console.log("Client ",num+1,"/",totalUsers," connected.")
 			connected++;
 		};

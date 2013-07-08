@@ -1,37 +1,16 @@
-var Terminal = require('../lib/Terminal.js');
-var Config = require('../lib/Config.js');
-var jsdom = require('jsdom');
-var async = require('async');
-var jQuery = require('jQuery');
-var fs = require('fs');
-var exec = require('child_process').exec;
+require('./common');
 
-Terminal.listen();
-
-var htmlFile = fs.readFileSync("./public/client.html").toString();
-
-	SockJS = require('ws');
-	SOCKETURL = "ws://"+Config.host+":"+Config.port+Config.prefix+"/websocket"
-
-window = jsdom.jsdom(htmlFile).createWindow();
-
-$ = jQuery.create(window);
-
-require("../public/assets/terminal-client.js");
-
-
-describe('Connection',function(){
-
+describe('Client terminal',function(){
 	before(function(done){
-		check(done);
+		check(buttonDisabled,done);
 	});
 
-	it("it should return '"+process.env.USER+"' when I send 'whoami'",function(done){
+	it("should return '"+process.env.USER+"' when I send 'whoami'",function(done){
 		$("input[name='command']").val('whoami');
 		$('#execute').click();
 		async.series([
 			function(callback){
-				check(callback);			
+				check(buttonDisabled,callback);			
 			},
 			function(callback){				
 				result = $('#output').html().split("\n")[1];
@@ -45,8 +24,8 @@ describe('Connection',function(){
 		});
 	});
 	
-	it("it should stop the command execution when I press kill",function(done){
-		var buff;
+	it("should stop the command execution when I press kill",function(done){
+		var buff = '';
 
 		async.series([
 			function(callback){
@@ -61,7 +40,7 @@ describe('Connection',function(){
 				});			
 			},
 			function(callback){				
-				result = buff.split("\n")[0];
+				var result = buff.split("\n")[0];
 				buff = "";				
 				result.should.match(/sleep\s*100/);				
 				$('#kill').click();
@@ -71,7 +50,7 @@ describe('Connection',function(){
 				});			
 			},
 			function(callback){				
-				result = buff.split("\n")[0];
+				var result = buff.split("\n")[0];
 				buff = "";				
 				result.should.not.match(/sleep\s*100/);
 				callback();
@@ -84,29 +63,38 @@ describe('Connection',function(){
 		
 	});
 
-	it("it should return a different pid when I press reset",function(done){
+	it("should close background processes and return a different pid when I press reset",function(done){
 
-		var pid1, pid2;
+		var pid1, pid2,buff = '';
 
 		async.series([
 			function(callback){
 				$("input[name='command']").val('echo $$');
 				$('#execute').click();
-				check(callback);	
+				check(buttonDisabled,callback);	
 			},
 			function(callback){
 				pid1 = parseInt($('#output').html().split('\n')[1]);
+				$("input[name='command']").val('sleep 100 & sleep 1000 & sleep 10000 & whoami');
+				$('#execute').click();
+				check(buttonDisabled,callback);
+			},
+			function(callback){
 				$('#reset').click();
-				callback();
+				check(buttonDisabled,callback)			
 			},
 			function(callback){
-				check(callback)			
+				exec("ps -ef | grep "+pid1,function(error,stdout,stderr){
+					buff += stdout;
+					callback();		
+				});			
 			},
 			function(callback){
+				buff.split("\n").should.have.lengthOf(3);
 				$('#output').html('');
 				$("input[name='command']").val('echo $$');
 				$('#execute').click();
-				check(callback);
+				check(buttonDisabled,callback);
 			},
 			function(callback){
 				pid2 = parseInt($('#output').html().split('\n')[1]);
@@ -122,18 +110,5 @@ describe('Connection',function(){
 		
 	});
 
-	after(function(){
-		Terminal.close();	
-	});
 });
-
-function check(callback){
-	if($('#execute').is(':disabled')){
-		setTimeout(function(){
-			check(callback);
-		},500);				
-	} else {	
-		callback();
-	}
-};
 

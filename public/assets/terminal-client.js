@@ -1,16 +1,21 @@
 $('#execute').attr("disabled",true);
 
+var state = false;
+var client1;
+
 var Client = function(){
-	socket = new SockJS(SOCKETURL)
+
+	var socket = new SockJS(SOCKET_URL)
 
 	socket.onopen = function(){
+		socket.send(''); //Send a username here to make the pty spawn as that user
 		$('#output').html('');
+		state = true;
 	}
 
 	socket.onmessage = function(e){
-		$('#output').append(colorReplace(e.data));
-		$('#output').scrollTop($('#output').prop('scrollHeight'));
-
+		appendOutput(colorReplace(e.data));
+		
 		var end_of_output = /(\$|>)\s*$/;
 
 		if(end_of_output.test(e.data)){		
@@ -18,8 +23,13 @@ var Client = function(){
 		};
 	}
 
-	socket.onclose = function(){
+	socket.onclose = socket.onerror = function(){
 		$('#execute').attr("disabled",true);
+		if(state)		
+			appendOutput("\nConnection to server closed.... Please click 'Reset' to reconnect");
+		else
+			appendOutput("\nCould not connect.... Please click 'Reset' to retry");
+		state = false;	
 	}
 
 
@@ -32,14 +42,16 @@ var Client = function(){
 	}	
 
 	socket.reset = function() {
-		socket.close()
-		socket = new Client();
+		socket.close();
+		$('#output').html('');
+		appendOutput("\nConnecting...");
+		client1 = new Client();
 	};
 
 	return socket;	
 }
 
-socket = new Client();
+client1 = new Client();
 
 $("#myForm").submit(function(){
 	if($('#execute').is(':disabled') == false){
@@ -50,21 +62,29 @@ $("#myForm").submit(function(){
 //Buttons
 	$("#execute").click(function(){
 		command = $("input[name='command']").val();			
-		socket.execute(command);
+		client1.execute(command);
 		$("input[name='command']").val('');
 		$('#execute').attr("disabled",true);
 	});
 
 	$("#kill").click(function(){
-		socket.kill();
+		client1.kill();
 		$('#execute').attr("disabled",true);
 	});
 
 	$("#reset").click(function(){
-		socket.reset();
+		client1.reset();
 		$('#execute').attr("disabled",true);
 	});
 
+timerFired = function (){
+	client1.close();
+}
+
+function appendOutput(data){
+	$('#output').append(data);
+	$('#output').scrollTop($('#output').prop('scrollHeight'));
+}
 
 function colorReplace(input) {
 
