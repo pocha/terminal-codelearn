@@ -20,6 +20,18 @@ This will start the server at port 1134.
 
 Now go to **http://localhost:1134/client.html** to see the application running.
 
+To start the server as daemon you can use [Forever](https://github.com/nodejitsu/forever).
+Install Forever by
+
+	npm install forever -g
+
+Now you can start the server as daemon
+
+	forever start -l forever.log -o out.log -e err.log app.js
+
++ `-l` logs the forever output to forever.log
++ `-o` logs stdout from app.js to out.log
++ `-e` logs stderr from app.js to err.log
 
 #Testing
 
