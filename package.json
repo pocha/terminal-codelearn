@@ -13,12 +13,13 @@
         "sockjs" : "0.3.7",
         "pty.js" : ">=0.2.2",
         "node-static" : ">=0.6.9",
-        "nodemailer" : ">=0.5.0"
+        "nodemailer" : ">=0.5.0",
+        "mongoose" : ">=3.6.14",
+        "async" : ">=0.2.9"
     },
     "devDependencies": {
         "ws" : ">=0.4.25",
         "should" : ">=1.2.2",
-        "async" : ">=0.2.9",
         "jsdom" : ">=0.6.5",
         "jQuery" : ">=1.7.4",
         "xmlhttprequest" : ">=1.5.0"
