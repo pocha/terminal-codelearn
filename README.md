@@ -39,22 +39,51 @@ Install the modules required for testing.
 
 	npm install --dev
 
+Install [Mocha](http://visionmedia.github.io/mocha/) by
+
+	npm install -g mocha
+
 Run the Mocha tests
   
 	mocha -r should -R spec
 
 You will see the tests passing with green check marks in front of them.
 
-#Benchmarking Results
+#Features
+
+###1.Spawn Terminal as a different user#
+When the connection opens for the first time, a username can be sent to the server. The server then spawns the Terminal as that user.
+
+If an empty string is sent, the user with which the Server was started will be the current user of the Terminal as well.
+
+
+###2.Send a eMail about error
+This application uses [Nodemailer](https://github.com/andris9/Nodemailer) to send email about errors. You can change the settings according to yourself in the file `lib/mailer.js`. The response whether the email was succesful or not is logged in the `email.log` file. 
+
+#Benchmarking
+
+##How to do benchmarking ?
+
+For server side Benchmarking, checkout the Server-profiling branch and run the server from there.
+In this benchmarking results are averaged out over all the commands that a particular user runs as well as over the numbers of users who have been connected till now. To reset the averages, restart the server.
+
+For client side Benchmarking, there are two scripts available in the benchmarking directory
+
++ `multiple-clients.js` Opens multiple connections to a single server and sends a particular number of messages through each connection. The average time per user per message at a particular concurrency level is recorded in `output-mutltiple.dat` file.
+
++ `single-client.js` Opens a single connection to the server and sends a particular number of messages . The time taken for the client to receive the output from the server for each request is recorded in `output-single.dat` file.
+
+
+##Results
 
 The scripts in Benchmark directory were used to generate the graphs.The server and the client specifications are given below
 
-###1.Server#
+####1.Server#
    + CPU : Intel Core i7 920 @ 2.67GHz
    + CPU cores : 4
    + Memory : 11.72 GB
 
-###2.Client#
+####2.Client#
    + CPU : Intel Xeon E5645 @ 2.40GHz
    + CPU cores : 1
    + Memory : 595 MB
@@ -63,17 +92,17 @@ Server to Client ping delay = 98.9 ms
 
 Each message sent to the server was the 'whoami' command of which the server returned the output.
 
-##Single Client#
+###Single Client#
 The graph below shows the client side delay measured when a single client is connected to the server.
 
 ![Single Client Graph](https://raw.github.com/pocha/terminal-codelearn/master/graphs/single-client.png)
    
 The blue lines give the minimum and the maximum of the dataset while the green one shows the average of the whole data
 
-##Multiple Clients#
+###Multiple Clients#
 This test tries to emulate multiple browsers connecting and interacting with the server.
 
-The Y-axis of the graph below shows the average time taken by the server to respond to a request . This time is measured on the server because the  client script introduces delay in processing the messages it recieves from the server.
+The Y-axis of the graph below shows the average time taken by the server to respond to a request . This time is measured on the server because the  client script introduces delay in processing the messages it receives from the server.
 
 The X-axis of the graph gives the total number of concurrent users connected to the server. 
 
