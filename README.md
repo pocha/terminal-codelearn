@@ -57,17 +57,29 @@ When the connection opens for the first time, a username can be sent to the serv
 If an empty string is sent, the user with which the Server was started will be the current user of the Terminal as well.
 
 
-###2.Send a eMail about error
+###2.Send an eMail about an error
 This application uses [Nodemailer](https://github.com/andris9/Nodemailer) to send email about errors. You can change the settings according to yourself in the file `lib/mailer.js`. The response whether the email was succesful or not is logged in the `email.log` file. 
+
+
+###3.Log data in MongoDb
+The application logs each command executed by the user with it's output and time at which it was executed in MongoDb. [MongoDb](http://www.mongodb.org) is an open source and a NoSQL database. You can follow the [Installation Guide](http://docs.mongodb.org/manual/installation) to install MongoDb on your specific platform.
+
 
 #Benchmarking
 
 ##How to do benchmarking ?
 
-For server side Benchmarking, checkout the Server-profiling branch and run the server from there.
-In this benchmarking results are averaged out over all the commands that a particular user runs as well as over the numbers of users who have been connected till now. To reset the averages, restart the server.
+For server side Benchmarking, checkout the server-profiling branch
 
-For client side Benchmarking, there are two scripts available in the benchmarking directory
+	git checkout server-profiling
+
+Now run the server. In this benchmarking, results are averaged out over all the commands that a particular user runs as well as over the numbers of users who have been connected till now. 
+
+> Note: To reset the averages, restart the server.
+
+For client side Benchmarking, there are two scripts available in the benchmarking directory. You can run the scripts by
+
+	node <script_name>
 
 + `multiple-clients.js` Opens multiple connections to a single server and sends a particular number of messages through each connection. The average time per user per message at a particular concurrency level is recorded in `output-mutltiple.dat` file.
 
