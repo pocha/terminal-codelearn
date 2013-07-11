@@ -1,4 +1,5 @@
-require('./common');
+require('./initialize-server');
+require('./initialize-client');
 
 describe('Mailer',function(){
 	it("should send a mail if I process a new error",function(done){

@@ -1,14 +1,13 @@
 $('#execute').attr("disabled",true);
 
 var state = false;
-var client1;
 
 var Client = function(){
 
 	var socket = new SockJS(SOCKET_URL)
 
 	socket.onopen = function(){
-		socket.send(''); //Send a username here to make the pty spawn as that user
+		socket.send(JSON.stringify({user: USERNAME, signature: SIGNATURE})); //Send a username here to make the pty spawn as that user
 		$('#output').html('');
 		state = true;
 	}
@@ -16,11 +15,11 @@ var Client = function(){
 	socket.onmessage = function(e){
 		appendOutput(colorReplace(e.data));
 		
-		var end_of_output = /(\$|>)\s*$/;
+		//var end_of_output = /(\$|>)\s*$/;
 
-		if(end_of_output.test(e.data)){		
+		//if(end_of_output.test(e.data)){		
 			$('#execute').attr("disabled",false);	
-		};
+		//};
 	}
 
 	socket.onclose = socket.onerror = function(){

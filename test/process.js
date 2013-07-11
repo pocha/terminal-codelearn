@@ -1,4 +1,5 @@
-require('./common');
+require('./initialize-server');
+require('./initialize-client');
 
 describe('Connection',function(){
 		
@@ -6,6 +7,7 @@ describe('Connection',function(){
 		check(buttonDisabled,done);
 	});
 
+	/* Test not needed for now 
 	it("should be owned by '"+process.env.USER+"'",function(done){
 
 		var buff = '';		
@@ -14,7 +16,7 @@ describe('Connection',function(){
 			function(callback){
 				$("input[name='command']").val('echo $$');
 				$('#execute').click();
-				check(buttonDisabled,callback);	
+				check(checkMsgInOutput('echo \$\$\n\d+\n'),callback);	
 			},
 			function(callback){
 				pid = parseInt($('#output').html().split('\n')[1]);
@@ -34,17 +36,17 @@ describe('Connection',function(){
 			done();	
 		});
 
-	});
+	}); */
 
 	it("should display the connection closed message when I send 'exit'",function(done){
 		async.series([
 			function(callback){
 				$("input[name='command']").val('exit');
 				$('#execute').click();
-				check(function(){return checkLength(2)},callback);
+				check(checkMsgInOutput('Connection to server closed'),callback);
 			},
 			function(callback){
-				$('#output').html().should.match(/connection to server closed/i);
+				client1.readyState.should == 0
 				$('#reset').click();
 				check(buttonDisabled,callback);
 			}
@@ -61,10 +63,10 @@ describe('Connection',function(){
 			function(callback){
 				Terminal.close();
 				$('#reset').click();
-				check(function(){return checkLength(3)},callback);
+				check(checkMsgInOutput('Could not connect'),callback);
 			},
 			function(callback){
-				$('#output').html().should.match(/could not connect/i);
+				client1.readyState.should == 0
 				Terminal.listen(callback);
 			},
 			function(callback){
@@ -83,10 +85,10 @@ describe('Connection',function(){
 		async.series([
 			function(callback){
 				timerFired();
-				check(function(){return checkLength(2)},callback);
+				check(checkMsgInOutput('Connection to server closed'),callback);
 			},
 			function(callback){
-				$('#output').html().should.match(/connection to server closed/i);
+				client1.readyState.should == 0
 				$('#reset').click();
 				check(buttonDisabled,callback);
 			}

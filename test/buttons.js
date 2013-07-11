@@ -1,4 +1,5 @@
-require('./common');
+require('./initialize-server');
+require('./initialize-client');
 
 describe('Client terminal',function(){
 	before(function(done){
