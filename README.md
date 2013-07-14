@@ -45,7 +45,7 @@ Install [Mocha](http://visionmedia.github.io/mocha/) by
 
 Run the Mocha tests
   
-	mocha -r should -R spec
+	sudo mocha -r should -R spec
 
 You will see the tests passing with green check marks in front of them.
 

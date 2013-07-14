@@ -5,28 +5,32 @@ var log_exec_output = function (error, stdout, stderr) {
 }
 
 require('./initialize-server')
+require('./initialize-client')
 
 var crypto = require('crypto')
 
 var user = "user_1"
 var incorrect_user = "user_2"
 
-before(function(done) {
-	exec("useradd --home /home/" + user + " --create-home --shell /bin/bash " + user, log_exec_output )
-	console.log("here")
-	//exec("echo -e 'password\npassword' | passwd user_1", log_exec_output(error,stdout,stderr))
-	done()
-})
+
 
 describe("Testing with right username & signature", function() {
 
 	before(function(done) {
-		GLOBAL.username = user
-		var hmac = crypto.createHmac('sha1', Config.secret) //change secret to the key inside sockjs_app.js
-		hmac.update(username)
-		GLOBAL.signature = hmac.digest('hex')
+		exec("useradd --home /home/" + user + " --create-home --shell /bin/bash " + user, function(){
+			done();
+		});
+		//console.log("here");
+		//exec("echo -e 'password\npassword' | passwd user_1", log_exec_output(error,stdout,stderr))
+	});
 
-		require ("./initialize-client")
+	before(function(done) {
+		USERNAME = user
+		var hmac = crypto.createHmac('sha1', Config.secret) //change secret to the key inside sockjs_app.js
+		hmac.update(USERNAME)
+		SIGNATURE = hmac.digest('hex')
+
+		$('#reset').click();
 
 		check(buttonDisabled,done)
 	})
@@ -40,7 +44,7 @@ describe("Testing with right username & signature", function() {
 			},
 			function(callback){
 				var result = $("#output").html().toString().split("\n");
-				result[1].should == username;
+				result[1].should.match(new RegExp(USERNAME));
 				callback();
 			}
 			],
@@ -60,7 +64,7 @@ describe("Testing with right username & signature", function() {
 			},
 			function(callback){
 				var result = $("#output").html().toString().split("\n");
-				result[1].should == '/home/' + username;
+				result[1].should.match(new RegExp('/home/' + USERNAME));
 				callback();
 			}
 			],
@@ -75,30 +79,35 @@ describe("Testing with right username & signature", function() {
 			function(callback){
 				$("input[name='command']").val('exit');
 				$('#execute').click();
-				check(checkLength(2),callback);	
+				check(checkLength(4),callback);	
 			},
 			function(callback){
-				client1.readyState.should == 0
-			callback();
+				client1.readyState.should.equal(3);
+				callback();
 			}
 			],
 			function(){
 				$('#output').html('');
 				done();	
 			});
+	});
+
+	after(function() {
+		//delete user
+		exec("userdel " + user, log_exec_output);
 	})
 })
 
 describe("Testing with correct user & incorrect signature", function() {
 	before(function(done){
-		GLOBAL.username = user
-		GLOBAL.signature = "somearbitsignature"
-		require ("./initialize-client")
-		check(checkLength(1),done)
+		USERNAME = user;
+		SIGNATURE = "somearbitsignature";
+		$('#reset').click();
+		check(checkMsgInOutput('Connection to server closed'),done);
 	})
 
 	it("sockJS client should be inactive to start with", function(done) {
-		client1.readyState.should == 0
+		client1.readyState.should.equal(3);
 		$('#output').html('');
 		done()
 	})
@@ -107,23 +116,28 @@ describe("Testing with correct user & incorrect signature", function() {
 
 describe("Testing with incorrect user & correct signature", function() {
 	before(function(done) {
-		GLOBAL.username = incorrect_user
+		USERNAME = incorrect_user
 		var hmac = crypto.createHmac('sha1', Config.secret) //change secret to the key inside sockjs_app.js
-		hmac.update(username)
-		GLOBAL.signature = hmac.digest('hex')
+		hmac.update(USERNAME)
+		SIGNATURE = hmac.digest('hex')
 
-		require ("./initialize-client")
-		setTimeout(done,2000)
+		$('#reset').click();
+		check(checkLength(3),done);
 	})
 
-	it("sockJS client should be inactive. User does not see any output",function(done) {
-		client1.readyState.should == 0
-		$("#output").html().should == ""
+	it("sockJS client should be inactive. User should see 'Unknown Id' message",function(done) {
+		$('#output').html().should.match(new RegExp('Unknown id: '+incorrect_user)); 
+		client1.readyState.should.equal(3);
 		done()
 	})
-})
 
-after(function(done) {
-	exec("userdel " + user, log_exec_output)
-	done()
-})
+	after(function() {
+		//reset state
+		USERNAME = '';
+		SIGNATURE = '';
+		$('#reset').click();
+	});
+
+});
+
+
