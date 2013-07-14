@@ -18,6 +18,7 @@ GLOBAL.window = jsdom.jsdom(htmlFile).createWindow();
 
 GLOBAL.$ = jQuery.create(window);
 
+require("../public/assets/ansi_to_html.js");
 require("../public/assets/terminal-client.js");
 
 GLOBAL.check = function (cond,callback){

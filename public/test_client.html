@@ -22,10 +22,20 @@
 				</div>
 			</div>
 
-<script> var SOCKET_URL = 'http://'+window.location.host+'/_sockjs'; </script>
+
+			<script> 
+				var SOCKET_URL = 'http://'+window.location.host+'/_sockjs';
+				/*var USERNAME = "user_3"; //pass username 
+				var SIGNATURE = "9c2813526b234857a0bf04e86b4fe76e1fe73b49"; //pass SHA1 encrypted username
+				var USERNAME = "user_2"; //pass username 
+				var SIGNATURE = "6e58721f5ad52b715e5558b145d04ce5c581539b"; //pass SHA1 encrypted username*/
+				var USERNAME = ""
+				var SIGNATURE = ""
+				var client1 //sockjs client defined globally so that it can be used in mocha tests
+			</script>
+<script src="assets/ansi_to_html.js" type="text/javascript"></script>
 <script src="assets/terminal-client.js" type="text/javascript"></script>
 <script src="assets/idle-timer.min.js" type="text/javascript"></script>
 <script src="assets/input-timer.js" type="text/javascript"></script>
-</script>
 </body>
 </html>
