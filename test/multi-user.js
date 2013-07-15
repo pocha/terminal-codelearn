@@ -94,7 +94,7 @@ describe("Testing with right username & signature", function() {
 
 	after(function() {
 		//delete user
-		exec("userdel " + user, log_exec_output);
+		exec("userdel -r " + user, log_exec_output);
 	})
 })
 
