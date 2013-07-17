@@ -29,9 +29,6 @@ Now you can start the server as daemon
 
 	forever start app.js
 
-+ `-l` logs the forever output to forever.log
-+ `-o` logs stdout from app.js to out.log
-+ `-e` logs stderr from app.js to err.log
 
 #Testing
 
