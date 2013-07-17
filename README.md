@@ -27,7 +27,7 @@ Install Forever by
 
 Now you can start the server as daemon
 
-	forever start -l forever.log -o out.log -e err.log app.js
+	forever start app.js
 
 + `-l` logs the forever output to forever.log
 + `-o` logs stdout from app.js to out.log
@@ -51,17 +51,21 @@ You will see the tests passing with green check marks in front of them.
 
 #Features
 
-###1.Spawn Terminal as a different user#
+###1.Log data in files#
+This application logs all the errors in the `err.log` file.
+Also all the miscellaneous logs are logged in the `out.log` file.
+
+###2.Spawn Terminal as a different user#
 When the connection opens for the first time, a username can be sent to the server. The server then spawns the Terminal as that user.
 
 If an empty string is sent, the user with which the Server was started will be the current user of the Terminal as well.
 
 
-###2.Send an eMail about an error
+###3.Send an eMail about an error
 This application uses [Nodemailer](https://github.com/andris9/Nodemailer) to send email about errors. You can change the settings according to yourself in the file `lib/mailer.js`. The response whether the email was succesful or not is logged in the `email.log` file. 
 
 
-###3.Log data in MongoDb
+###4.Log data in MongoDb
 The application logs each command executed by the user with it's output and time at which it was executed in MongoDb. [MongoDb](http://www.mongodb.org) is an open source and a NoSQL database. You can follow the [Installation Guide](http://docs.mongodb.org/manual/installation) to install MongoDb on your specific platform.
 
 

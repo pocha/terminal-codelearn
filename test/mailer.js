@@ -18,6 +18,8 @@ describe('Mailer',function(){
 			}
 		],
 		function(){
+			if(fs.existsSync('email.log'))
+					fs.unlinkSync('email.log');
 			done();	
 		});
 
