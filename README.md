@@ -6,6 +6,7 @@ The purpose of this app is **NOT** to emulate a true Terminal. It is designed to
 
 - **No typing lag** Unlike any other web Terminal emulation on the web (or a remote SSH client), which reports every keypress to the backend & eventually slowing down the typing, this app only sends data when 'enter' key is pressed making typing of commands super-fast.
 - **Super fast execution & data transfer** The app uses Node.js backend & [SockJS](http://sockjs.org) for communication. You probably cant get anything else doing things faster than what the two beasts are doing. Scroll down to check latency figures.
+- **Works for users behind proxy** One of the most popular project [Gateone](http://github.com/liftoff/GateOne) does not work behind proxy. Since the project uses SockJS, the client protocol degrades to a non-websocket protocol behind proxy.
 
 ##Cons
 
