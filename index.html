@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="assets/css/layout-default-latest.css" media="all" rel="stylesheet" type="text/css" />			
+		<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+
+		<script src="assets/js/jquery-latest.js" type="text/javascript"></script>
+		<script src="assets/js/jquery-ui-latest.js" type="text/javascript"></script>
+		<script src="assets/js/jquery.layout-latest.js" type="text/javascript"></script>
+		<script>
+			$(document).ready(function () {
+
+				// this layout could be created with NO OPTIONS - but showing some here just as a sample...
+				// myLayout = $('body').layout(); -- syntax with No Options
+
+				$('body').layout({
+					north__size: 55
+					,north__spacing_open:		0
+					, 	east__size: 0.5 
+					, 	center__size: 0.5
+					, east__maskContents: true
+					, closable : false
+				});
+
+				//resizeTreeSlider()
+			})
+
+		</script>
+	</head>
+	<body>
+
+
+		<DIV class="ui-layout-north" style=" margin:0px; padding:0px;">
+			<div class="navbar navbar-fluid-top navbar-inverse">
+				<div class="navbar-inner">
+					<div class="container-fluid" style="padding-right:0px;">
+						<a class="brand" href="http://www.codelearn.org" style="font-size:30px; font-weight:900; margin-top:5px;">Terminal Demo</a>
+						<a class="btn btn-navbar" data-target=".nav-collapse" data-toggle="collapse">
+							<span class="icon-bar"> </span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+
+						<div class="container-fluid nav-collapse collapse" style="padding-right:0px;">
+
+							<style>
+								.nav.pull-right li {
+									padding-top:12px;
+									padding-bottom:0;
+								}
+							</style>
+							<ul class="nav pull-right">
+								<li><a href="#"><iframe allowtransparency="true" frameborder="0" scrolling="no" src="http://platform.twitter.com/widgets/follow_button.1347008535.html#_=1351075047580&amp;id=twitter-widget-0&amp;lang=en&amp;screen_name=codelearn&amp;show_count=true&amp;show_screen_name=false&amp;size=s" class="twitter-follow-button" style="width: 150px; height: 20px; " title="Twitter Follow Button" data-twttr-rendered="true"></iframe></a></li>
+								<li><a href="#"><iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Ffacebook.com%2FCodelearn&amp;send=false&amp;layout=button_count&amp;width=110&amp;show_faces=false&amp;action=like&amp;colorscheme=light&amp;font&amp;height=21&amp;appId=208006552635000" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:110px; height:21px;" allowTransparency="true"></iframe></a></li>
+								<li><a href="#"><iframe src="http://ghbtns.com/github-btn.html?user=pocha&repo=terminal-codelearn&type=watch&count=true"
+										allowtransparency="true" frameborder="0" scrolling="0" width="80" height="20"></iframe></a></li>
+								<li><a href="#"><iframe src="http://ghbtns.com/github-btn.html?user=pocha&repo=terminal-codelearn&type=fork&count=true"
+										allowtransparency="true" frameborder="0" scrolling="0" width="80" height="20"></iframe></a></li>
+							</ul>
+						</div><!--/.nav-collapse -->
+					</div>
+				</div>
+			</div>
+
+		</DIV>
+
+
+		<DIV class="ui-layout-center" style=" margin:0px; padding:0px; position:relative;">
+			hello there
+		</DIV>
+		<DIV class="ui-layout-east" style=" margin:0px; padding:0px; overflow:hidden">
+			<iframe id="terminal" src="http://terminal.codelearn.org/client.html" style="width:100%; height:100%; padding:10px;" frameborder=0 onload="resizeTerminalBody()"></iframe>
+		</DIV><!-- codelearn -->
+
+		<!-- Facebook --> 
+		<script>(function(d, s, id) {
+			var js, fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) return;
+			js = d.createElement(s); js.id = id;
+			js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+			fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));
+	</script>
+
+</body>
+
+
+</html>
