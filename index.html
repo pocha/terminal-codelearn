@@ -7,11 +7,20 @@
 		<script src="assets/js/jquery-latest.js" type="text/javascript"></script>
 		<script src="assets/js/jquery-ui-latest.js" type="text/javascript"></script>
 		<script src="assets/js/jquery.layout-latest.js" type="text/javascript"></script>
+		<script src="assets/js/showdown.js" type="text/javascript"></script>
+		<script src="assets/js/github.js" type="text/javascript"></script>
 		<script>
 			$(document).ready(function () {
 
 				// this layout could be created with NO OPTIONS - but showing some here just as a sample...
 				// myLayout = $('body').layout(); -- syntax with No Options
+
+
+				$.get("README.md", function(data) {
+					console.log($(data).html())
+					var converter = new Showdown.converter({extensions: ['github']});
+					$(".ui-layout-center").html(converter.makeHtml(data))
+				})
 
 				$('body').layout({
 					north__size: 55
@@ -66,10 +75,9 @@
 
 
 		<DIV class="ui-layout-center" style=" margin:0px; padding:0px; position:relative;">
-			hello there
 		</DIV>
 		<DIV class="ui-layout-east" style=" margin:0px; padding:0px; overflow:hidden">
-			<iframe id="terminal" src="http://terminal.codelearn.org/client.html" style="width:100%; height:100%; padding:10px;" frameborder=0 onload="resizeTerminalBody()"></iframe>
+			<iframe id="terminal" src="http://terminal.codelearn.org/client.html" style="width:100%; height:100%; padding:10px;" frameborder=0></iframe>
 		</DIV><!-- codelearn -->
 
 		<!-- Facebook --> 
