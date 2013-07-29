@@ -1,34 +1,42 @@
-Pseudo Bash Terminal on Web
+Pseudo Linux Bash Terminal on Web
 -----------------------
-The purpose of this app is not to emulate a true Terminal. It is designed to let website owners give a web based Pseudo Terminal to their users to be able to run linux commands. It is characterized by following features :-
+The purpose of this app is **NOT** to emulate a true Terminal. It is designed to let website owners give a web based Pseudo Terminal to their users to be able to run linux commands. It is characterized by following features :-
 
 - **No typing lag** Unlike any other web Terminal emulation on the web (or a remote SSH client), which reports every keypress to the backend & eventually slowing down the typing, this app only sends data when 'enter' key is pressed making typing of commands super-fast.
 - **Super fast execution & data transfer** The app uses Node.js backend & [SockJS](http://sockjs.org) for communication. You probably cant get anything else doing things faster than what the two beasts are doing. Scroll down to check latency figures.
 
-Check the [live demo](http://pocha.github.io/terminal-codelearn)
-
-
 ![Application Screenshot](http://www.codelearn.org/blog/wp-content/uploads/2013/06/terminal_screenshot.png)
 
-> Note : security etc has not been taken care. Google for chroot & /etc/security/limits.conf to be able to jail users & limit their privileges.
+Check the [live demo](http://pocha.github.io/terminal-codelearn)
+
+> Note : Server side security is not covered as part of this app. You need to jail the Terminal user & limit his system privileges using /etc/security/limits.conf . 
 
 ##Features
 
 
-######1.Multi user support##
-When the connection opens for the first time, a username can be sent to the server. The server then spawns the Terminal as that user.
+######1. Multi user support##
+Set `USERNAME` & `SIGNATURE` variable in public/client.html to spawn Terminal as a linux user with the USERNAME value you specified. `SIGNATURE` is a ssha encrypted USERNAME with `secret` (defined in lib/config.js . Feel free to change it).
 
-If an empty string is sent, the user with which the Server was started will be the current user of the Terminal as well.
+While integrating the Terminal in your app, you need to 'externally' generate SIGNATURE for the USERNAME & set the value in public/client.html . Here is a Node.js code to generate the same
+      
 
-######2.Terminal command logging in Mongodb
-The application logs each command executed by the user with it's output and time at which it was executed in MongoDb. [MongoDb](http://www.mongodb.org) is an open source and a NoSQL database. You can follow the [Installation Guide](http://docs.mongodb.org/manual/installation) to install MongoDb on your specific platform.
+      crypto = require('crypto')
+	  var hmac = crypto.createHmac('sha1', Config.secret) //change secret to the key inside lib/config.js
+      hmac.update(USERNAME)
+      SIGNATURE = hmac.digest('hex')
 
 
-######3.Error intimation emails to admin
+You may leave USERNAME & SIGNATURE empty in public/client.html . In that case, the user with which the server was started will be the owner of the Terminal.
+
+######2. Terminal command logging in Mongodb
+The application logs each command executed by the user with it's output and time at which it was executed in MongoDB. [MongoDB](http://www.mongodb.org) is an open source and a NoSQL database. You can follow the [Installation Guide](http://docs.mongodb.org/manual/installation) to install MongoDb on your specific platform.
+
+
+######3. Error intimation emails to admin
 This application uses [Nodemailer](https://github.com/andris9/Nodemailer) to send email about errors. You can change the settings according to yourself in the file `lib/mailer.js`. The response whether the email was succesful or not is logged in the `email.log` file. 
 
 
-######4.Logging##
+######4. Logging##
 This application logs all the errors in the `err.log` file.
 Also all the miscellaneous logs are logged in the `out.log` file.
 
@@ -73,7 +81,7 @@ Run the Mocha tests
 You will see the tests passing with green check marks in front of them.
 
 
-##Benchmarking
+##Latency benchmark data
 
 ####How-to run benchmark tests
 
@@ -94,9 +102,9 @@ For client side Benchmarking, there are two scripts available in the benchmarkin
 + `single-client.js` Opens a single connection to the server and sends a particular number of messages . The time taken for the client to receive the output from the server for each request is recorded in `output-single.dat` file.
 
 
-####Benchmark Results
+####Benchmarking Results
 
-The scripts in Benchmark directory were used to generate the graphs.The server and the client specifications are given below
+The scripts in benchmark directory were used to generate the graphs.The server and the client specifications are given below
 
 ########1.Server##
    + CPU : Intel Core i7 920 @ 2.67GHz
