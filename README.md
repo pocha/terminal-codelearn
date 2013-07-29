@@ -1,13 +1,21 @@
 Pseudo Linux Bash Terminal on Web
 -----------------------
-The purpose of this app is **NOT** to emulate a true Terminal. It is designed to let website owners give a web based Pseudo Terminal to their users to be able to run linux commands. It is characterized by following features :-
+The purpose of this app is **NOT** to emulate a true Terminal. It is designed to let website owners give a web based Pseudo Terminal to their users to be able to run linux commands.
+
+##Characterstics
 
 - **No typing lag** Unlike any other web Terminal emulation on the web (or a remote SSH client), which reports every keypress to the backend & eventually slowing down the typing, this app only sends data when 'enter' key is pressed making typing of commands super-fast.
 - **Super fast execution & data transfer** The app uses Node.js backend & [SockJS](http://sockjs.org) for communication. You probably cant get anything else doing things faster than what the two beasts are doing. Scroll down to check latency figures.
 
+##Cons
+
+- **Bash shortcuts do not work**  Bash shortcuts like tab autocomplete, previous/next command navigation using up/down arrow key etc does not work. The data is sent to the server only on 'enter' press & the response is populated in the output area.
+- **Can not run Vim/Emacs** Again since every keypress does not get reported, things simply hung while running Vim or Emacs.
+
+
 ![Application Screenshot](http://www.codelearn.org/blog/wp-content/uploads/2013/06/terminal_screenshot.png)
 
-Check the [live demo](http://pocha.github.io/terminal-codelearn)
+Check the [live demo](http://pocha.github.io/terminal-codelearn). The app is currently deployed in production in [Codelearn Playground](http://www.codelearn.org/apps/code_play).
 
 > Note : Server side security is not covered as part of this app. You need to jail the Terminal user & limit his system privileges using /etc/security/limits.conf . 
 
