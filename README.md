@@ -2,13 +2,13 @@
 
 The purpose of this app is **NOT** to emulate a true Terminal. It is designed to let website owners give a web based Pseudo Terminal to their users who can run linux commands.
 
-##Unique Features##
+**Unique Features**
 
 - **No typing lag** Unlike any other web Terminal emulation on the web (or a remote SSH client), which reports every keypress to the backend & eventually slowing down the typing, this app only sends data when 'enter' key is pressed making typing of commands super-fast.
 - **Super fast execution & data transfer** The app uses Node.js backend & [SockJS](http://sockjs.org) for communication. You probably cant get anything else doing things faster than what the two beasts are doing. Scroll down to check latency figures.
 - **Works for users behind proxy** One of the most popular project [Gateone](http://github.com/liftoff/GateOne) which solved the problem, does not work behind proxy. Since this project has SockJS, the communication protocol degrades to a non-websocket protocol behind proxy keeping the functionality alive.
 
-##Cons##
+**Cons**
 
 - **Bash shortcuts do not work**  Bash shortcuts like tab autocomplete, previous/next command navigation using up/down arrow key etc does not work. The data is sent to the server only on 'enter' press & the response is populated in the output area.
 - **Can not run Vim/Emacs** Again since every keypress does not get reported, things simply hung while running Vim or Emacs.
@@ -20,10 +20,10 @@ Check the [live demo](http://pocha.github.io/terminal-codelearn). The app is cur
 
 > Note : Server side security is not covered as part of this app. You need to jail the Terminal user & limit his system privileges using /etc/security/limits.conf . 
 
-##Additional Features##
+###Additional Features###
 
 
-###1. Multi user support###
+**1. Multi user support**
 Set `USERNAME` & `SIGNATURE` variable in public/client.html to spawn Terminal as a linux user with the USERNAME value you specified. `SIGNATURE` is a ssha encrypted USERNAME with `secret` (defined in lib/config.js . Feel free to change it).
 
 While integrating the Terminal in your app, you need to 'externally' generate SIGNATURE for the USERNAME & set the value in public/client.html . Here is a Node.js code to generate the same
@@ -37,22 +37,22 @@ While integrating the Terminal in your app, you need to 'externally' generate SI
 
 You may leave USERNAME & SIGNATURE empty in public/client.html . In that case, the user with which the server was started will be the owner of the Terminal.
 
-###2. Terminal command logging in Mongodb###
+**2. Terminal command logging in Mongodb**
 The application logs each command executed by the user with it's output and time at which it was executed in MongoDB. [MongoDB](http://www.mongodb.org) is an open source and a NoSQL database. You can follow the [Installation Guide](http://docs.mongodb.org/manual/installation) to install MongoDb on your specific platform.
 
 
-###3. Error intimation emails to admin###
+**3. Error intimation emails to admin**
 This application uses [Nodemailer](https://github.com/andris9/Nodemailer) to send email about errors. You can change the settings according to yourself in the file `lib/mailer.js`. The response whether the email was succesful or not is logged in the `email.log` file. 
 
 
-###4. Logging###
+**4. Logging**
 This application logs all the errors in the `err.log` file.
 Also all the miscellaneous logs are logged in the `out.log` file.
 
 
-##Latency##
+###Latency###
 
-###How-to run benchmark tests###
+**How-to run benchmark tests**
 
 For server side Benchmarking, checkout the server-profiling branch
 
@@ -71,16 +71,18 @@ For client side Benchmarking, there are two scripts available in the benchmarkin
 + `single-client.js` Opens a single connection to the server and sends a particular number of messages . The time taken for the client to receive the output from the server for each request is recorded in `output-single.dat` file.
 
 
-###Benchmarking Results###
+**Benchmarking Results**
 
 The scripts in benchmark directory were used to generate the graphs.The server and the client specifications are given below
 
-#####1.Server####
+1. Server configuration
+
    + CPU : Intel Core i7 920 @ 2.67GHz
    + CPU cores : 4
    + Memory : 11.72 GB
 
-####2.Client####
+2. Client configuration
+
    + CPU : Intel Xeon E5645 @ 2.40GHz
    + CPU cores : 1
    + Memory : 595 MB
@@ -89,14 +91,14 @@ Server to Client ping delay = 98.9 ms
 
 Each message sent to the server was the 'whoami' command of which the server returned the output.
 
-####Single client benchmark data####
+**Single client benchmark data**
 The graph below shows the client side delay measured when a single client is connected to the server.
 
 ![Single Client Graph](https://raw.github.com/pocha/terminal-codelearn/master/graphs/single-client.png)
    
 The blue lines give the minimum and the maximum of the dataset while the green one shows the average of the whole data
 
-####Multiple clients benchmark data ####
+**Multiple clients benchmark data**
 This test tries to emulate multiple browsers connecting and interacting with the server.
 
 The Y-axis of the graph below shows the average time taken by the server to respond to a request . This time is measured on the server because the  client script introduces delay in processing the messages it receives from the server.
@@ -107,7 +109,7 @@ The X-axis of the graph gives the total number of concurrent users connected to 
 
 This graph measures the time taken upto 506 clients only. More than 506 clients are not able to connect because 'pty.js' modules gives error that 'forkpty(3) failed'.
 
-##Installation##
+###Installation###
 
 Install the modules required to run the application.
 
@@ -131,7 +133,7 @@ Now you can start the server as daemon
 	forever start app.js
 
 
-##Mocha tests##
+###Mocha tests###
 
 Install the modules required for testing.
 
