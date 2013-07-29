@@ -16,12 +16,7 @@
 				// myLayout = $('body').layout(); -- syntax with No Options
 
 
-				$.get("README.md", function(data) {
-					//console.log($(data).html())
-					var converter = new Showdown.converter({extensions: ['github']});
-					$(".ui-layout-center").html(converter.makeHtml(data))
-				})
-
+			
 				$('body').layout({
 					north__size: 55
 					,north__spacing_open:		0
@@ -32,6 +27,13 @@
 				});
 
 				//resizeTreeSlider()
+
+				$.get("README.md", function(data) {
+					//console.log($(data).html())
+					var converter = new Showdown.converter({extensions: ['github']});
+					$(".ui-layout-center").html(converter.makeHtml(data))
+				})
+
 			})
 
 		</script>
