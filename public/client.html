@@ -7,17 +7,25 @@
 </head>
 
 <body style="margin: 100px;">
+			<style>
+				#output input {
+					background-color:transparent;
+					box-shadow:none;
+					height:20px; margin-bottom:2px;
+					padding-left:0;
+					font-size: inherit;
+				}
+				#output input:focus {
+					border:0;
+					box-shadow: none;
+					outline: none;
+				}
+			</style>
 			<pre id="output" style="height:300px; overflow:auto; font-size:12px;"></pre>
 
 			<div class="row-fluid">	
-				<div class="span6">
-					<form id="myForm" class="form-inline" onsubmit="return false;">
-						<input type="text" class="input-xlarge" style="width:70%; height:30px" name="command" placeholder="Enter Command" autocomplete="off">
-						<button id="execute" class="btn btn-primary">Go!</button>
-					</form>
-				</div>
-				<div class="span6">
-						<button id="kill" class="btn">Kill Process</button>
+				<div class="span12">
+						<button id="kill" class="btn">Kill Process (Control+C)</button>
 						<button id="reset" class="btn">Reset</button>						
 				</div>
 			</div>
