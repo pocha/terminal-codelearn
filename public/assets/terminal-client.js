@@ -16,7 +16,10 @@ var Client = function(){
 	}
 
 	socket.onmessage = function(e){
-		appendOutput(filter.toHtml(e.data));
+		//console.log(e.data)
+		data = e.data.replace("<","&lt;").replace(">","&gt;")
+		//console.log(data)
+		appendOutput(filter.toHtml(data));
 	}
 
 	socket.onclose = socket.onerror = function(){
@@ -78,7 +81,6 @@ timerFired = function (){
 
 function appendOutput(data){
 	//$('#output').append(data);
-	//console.log(data)
 	$("#output input").before(data)
 	$('#output').scrollTop($('#output').prop('scrollHeight'));
 }
