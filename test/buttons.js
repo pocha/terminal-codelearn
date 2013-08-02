@@ -3,63 +3,54 @@ require('./initialize-client');
 
 describe('Client terminal',function(){
 	before(function(done){
-		check(buttonDisabled,done);
+		check(function() { return !$("#output").text() },done);
+		initializeEnvironment();
 	});
 
 	it("should return '"+process.env.USER+"' when I send 'whoami'",function(done){
 		$("input[name='command']").val('whoami');
-		$('#execute').click();
+		keyPress(ENTER_KEY);
 		async.series([
 			function(callback){
-				check(buttonDisabled,callback);			
+				check(checkLength(2),callback);			
 			},
 			function(callback){				
-				result = $('#output').html().split("\n")[1];
+				result = $('#output').text().split("\n")[1];
 				result.should.match(new RegExp(process.env.USER));				
 				callback();		
 			}
 		],
 		function(){
-			$('#output').html('');
-			done();	
+			initializeEnvironment();
+			done()
 		});
 	});
 	
 	it("should stop the command execution when I press kill",function(done){
-		var buff = '';
 
 		async.series([
 			function(callback){
 				$("input[name='command']").val('sleep 100');
-				$('#execute').click();
-				setTimeout(callback,50);	
+				keyPress(ENTER_KEY);
+				check(function() { return !$("#output").text().match(/sleep 100/) }, function() { setTimeout(callback,2000) } );	
 			},
-			function(callback){
-				exec("ps -ef | grep 'sleep 100' | awk '{print $8"+'"\t"'+"$9}'",function(error,stdout,stderr){
-					buff += stdout;
-					callback();		
+			function(callback){			
+				exec("ps -ef | grep 'sleep 100' | grep -v grep",function(error,stdout,stderr){
+					stdout.should.match(/sleep\s*100/);
+					$('#kill').click();
+					check(checkLength(2),callback);	
 				});			
 			},
 			function(callback){				
-				var result = buff.split("\n")[0];
-				buff = "";				
-				result.should.match(/sleep\s*100/);				
-				$('#kill').click();
-				exec("ps -ef | grep 'sleep 100' | awk '{print $8"+'"\t"'+"$9}'",function(error,stdout,stderr){
-					buff += stdout;
-					callback();		
+				exec("ps -ef | grep 'sleep 100' | grep -v grep",function(error,stdout,stderr){
+					stdout.should.not.match(/sleep\s*100/);
+					callback()
 				});			
-			},
-			function(callback){				
-				var result = buff.split("\n")[0];
-				buff = "";				
-				result.should.not.match(/sleep\s*100/);
-				callback();
 			}
 		],
 		function(){
-			$('#output').html('');
-			done();	
+			initializeEnvironment();
+			done()
 		});
 		
 	});
@@ -71,44 +62,39 @@ describe('Client terminal',function(){
 		async.series([
 			function(callback){
 				$("input[name='command']").val('echo $$');
-				$('#execute').click();
-				check(buttonDisabled,callback);	
+				keyPress(ENTER_KEY);
+				check(checkLength(3),callback);	
 			},
 			function(callback){
-				pid1 = parseInt($('#output').html().split('\n')[1]);
+				pid1 = $('#output').text().split('\n')[1];
+				console.log("pid found - " + pid1)
 				$("input[name='command']").val('sleep 100 & sleep 1000 & sleep 10000 & whoami');
-				$('#execute').click();
-				check(buttonDisabled,callback);
-			},
-			function(callback){
-				$('#reset').click();
-				check(buttonDisabled,callback)			
+				keyPress(ENTER_KEY);
+				setTimeout(callback,2000);
 			},
 			function(callback){
 				exec("ps -ef | grep "+pid1,function(error,stdout,stderr){
-					buff += stdout;
-					callback();		
+					//stdout.split("\n").should.have.lengthOf(3);
+					$('#reset').click();
+					checkPromptPostReset(callback)
 				});			
 			},
 			function(callback){
-				buff.split("\n").should.have.lengthOf(3);
-				$('#output').html('');
 				$("input[name='command']").val('echo $$');
-				$('#execute').click();
-				check(buttonDisabled,callback);
+				keyPress(ENTER_KEY);
+				check(checkLength(2),callback);
 			},
 			function(callback){
-				pid2 = parseInt($('#output').html().split('\n')[1]);
-	
+				pid2 = parseInt($('#output').text().split('\n')[1]);
 				pid1.should.not.equal(pid2);				
 				callback();
 			}
 		],
 		function(){
-			$('#output').html('');
-			done();	
+			initializeEnvironment();
+			done()
 		});
-		
+
 	});
 
 });

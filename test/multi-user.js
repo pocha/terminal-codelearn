@@ -31,25 +31,24 @@ describe("Testing with right username & signature", function() {
 		SIGNATURE = hmac.digest('hex')
 
 		$('#reset').click();
-
-		check(buttonDisabled,done)
+		checkPromptPostReset(done,user)
 	})
 
 	it("should login as user",function(done) {
 		async.series([
 			function(callback){
 				$("input[name='command']").val('whoami');
-				$('#execute').click();
-				check(buttonDisabled,callback);	
+				keyPress(ENTER_KEY)
+				check(checkLength(2),callback);	
 			},
 			function(callback){
-				var result = $("#output").html().toString().split("\n");
+				var result = $("#output").html().split("\n");
 				result[1].should.match(new RegExp(USERNAME));
 				callback();
 			}
 			],
 			function(){
-				$('#output').html('');
+				initializeEnvironment();
 				done();	
 			});
 
@@ -59,17 +58,17 @@ describe("Testing with right username & signature", function() {
 		async.series([
 			function(callback){
 				$("input[name='command']").val('pwd');
-				$('#execute').click();
-				check(buttonDisabled,callback);	
+				keyPress(ENTER_KEY)
+				check(checkLength(2),callback);	
 			},
 			function(callback){
-				var result = $("#output").html().toString().split("\n");
+				var result = $("#output").text().toString().split("\n");
 				result[1].should.match(new RegExp('/home/' + USERNAME));
 				callback();
 			}
 			],
 			function(){
-				$('#output').html('');
+				initializeEnvironment();
 				done();	
 			});
 	})
@@ -78,7 +77,7 @@ describe("Testing with right username & signature", function() {
 		async.series([
 			function(callback){
 				$("input[name='command']").val('exit');
-				$('#execute').click();
+				keyPress(ENTER_KEY)
 				check(checkLength(4),callback);	
 			},
 			function(callback){
@@ -87,7 +86,7 @@ describe("Testing with right username & signature", function() {
 			}
 			],
 			function(){
-				$('#output').html('');
+				initializeEnvironment();
 				done();	
 			});
 	});
@@ -108,7 +107,7 @@ describe("Testing with correct user & incorrect signature", function() {
 
 	it("sockJS client should be inactive to start with", function(done) {
 		client1.readyState.should.equal(3);
-		$('#output').html('');
+		initializeEnvironment();
 		done()
 	})
 })
@@ -126,7 +125,7 @@ describe("Testing with incorrect user & correct signature", function() {
 	})
 
 	it("sockJS client should be inactive. User should see 'Unknown Id' message",function(done) {
-		$('#output').html().should.match(new RegExp('Unknown id: '+incorrect_user)); 
+		$('#output').text().should.match(new RegExp('Unknown id: '+incorrect_user)); 
 		client1.readyState.should.equal(3);
 		done()
 	})

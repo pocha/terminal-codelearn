@@ -22,7 +22,7 @@ require("../public/assets/ansi_to_html.js");
 require("../public/assets/terminal-client.js");
 
 GLOBAL.check = function (cond,callback){
-	console.log("output data - " + $("#output").html())
+	//console.log("output data - " + $("#output").text())
 	if(cond()){
 		setTimeout(function(){
 			check(cond,callback);
@@ -32,15 +32,36 @@ GLOBAL.check = function (cond,callback){
 	}
 };
 
-GLOBAL.buttonDisabled = function(){
-	return $('#execute').is(':disabled')
+GLOBAL.ENTER_KEY = 13
+GLOBAL.UP_KEY = 38
+GLOBAL.DOWN_KEY = 40
+GLOBAL.TAB_KEY = 9
+
+GLOBAL.keyPress = function(keycode) {
+	var e = jQuery.Event("keydown")
+	e.which = keycode
+	$("input[name='command']").trigger(e)
+}
+
+GLOBAL.initializeEnvironment = function() {
+	$("#output").contents().filter(function(){
+		return (this.nodeType == 3);
+	}).remove();
+
+	$("#output span").remove()
+	$("input[name='command']").val("")
+}
+
+GLOBAL.checkPromptPostReset = function(done,user) {
+	user = user || process.env.USER
+	check(function() { return !$("#output").text().match(new RegExp(user)) } ,done)			
 }
 
 GLOBAL.checkLength = function(len){
-	return function() { return ($('#output').html().split('\n').length < len) };
+	return function() { return ($('#output').text().split('\n').length < len) };
 }
 GLOBAL.checkMsgInOutput = function(msg) {
-	return function() { return $("#output").html().match(new RegExp(msg)) == null  }
+	return function() { return $("#output").text().match(new RegExp(msg)) == null  }
 }
 
 console.log("done")
