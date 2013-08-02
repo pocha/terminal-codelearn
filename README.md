@@ -10,7 +10,8 @@ The purpose of this app is **NOT** to emulate a true Terminal. It is designed to
 
 **Cons**
 
-- **Bash shortcuts do not work**  Bash shortcuts like tab autocomplete, previous/next command navigation using up/down arrow key etc does not work. The data is sent to the server only on 'enter' press & the response is populated in the output area.
+- **Bash shortcuts do not work**  ~~Bash shortcuts like tab autocomplete, previous/next command navigation using up/down arrow key etc does not work.~~ The data is sent to the server only on 'enter' press & the response is populated in the output area.
+  **Update** - Autocomplete works the native way now. Command navigation is handled on the javascript side so it does NOT persist across page load. Other complicated bash shortcuts wont work. 
 - **Can not run Vim/Emacs** Again since every keypress does not get reported, things simply hung while running Vim or Emacs.
 
 
