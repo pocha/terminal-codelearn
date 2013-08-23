@@ -32,7 +32,7 @@ var end_of_output = /(\$|>)\s*$/;
 		Socket = new Websocket(URL);
 
 		Socket.onopen = function() {	
-			Socket.send('');
+			Socket.send(JSON.stringify({user: '', signature:''}));
 			console.log("Client connected.")
 		};
 

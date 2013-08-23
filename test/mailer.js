@@ -1,4 +1,5 @@
-require('./common');
+require('./initialize-server');
+require('./initialize-client');
 
 describe('Mailer',function(){
 	it("should send a mail if I process a new error",function(done){
@@ -17,6 +18,8 @@ describe('Mailer',function(){
 			}
 		],
 		function(){
+			if(fs.existsSync('email.log'))
+					fs.unlinkSync('email.log');
 			done();	
 		});
 
