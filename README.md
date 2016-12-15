@@ -140,7 +140,7 @@ Install the modules required for testing.
 
 	npm install --dev
 
-Install [Mocha](http://visionmedia.github.io/mocha/) by
+Install [Mocha](http://mochajs.org/) by
 
 	npm install -g mocha
 
