@@ -1,4 +1,4 @@
-#Pseudo Linux Bash Terminal on Web#
+# Pseudo Linux Bash Terminal on Web
 
 The purpose of this app is **NOT** to emulate a true Terminal. It is designed to let website owners give a web based Pseudo Terminal to their users who can run linux commands.
 
@@ -21,7 +21,7 @@ Check the [live demo](http://pocha.github.io/terminal-codelearn). The app is cur
 
 > Note : Server side security is not covered as part of this app. You need to jail the Terminal user & limit his system privileges using /etc/security/limits.conf . 
 
-###Additional Features###
+### Additional Features
 
 
 **1. Multi user support**
@@ -51,7 +51,7 @@ This application logs all the errors in the `err.log` file.
 Also all the miscellaneous logs are logged in the `out.log` file.
 
 
-###Latency###
+### Latency
 
 **How-to run benchmark tests**
 
@@ -110,7 +110,7 @@ The X-axis of the graph gives the total number of concurrent users connected to 
 
 This graph measures the time taken upto 506 clients only. More than 506 clients are not able to connect because 'pty.js' modules gives error that 'forkpty(3) failed'.
 
-###Installation###
+### Installation
 
 Install the modules required to run the application.
 
@@ -134,7 +134,7 @@ Now you can start the server as daemon
 	forever start app.js
 
 
-###Mocha tests###
+### Mocha tests
 
 Install the modules required for testing.
 
